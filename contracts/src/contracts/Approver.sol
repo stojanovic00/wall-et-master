@@ -40,20 +40,17 @@ contract Approver {
      * @dev Deposit ERC-20 tokens to MultiSig contract
      * @param multiSigAddress The address of the MultiSig contract
      * @param txHash The transaction hash for the deposit
-     * @param token The ERC-20 token address
      * @param amount The amount of tokens to deposit
      */
     function depositTokenToMultiSig(
         address multiSigAddress,
         bytes32 txHash,
-        address token,
         uint256 amount
     ) public {
         require(multiSigAddress != address(0), "Invalid MultiSig address");
-        require(token != address(0), "Invalid token address");
         require(amount > 0, "Amount must be greater than 0");
 
-        IMultiSig(multiSigAddress).deposit(txHash, token, amount);
+        IMultiSig(multiSigAddress).depositToken(txHash, amount);
     }
 
     /**
@@ -70,12 +67,7 @@ contract Approver {
         uint256 depositAmount
     ) external {
         this.approveToken(token, multiSigAddress, depositAmount);
-        this.depositTokenToMultiSig(
-            multiSigAddress,
-            txHash,
-            token,
-            depositAmount
-        );
+        this.depositTokenToMultiSig(multiSigAddress, txHash, depositAmount);
     }
 
     /**

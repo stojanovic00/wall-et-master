@@ -46,7 +46,7 @@ contract ApproverTest is Test {
 
         // we need to propose something to get txhash
         vm.startPrank(signer1);
-        bytes32 txHash = multiSig.propose(address(0x999), 10, address(token));
+        bytes32 txHash = multiSig.proposeToken(address(0x999), 10, address(token));
         vm.stopPrank();
 
         //now we test a

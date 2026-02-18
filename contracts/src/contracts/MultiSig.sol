@@ -6,29 +6,30 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IMultiSig} from "../interfaces/IMultiSig.sol";
 
 /**
- * @title Storage
- * @dev Store & retrieve value in a variable
- * @custom:dev-run-script ./scripts/deploy_with_ethers.ts
+ * @title MultiSig
+ * @dev Multi-signature wallet contract
  */
 contract MultiSig is IMultiSig {
     // Validator addresses
-    mapping(address => bool) public signers;
+    mapping(address => bool) private signers;
 
     // Minimum number of signatures required for quorum
     uint256 public minSignatures;
 
-    event Propose(bytes32 txHash);
+    uint256 private nonce;
 
-    // Keccak256(Transaction) => bool
-    mapping(bytes32 => Transaction) public transactions;
-    mapping(bytes32 => mapping(address => bool)) public transactionSigners;
+    // Keccak256(Transaction) => Transaction
+    mapping(bytes32 => Transaction) private transactions;
+    mapping(address => mapping(bytes32 => bool)) private transactionSigners;
+
+    event Propose(bytes32 txHash);
 
     modifier onlySigner() {
         require(signers[msg.sender], "Only signers can call this function");
         _;
     }
 
-    /**
+    /*
      * @dev Constructor - sets up validators and minimum signatures
      * @param _signers Array of validator addresses
      * @param _minSignatures Minimum number of signatures required for quorum
@@ -36,54 +37,34 @@ contract MultiSig is IMultiSig {
     constructor(address[] memory _signers, uint256 _minSignatures) {
         require(_signers.length > 0, "Must have at least one signer");
         require(_minSignatures > 0, "Min signatures must be greater than 0");
-        require(
-            _minSignatures <= _signers.length,
-            "Min signatures cannot exceed signer count"
-        );
+        require(_minSignatures <= _signers.length, "Min signatures cannot exceed signer count");
 
         for (uint256 i = 0; i < _signers.length; i++) {
+            require(_signers[i] != address(0), "Invalid signer address");
+            require(!signers[_signers[i]], "Duplicate signer");
             signers[_signers[i]] = true;
         }
         minSignatures = _minSignatures;
     }
 
-    function getBalance() public view returns (uint256) {
-        return address(this).balance;
+    function depositNative(bytes32 txHash) external payable {
+        require(transactions[txHash].proposer != address(0), "Transaction not found");
+        require(transactions[txHash].native, "Transaction is not native");
+        transactions[txHash].balance += msg.value;
     }
 
-    function getBalance(bytes32 txHash) public view returns (uint256) {
-        return transactions[txHash].balance;
-    }
+    function depositToken(bytes32 txHash, uint256 amount) external {
+        require(transactions[txHash].proposer != address(0), "Transaction not found");
+        require(!transactions[txHash].native, "Transaction is not a token transaction");
 
-    function getBalance(address token) public view returns (uint256) {
-        IERC20 tokenContract = IERC20(token);
-        return tokenContract.balanceOf(address(this));
-    }
-
-    function deposit(bytes32 txHash, address token, uint256 amount) external {
-        require(
-            transactions[txHash].proposer != address(0),
-            "Transaction not found"
-        );
-
-        IERC20 tokenContract = IERC20(token);
+        IERC20 tokenContract = IERC20(transactions[txHash].token);
         tokenContract.transferFrom(msg.sender, address(this), amount);
         transactions[txHash].balance += amount;
     }
 
-    function deposit(bytes32 txHash) external payable {
-        require(
-            transactions[txHash].proposer != address(0),
-            "Transaction not found"
-        );
-        transactions[txHash].balance += msg.value;
-    }
-
-    function propose(
-        address to,
-        uint256 amount
-    ) external returns (bytes32 txHash) {
+    function proposeNative(address to, uint256 amount) external returns (bytes32 txHash) {
         require(to != address(0), "Invalid target address");
+        require(amount > 0, "Amount must be greater than 0");
 
         Transaction memory transaction = Transaction({
             to: to,
@@ -97,23 +78,17 @@ contract MultiSig is IMultiSig {
             balance: 0
         });
 
-        txHash = keccak256(
-            abi.encodePacked(to, amount, msg.sender, transaction.timestamp)
-        );
+        txHash = keccak256(abi.encodePacked(msg.sender, nonce++));
 
         transactions[txHash] = transaction;
         emit Propose(txHash);
         return txHash;
     }
 
-    function propose(
-        address to,
-        uint256 amount,
-        address token
-    ) external returns (bytes32 txHash) {
+    function proposeToken(address to, uint256 amount, address token) external returns (bytes32 txHash) {
         require(to != address(0), "Invalid target address");
+        require(amount > 0, "Amount must be greater than 0");
         require(token != address(0), "Invalid token address");
-        require(address(this).code.length > 0, "Contract not deployed");
 
         IERC20 tokenContract = IERC20(token);
         require(tokenContract.totalSupply() > 0, "Token not deployed");
@@ -130,72 +105,73 @@ contract MultiSig is IMultiSig {
             balance: 0
         });
 
-        txHash = keccak256(
-            abi.encodePacked(to, amount, msg.sender, transaction.timestamp)
-        );
+        txHash = keccak256(abi.encodePacked(msg.sender, nonce++));
 
         transactions[txHash] = transaction;
         emit Propose(txHash);
         return txHash;
     }
 
-    //sign
-
     function sign(bytes32 txHash) external onlySigner {
         Transaction storage transaction = transactions[txHash];
 
+        require(transaction.proposer != address(0), "Transaction not found");
         require(!transaction.executed, "Transaction already executed");
-        require(!transactionSigners[txHash][msg.sender], "Already signed");
+        require(!transactionSigners[msg.sender][txHash], "Already signed");
 
-        transactionSigners[txHash][msg.sender] = true;
+        transactionSigners[msg.sender][txHash] = true;
         transaction.signedCount++;
     }
-
-    //execute
 
     function execute(bytes32 txHash) external onlySigner {
         Transaction storage transaction = transactions[txHash];
         require(transaction.proposer != address(0), "Transaction not found");
-        require(
-            transaction.signedCount >= minSignatures,
-            "Not enough signatures"
-        );
+        require(transaction.signedCount >= minSignatures, "Not enough signatures");
         require(!transaction.executed, "Transaction already executed");
 
         if (transaction.native) {
-            require(
-                transaction.balance >= transaction.amount,
-                "Not enough balance"
-            );
+            require(transaction.balance >= transaction.amount, "Not enough balance");
+            require(address(this).balance >= transaction.amount, "Insufficient contract balance");
 
-            //TODO think about reentrancy
             transaction.executed = true;
-            (bool success, ) = transaction.to.call{value: transaction.amount}(
-                ""
-            );
+            (bool success,) = transaction.to.call{value: transaction.amount}("");
 
             require(success, "Execution failed");
         } else {
-            require(
-                transaction.balance >= transaction.amount,
-                "Not enough balance"
-            );
+            require(transaction.balance >= transaction.amount, "Not enough balance");
 
             IERC20 tokenContract = IERC20(transaction.token);
+            require(tokenContract.balanceOf(address(this)) >= transaction.amount, "Insufficient contract token balance");
 
             transaction.executed = true;
-            bool success = tokenContract.transfer(
-                transaction.to,
-                transaction.amount
-            );
+            bool success = tokenContract.transfer(transaction.to, transaction.amount);
 
             require(success, "Execution failed");
         }
     }
 
-    function getTransaction(
-        bytes32 txHash
-    ) external view returns (Transaction memory) {
+    function isSigner(address signer) public view returns (bool) {
+        return signers[signer];
+    }
+
+    function hasSignedTx(address signer, bytes32 txHash) public view returns (bool) {
+        return transactionSigners[signer][txHash];
+    }
+
+    function getTransaction(bytes32 txHash) external view returns (Transaction memory) {
         return transactions[txHash];
+    }
+
+    function getContractBalanceNative() public view returns (uint256) {
+        return address(this).balance;
+    }
+
+    function getTransactionBalance(bytes32 txHash) public view returns (uint256) {
+        return transactions[txHash].balance;
+    }
+
+    function getContractBalanceToken(address token) public view returns (uint256) {
+        IERC20 tokenContract = IERC20(token);
+        return tokenContract.balanceOf(address(this));
     }
 }

@@ -1,0 +1,44 @@
+{
+  // Solidity Language Server Configuration
+  "solidity.packageDefaultDependenciesContractsDirectory": "contracts",
+  "solidity.packageDefaultDependenciesDirectory": "contracts/lib",
+  "solidity.compileUsingRemoteVersion": "v0.8.30",
+  "solidity.formatter": "forge",
+  "solidity.defaultCompiler": "localNodeModule",
+
+  // Solidity Remappings (matches foundry.toml)
+  "solidity.remappings": [
+    "@openzeppelin/=contracts/lib/openzeppelin-contracts/",
+    "forge-std/=contracts/lib/forge-std/src/"
+  ],
+
+  // File associations
+  "files.associations": {
+    "*.sol": "solidity"
+  },
+
+  // Editor settings for Solidity
+  "[solidity]": {
+    "editor.defaultFormatter": "JuanBlanco.solidity",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true
+  },
+
+  // Search settings (exclude build artifacts)
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/contracts/out": true,
+    "**/contracts/cache": true,
+    "**/contracts/lib": true,
+    "**/extension/dist": true
+  },
+
+  // File watcher settings
+  "files.watcherExclude": {
+    "**/contracts/out/**": true,
+    "**/contracts/cache/**": true,
+    "**/contracts/lib/**": true,
+    "**/extension/node_modules/**": true
+  }
+}
