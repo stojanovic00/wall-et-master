@@ -90,7 +90,7 @@ const SendErc20Screen: React.FC<SendErc20ScreenProps> = ({ onBack, onTransaction
       const tokenAddressBook = getTokenAddressBook();
       let tokenInfo = tokenAddressBook[tokenAddress.trim()];
       if (!tokenInfo) {
-        let tokenInfo = await getTokenInfo(tokenAddress.trim());
+        tokenInfo = await getTokenInfo(tokenAddress.trim());
 
         if (tokenInfo) {
           addToTokenAddressBook(

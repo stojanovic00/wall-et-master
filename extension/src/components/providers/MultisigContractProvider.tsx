@@ -145,7 +145,6 @@ export const MultisigContractProvider: React.FC<
         throw new Error("Caller is not a signer of this multisig contract");
       }
       
-      // Send the transaction
       const tx = await contract["propose(address,uint256)"](to, amount);
       console.log("Transaction sent, hash:", tx.hash, "waiting for receipt...");
       const receipt = await tx.wait();
@@ -154,11 +153,20 @@ export const MultisigContractProvider: React.FC<
       }
 
       console.log("Transaction receipt:", receipt);
-      
-      // Get the transaction hash from the return value
-      const txHash = await contract["propose(address,uint256)"].staticCall(to, amount);
-      console.log("Transaction hash from return value:", txHash);
-      
+
+      let txHash: string | null = null;
+      for (const log of receipt.logs) {
+        try {
+          const parsed = contract.interface.parseLog(log);
+          if (parsed && parsed.name === "Propose") {
+            txHash = parsed.args[0];
+            break;
+          }
+        } catch {}
+      }
+      if (!txHash) throw new Error("Could not retrieve transaction hash from Propose event");
+      console.log("Transaction hash from Propose event:", txHash);
+
       return txHash;
     } catch (err: any) {
       console.error("Error in proposeNative:", err);
@@ -202,16 +210,24 @@ export const MultisigContractProvider: React.FC<
       );
       console.log("Transaction sent, hash:", tx.hash, "waiting for receipt...");
       const receipt = await tx.wait();
-      console.log("🚀 ~ receipt:", receipt);
       if (receipt.status !== 1) {
         throw new Error("Transaction failed with status: " + receipt.status);
       }
-      console.log(receipt);
-      
-      // Get the transaction hash from the return value
-      const txHash = await contract["propose(address,uint256,address)"].staticCall(to, amount, token);
-      console.log("Transaction hash from return value:", txHash);
-      
+      console.log("Transaction receipt:", receipt);
+
+      let txHash: string | null = null;
+      for (const log of receipt.logs) {
+        try {
+          const parsed = contract.interface.parseLog(log);
+          if (parsed && parsed.name === "Propose") {
+            txHash = parsed.args[0];
+            break;
+          }
+        } catch {}
+      }
+      if (!txHash) throw new Error("Could not retrieve transaction hash from Propose event");
+      console.log("Transaction hash from Propose event:", txHash);
+
       return txHash;
     } catch (err: any) {
       console.error("Error in proposeToken:", err);
@@ -387,8 +403,7 @@ export const MultisigContractProvider: React.FC<
 
       console.log("🚀 ~ receipt:", receipt);
 
-      // Revoke delegation after successful deposit
-      // await revokeDelegation(wallet);
+      await revokeDelegation(wallet);
 
       return true;
     } catch (err: any) {

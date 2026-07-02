@@ -99,34 +99,23 @@ const App = () => {
     timestamp: number;
   } | null>(null);
 
-  // Set initial screen based on wallet state
+  // Set initial screen based on wallet state; do not overwrite 'generated' screen
   useEffect(() => {
     if (!isLoading) {
-      if (wallet) {
+      if (wallet && currentScreen !== "generated") {
         setCurrentScreen("wallet");
-      } else if (isPasswordSet) {
+      } else if (!wallet && isPasswordSet) {
         setCurrentScreen("unlock");
-      } else {
+      } else if (!wallet && !isPasswordSet) {
         setCurrentScreen("setup");
       }
     }
-  }, [isLoading, wallet, isPasswordSet]);
+  }, [isLoading, wallet, isPasswordSet, currentScreen]);
 
   const handleGenerateWallet = async (password: string) => {
     try {
-      // Generate a new wallet directly
-      const { ethers } = await import("ethers");
-      const newWallet = ethers.Wallet.createRandom();
-
-      // Store the wallet data for display
-      setGeneratedWalletData({
-        privateKey: newWallet.privateKey,
-        address: newWallet.address,
-      });
-
-      // Call the provider's generateWallet to store it encrypted
-      await generateWallet(password);
-
+      const { privateKey, address } = await generateWallet(password);
+      setGeneratedWalletData({ privateKey, address });
       setCurrentScreen("generated");
     } catch (error) {
       console.error("Error generating wallet:", error);
@@ -162,8 +151,8 @@ const App = () => {
     }
   };
 
-  const handleLock = () => {
-    lockWallet();
+  const handleLock = async () => {
+    await lockWallet();
     setCurrentScreen("unlock");
   };
 

@@ -75,8 +75,9 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
   const [depositValue, setDepositValue] = useState("");
   const [depositTokenAddress, setDepositTokenAddress] = useState("");
 
-  // Sign/Execute form state
-  const [txId, setTxId] = useState("");
+  // Sign/Execute form state (separate so switching tabs doesn't pre-populate the other)
+  const [signTxId, setSignTxId] = useState("");
+  const [executeTxId, setExecuteTxId] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [loadingType, setLoadingType] = useState<"propose" | "deposit" | "sign" | "execute" | null>(null);
@@ -224,7 +225,21 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
         txHash = await proposeNative(to, ethers.parseEther(value));
       } else {
         if (!tokenAddress) return setError("Token address required");
-        txHash = await proposeToken(to, ethers.parseEther(value), tokenAddress);
+        const tokenBook = getTokenAddressBook();
+        let decimals = 18;
+        if (tokenBook[tokenAddress]) {
+          decimals = tokenBook[tokenAddress].decimals;
+        } else if (wallet?.provider) {
+          try {
+            const tokenContract = new ethers.Contract(
+              tokenAddress,
+              ["function decimals() view returns (uint8)"],
+              wallet.provider
+            );
+            decimals = Number(await tokenContract.decimals());
+          } catch {}
+        }
+        txHash = await proposeToken(to, ethers.parseUnits(value, decimals), tokenAddress);
       }
       if (!txHash) throw new Error("Failed to propose transaction");
       addMultisigTx(contractAddress, txHash);
@@ -319,31 +334,30 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
   const handleSign = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!txId) return setError("Transaction ID required");
+    if (!signTxId) return setError("Transaction ID required");
     setLoading(true);
     setLoadingType("sign");
     try {
-      // Save txId if not already saved and valid
       const existingTxs = getMultisigTxs(contractAddress);
-      if (!existingTxs.includes(txId)) {
-        const txData = await getTransactionData(txId);
+      if (!existingTxs.includes(signTxId)) {
+        const txData = await getTransactionData(signTxId);
         if (txData) {
-          addMultisigTx(contractAddress, txId);
+          addMultisigTx(contractAddress, signTxId);
         } else {
           throw new Error("Invalid transaction ID");
         }
       }
-      
-      const signResult = await sign(txId);
+
+      const signResult = await sign(signTxId);
       if (!signResult) {
         throw new Error("Transaction signing failed");
       }
-      
+
       onMultisigTransactionSuccess({
         transactionType: "sign",
-        txHash: txId,
+        txHash: signTxId,
         contractAddress,
-        transactionId: txId,
+        transactionId: signTxId,
         recipientAddress: undefined,
         amount: undefined,
         tokenAddress: undefined,
@@ -364,31 +378,30 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
   const handleExecute = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!txId) return setError("Transaction ID required");
+    if (!executeTxId) return setError("Transaction ID required");
     setLoading(true);
     setLoadingType("execute");
     try {
-      // Save txId if not already saved and valid
       const existingTxs = getMultisigTxs(contractAddress);
-      if (!existingTxs.includes(txId)) {
-        const txData = await getTransactionData(txId);
+      if (!existingTxs.includes(executeTxId)) {
+        const txData = await getTransactionData(executeTxId);
         if (txData) {
-          addMultisigTx(contractAddress, txId);
+          addMultisigTx(contractAddress, executeTxId);
         } else {
           throw new Error("Invalid transaction ID");
         }
       }
-      
-      const executeResult = await execute(txId);
+
+      const executeResult = await execute(executeTxId);
       if (!executeResult) {
         throw new Error("Transaction execution failed");
       }
-      
+
       onMultisigTransactionSuccess({
         transactionType: "execute",
-        txHash: txId,
+        txHash: executeTxId,
         contractAddress,
-        transactionId: txId,
+        transactionId: executeTxId,
         recipientAddress: undefined,
         amount: undefined,
         tokenAddress: undefined,
@@ -666,8 +679,8 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
                 <input
                   type="text"
                   className="input"
-                  value={txId}
-                  onChange={(e) => setTxId(e.target.value)}
+                  value={signTxId}
+                  onChange={(e) => setSignTxId(e.target.value)}
                   placeholder="Transaction ID"
                   list="sign-txid-list"
                 />
@@ -691,8 +704,8 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
                 <input
                   type="text"
                   className="input"
-                  value={txId}
-                  onChange={(e) => setTxId(e.target.value)}
+                  value={executeTxId}
+                  onChange={(e) => setExecuteTxId(e.target.value)}
                   placeholder="Transaction ID"
                   list="execute-txid-list"
                 />

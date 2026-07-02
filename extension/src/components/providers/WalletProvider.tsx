@@ -15,11 +15,11 @@ interface WalletContextType {
   address: string;
   isLoading: boolean;
   isPasswordSet: boolean;
-  generateWallet: (password: string) => Promise<void>;
+  generateWallet: (password: string) => Promise<{ privateKey: string; address: string }>;
   importWallet: (privateKey: string, password: string) => Promise<void>;
   clearWallet: () => Promise<void>;
   setPassword: (password: string) => Promise<void>;
-  lockWallet: () => void;
+  lockWallet: () => Promise<void>;
   unlockWallet: (password: string) => Promise<boolean>;
   signTransaction: (
     to: string,
@@ -136,22 +136,22 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     return bytes.toString(crypto.enc.Utf8);
   };
 
-  const generateWallet = async (password: string) => {
+  const generateWallet = async (password: string): Promise<{ privateKey: string; address: string }> => {
     try {
       setIsLoading(true);
       const newHDWallet = ethers.Wallet.createRandom();
       const newWallet = new ethers.Wallet(newHDWallet.privateKey);
 
-      // Connect wallet to Infura provider
       const connectedWallet = newWallet.connect(provider);
 
-      // Encrypt and store the private key
       await storeEncryptedWallet(newWallet.privateKey, password);
+      await setPassword(password);
 
       setWallet(connectedWallet);
       setAddress(connectedWallet.address);
-      setPassword(password);
       setIsPasswordSet(true);
+
+      return { privateKey: newWallet.privateKey, address: newWallet.address };
     } catch (error) {
       console.error("Error generating wallet:", error);
       throw error;
@@ -241,9 +241,12 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
 
   const setPassword = async (password: string) => {
     try {
-      // Store the password hash for verification (not the actual password)
       const passwordHash = crypto.SHA256(password).toString();
-      await chrome.storage.local.set({ passwordHash });
+      if (typeof chrome !== "undefined" && chrome.storage) {
+        await chrome.storage.local.set({ passwordHash });
+      } else {
+        localStorage.setItem("password_hash", passwordHash);
+      }
     } catch (error) {
       console.error("Error setting password:", error);
       throw error;
@@ -328,12 +331,11 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     }
   };
 
-  const lockWallet = () => {
+  const lockWallet = async () => {
     setWallet(null);
     setAddress("");
-    // Remove unlocked state and decrypted private key
     if (typeof chrome !== "undefined" && chrome.storage) {
-      chrome.storage.local.set({
+      await chrome.storage.local.set({
         isUnlocked: false,
         decryptedPrivateKey: null,
       });
@@ -457,7 +459,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
       throw new Error("No wallet loaded");
     }
     const balance = await wallet.provider?.getBalance(wallet.address);
-    if (!balance) {
+    if (balance === undefined || balance === null) {
       throw new Error("Failed to get balance");
     }
     return ethers.formatEther(balance);
@@ -525,21 +527,12 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
         gasPriceWei = ethers.parseUnits("20", "gwei");
       }
 
-      // Create transaction object
-      const tx = {
-        to: to,
-        value: amountWei,
-        gasPrice: gasPriceWei,
-        gasLimit: 210000, // Standard gas limit for ETH transfer
-        chainId: 11155111, // Sepolia chain ID
-      };
-
       const contract = new ethers.Contract(tokenAddress, Erc20Json.abi, wallet);
 
-      // Send the transaction directly (ethers will handle signing and broadcasting)
       const transaction = await contract["transfer(address,uint256)"](
         to,
-        amountWei
+        amountWei,
+        { gasPrice: gasPriceWei, gasLimit: 210000 }
       );
 
       // Wait for the transaction to be mined
