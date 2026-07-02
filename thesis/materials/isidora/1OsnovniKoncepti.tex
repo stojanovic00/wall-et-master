@@ -1,0 +1,627 @@
+\chapter{Osnovni koncepti}
+
+\section{Elementi dokaza nultog znanja} %mozda i Ključni koncepti dokaza nultog znanja
+U dokazima nultog znanja u\v cestvuju dve strane: dokaziva\v c i verifikator. Ukoliko se dokaziva\v c ili verifikator pridr\v zavaju protokola nultog znanja korektno, ka\v zemo da su po\v steni. Svaki dokaz nultog znanja neke tvrdnje mora zadovoljavati slede\' ca tri svojstva:
+\begin{enumerate}
+	\item \textbf{Kompletnost} - ukoliko je  tvrdnja ta\v cna, protokol sa nultim znanjem uvek vra\' ca {\it ta\v cno}. Bilo koji po\v steni dokaziva\v c \' ce ubediti bilo kog po\v stenog verifikatora u istinitost tvrdnje.
+	\item \textbf{Ispravnost} - ukoliko je  tvrdnja neta\v cna, teorijski je nemogu\' ce prevariti protokol nultog znanja da vrati {\it ta\v cno}. Ni jedan la\v zljivi dokaziva\v c ne mo\v ze prevariti ni jednog po\v stenog verifikatora da poveruje da je neta\v cna tvrdnja ta\v cna (postoji izuzetak zanemarivo male verovatno\' ce).
+	\item \textbf{Nulto znanje} - verifikator ne mo\v ze nau\v citi ni\v sta o tvrdnji osim njene istinitosti.
+\end{enumerate}
+
+\section{Tipovi dokaza nultog znanja}
+Dokazi nultog znanja mogu biti interaktivni ili neinteraktivni. Interaktivni dokazi uklju\v cuju uzajamnu komunikaciju izme\dj u dokaziva\v ca i verifikatora, dok neinteraktivni dozvoljavaju dokaziva\v cu da generi\v se jedan dokaz koji \' ce verifikator kasnije koristiti nezavisno od dokaziva\v ca.
+
+\subsection{Uvod u interaktivne dokaze}
+U svojoj osnovnoj formi dokazi nultog znanja su interaktivni i sastoje se iz tri elementa: svedoka, izazova i odgovora.
+
+\begin{enumerate}
+	\item \textbf{Svedok} - Dokaziva\v c \v zeli da doka\v ze znanje o nekoj skrivenoj informaciji verifikatoru. Ta skrivena informacija je {\it svedok} dokaza. Dokaziva\v c na osnovu znanja o svedoku pravi grupu pitanja na koje  mo\v ze odgovoriti samo strana koja ima znanje o skrivenoj informaciji. Dakle, dokaziva\v c zapo\v cinje proces dokazivanja tako \v sto nasumi\v cno bira pitanje, ra\v cuna odgovor i \v salje ga verifikatoru.
+	\item \textbf{Izazov} - Verifikator nasumi\v cno bira drugo pitanje i  pita dokaziva\v ca da mu odgovori.
+	\item \textbf{Odgovor} - Dokaziva\v c prihvata pitanje, ra\v cuna odgovor i vra\' ca ga verifikatoru. Na osnovu odgovora dokaziva\v ca, verifikator mo\v ze otkriti da li on ima skrivenu informaciju. Da bi se osigurao da dokaziva\v c ne naga\dj a odgovore, verifikator mo\v ze slati vi\v se pitanja. Pitanja \v salje sve dok ne bude smatrao da je verovatno\' ca da dokaziva\v c slu\v cajno poga\dj a ta\v cne odgovore dovoljno mala. 
+\end{enumerate}
+
+Slede\' ci primer demonstrira prethodno opisani postupak interaktivnih dokaza nultog znanja \cite{alibaba}.\\
+
+\begin{npra}[Pri\v ca o Ali Babinoj pe\' cini]
+	Nekada davno Ali Baba je jure\' ci lopove otkrio pe\' cinu koja je na ulazu razgranata na dva puta. Put $A$ i put $B$. Oba puta se na izgled zavr\v savaju \' corsokakom (slika \ref{pecina}). Ali zapravo putevi se nastavljaju jedan na drugi i pregra\dj eni su zidom koji se mo\v ze otvoriti samo uz pomo\' c \v carobnih re\v ci. \v Carobne re\v ci se generacijama prenose Ali Babinom porodicom. Vericin davni predak bio  je Ali Baba pa ona zna \v carobne re\v ci. Jednog dana odlu\v cila je da poka\v ze pe\' cinu Draganu i bila je \v sokirana kada joj je Dragan rekao da je on ve\' c bio tamo i da zna \v carobne re\v ci. Pitala ga je da joj ka\v ze koje su te re\v ci kako bi se uverila da Dragan ne blefira ali Dragan je previ\v se privatna osoba i nije \v zeleo da joj ka\v ze re\v ci direktno. Dogovorili su se da Verica \v ceka ispred pe\' cine dok se Dragan sakrije unutra,  nakon \v sto se Dragan sakrio Verica ne znaju\' ci put kojim je Dragan krenuo gromoglasno uzvikne jedan od dva mogu\' ca puta kojim \v zeli da se Dragan vrati nazad. Ukoliko je Verica izabrala put kojim Dragan nije u\v sao, Dragan bi morao da pro\dj e kroz tajni zid za \v sta bi morao znati \v carobne re\v ci. Nakon \v sto se Dragan sakrio i Verica viknula naziv puta, Dragan je do\v sao sa puta koji je Verica viknula. Verica mu isprva nije verovala da zna \v carobne re\v ci, mislila je da je Dragan pogodio put koji je ona viknula pa je tra\v zila da ponove eksperiment vi\v se puta. Nakon \v sto su ponovili eksperiment dosta puta Verica je priznala da Dragan zna \v carobne re\v ci jer je verovatno\' ca da je  nasumi\v cno pogodio put toliko puta za redom jako mala.  
+\end{npra}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.4\linewidth]{A.png}
+	\caption{Ali Babina pe\' cina}
+	\label{pecina}
+\end{figure}
+
+\subsection{Uvod u neinteraktivne dokaze}
+Iako su interaktivni dokazi nultog znanja  bili zna\v cajno otkri\' ce, potreba za konstantnom povezano\v s\' cu i interakcijom izme\dj u dve strane je zna\v cajno ograni\v cavala njihovu primenu. \v Cak i kada bi verifikator bio ube\dj en u znanje dokaziva\v ca dokaz bi bio nedostupan nekom drugom verifikatoru koji \v zeli da proveri istu informaciju. Kako bi se ovaj problem re\v sio predstavljeni su neinteraktivni dokazi nultog znanja u kojima verifikator i dokaziva\v c imaju deljeni klju\v c. \\
+Za razliku od interaktivnih dokaza, neinteraktivni zahtevaju jednokratnu komunikaciju izme\dj u verifikatora i dokaziva\v ca. Dokaziva\v c prosle\dj uje tajnu informaciju specijalnom algoritmu koji ra\v cuna dokaz nultog znanja. Dokaz se \v salje verifikatoru koji proverava da li dokaziva\v c zna tajnu informaciju koriste\' ci drugi algoritam. Jednom kada je dokaz izgenerisan on je dostupan i drugim verifikatorima koji imaju pristup deljenom klju\v cu i verifikacionom algoritmu. Pritom verifikator nije u stanju da rekonstrui\v se originalnu informaciju iz dokaza.\\
+Ovaj tip dokaza je posebno koristan u slu\v caju da je komunikacija izme\dj u strana ograni\v cena ili skupa. Neinteraktivni dokazi nultog znanja imaju dosta podtipova koji su prevas{}hodno razvijeni za razli\v cite potrebe primene.
+
+\section{Osnovne matemati\v cke definicije}
+U ovom delu rada su izlistane najvažnije definicije koje predstavljaju neophodnu matematičku pozadinu za razumevanje daljih koncepata\cite{neglf}.
+\begin{definition} 
+	Značajni skupovi stringova:
+	$$\{0,1\}^{n} = \{a_{1}a_{2}...a_{n}\ |\ a_{i}\in \{0,1\}\}$$
+	$$\{0,1\}^{*} = \{a_{1}a_{2}...a_{n}\ |\ a_{i}\in \{0,1\}\ \land \ n\in \mathbb{N}\}$$
+\end{definition}
+
+
+\begin{definition} 
+	Jezik $L$ predstavlja podskup od $\{0,1\}^{*}$ tj. $L \subseteq \{0,1\}^{*}$.
+\end{definition}
+
+
+\begin{definition} 
+	Neka su $f(n)$ i $g(n)$ funkcije sa ne-negativnim vrednostima. Kažemo da $g$ asimptotski ne raste br\v ze od $f$ ako: $${\mathcal {O}}(f)=\{g|g:\mathbb{N} \rightarrow \mathbb{R} ^{+},\exists c\in \mathbb{R} ^{+} , \exists n_{0}\in \mathbb{N} ,\forall n\geq n_{0}:g(n)\leq c\cdot f(n)\}$$
+\end{definition}
+
+\begin{definition}
+	Funkcija $f(n)$ je polinomijalno ograničena funkcija ako postoje konstanta $c>0$ i pozitivan celi broj $k$ takvi da:
+	$$f(n)={\mathcal {O}}(n^{k})$$
+\end{definition}
+
+Ovo znači da je funkcija $f(n)$ za dovoljno veliko $n$ ograničena odozgo polinomijalnom funkcijom $n^{k}$ pomnoženom konstantom $c$.
+
+\begin{definition}
+	Funkcija $\mu (x)$ je zanemarljiva funkcija ukoliko za svaku polinomijalno ograničenu funkciju $poly(n)$ postoji $N \in \mathbb{N}$ takvo da za svako $n > N$:
+	$$|\mu(n)|< \frac{1}{poly(n)}$$
+\end{definition}
+
+Zanemarljiva funkcija  $\mu (x)$ opada brže od inverzne vrednosti bilo koje polinomijalno ograničene funkcije pa kako $n$ raste, vrednosti $\mu(n)$ postaju toliko male da su gotovo zanemarljive. Skup zanemarljivih funkcija je zatvoren za operaciju množenja. Ova osobina je važna zato što se teži da verovatnoća uspeha napadača bude zanemarljiva funkcija, pa sve dok napadač ponavlja svoje pokušaje polinomijalno mnogo puta, on neće uspeti da stvori nezanemarljivu pretnju.
+
+\begin{definition}
+	Ako je dato $n$ nezavisnih događaja $X_{i}$, od kojih se svaki dešava sa verovatnoćom $\theta$, onda je ukupni broj uspešnih događaja obeležen sa $\sum_{i} X_{i}$ i prati binomnu distribuciju:
+	$$\Pr[X=k] = \left ({n \atop k}\right )\theta^{k}(1-\theta^{n-k})$$
+\end{definition}
+
+U tih $n$ pokušaja očekuje se da se desi $E[x]=n\theta$ događaja. Iz prethodne definicije može se proceniti verovatnoća da se ponavljanjem istog algoritma događaj izvrši uspešno kada ne treba.  Pa je verovatnoća da se događaj desi svaki put $\Pr[X=n] = \theta^{n}$. Ako je verovatnoća lažnog događaja $\theta \in$ [$0,1$) onda je $\Pr[X=n]$ zanemarljiva funkcija od $n$.
+
+\subsection{Problem kvadratnog ostatka}
+Problem kvadratnog ostatka se odnosi na određivanje da li je neki broj kvadratni ostatak po modulu $m$, odnosno da li postoji neki broj $x$ takav da je $x^{2} \equiv a \pmod  m$, bez poznavanja faktorizacije $m$. Broj $m$ je najčešće proizvod dva velika prosta broja. Ovaj problem je teško rešiti bez poznavanja faktorizacije, što je od suštinskog značaja za sigurnost određenih kriptografskih protokola.
+
+\begin{definition}
+	Neka je $Z_{m}^{*}$ celobrojni skup brojeva između $1$ i $m$ koji su relativno prosti sa $m$ (nemaju nijednog zajedničkog činioca osim jedinice). Element $a \in Z_{m}^{*}$ je kvadratni ostatak po modulu $m$ ukoliko važi $x^{2} \equiv a \pmod m$  za neko $x \in Z_{m}^{*}$, u suprotnom $a$ je kvadratni neostatak. 
+\end{definition}
+
+\begin{npra}
+	\label{kvost7i11}
+	Računanje kvadratnog ostatka brojeva $7$ i $11$:
+	\begin{itemize}
+		\item Pronalaženje kvadratnog ostatka po modulu $7$:\\
+		Kada je $x=0$, $x^{2} \pmod 7 = 0^{2} \pmod 7 = 0$\\
+		Kada je $x=1$, $x^{2} \pmod 7 = 1^{2} \pmod 7 = 1$\\
+		Kada je $x=2$, $x^{2} \pmod 7 = 2^{2} \pmod 7 = 4$\\
+		Kada je $x=3$, $x^{2} \pmod 7 = 3^{2} \pmod 7 = 2$\\
+		Kada je $x=4$, $x^{2} \pmod 7 = 4^{2} \pmod 7 = 2$\\
+		Kada je $x=5$, $x^{2} \pmod 7 = 5^{2} \pmod 7 = 4$\\
+		Kada je $x=6$, $x^{2} \pmod 7 = 6^{2} \pmod 7 = 1$\\
+		Pa su kvadratni ostaci po modulu $7: 1,2$ i $4$ dok su kvadratni neostaci $3,5$ i $6$. 
+		\item Pronalaženje kvadratnog ostatka po modulu $11$:\\
+		Kada je $x=0$, $x^{2} \pmod{11} = 0^{2} \pmod{11} = 0$\\
+		Kada je $x=1$, $x^{2} \pmod{11} = 1^{2} \pmod{11} = 1$\\
+		Kada je $x=2$, $x^{2} \pmod{11} = 2^{2} \pmod{11} = 4$\\
+		Kada je $x=3$, $x^{2} \pmod{11} = 3^{2} \pmod{11} = 9$\\
+		Kada je $x=4$, $x^{2} \pmod{11} = 4^{2} \pmod{11} = 5$\\
+		Kada je $x=5$, $x^{2} \pmod{11} = 5^{2} \pmod{11} = 3$\\
+		Kada je $x=6$, $x^{2} \pmod{11} = 6^{2} \pmod{11} = 3$\\
+		Kada je $x=7$, $x^{2} \pmod{11} = 7^{2} \pmod{11} = 5$\\
+		Kada je $x=8$, $x^{2} \pmod{11} = 8^{2} \pmod{11} = 9$\\
+		Kada je $x=9$, $x^{2} \pmod{11} = 9^{2} \pmod{11} = 4$\\
+		Kada je $x=10$, $x^{2} \pmod{11} = 10^{2} \pmod{11} = 1$\\
+		Pa su kvadratni ostaci po modulu $11: 1,3,4,5$ i $9$ dok su kvadratni neostaci $2,6,7,8$ i $10$. Brojevi koji su kongruentni nuli nisu ni kvadratni ostaci ni kvadratni neostaci.
+	\end{itemize}
+\end{npra}
+
+Nerešivost problema kvadratnog ostatka u polinomijalnom vremenu predstavlja temelj sigurnosti brojnih konstrukcija u kriptografiji, uključujući sisteme za šifrovanje sa javnim ključem, generatore pseudonasumičnih brojeva, kao i neke od kriptografskih protokola. Ukoliko bi se pronašao efikasan algoritam koji radi u polinomijalnom vremenu koji bi rešio pitanje kvadratnog ostatka po modulu $m$, bez poznavanja faktorizacije broja $m$, došlo bi do velikih iskoraka u teoriji brojeva i rešavanja otvorenih problema koji se protežu već dugi niz godina.
+
+\begin{definition}
+	\label{defLez}
+	Neka je $p$ neparan prost broj i $x$ kvadratni ostatak po modulu $p$, Ležandrov \footnote{\textenglish{Adrien-Marie Legendre(1752-1833)} je bio francuski matematičar i astronom, poznat po Ležandrovim polinomima i Ležandrovoj transformaciji. Izračunao je putanju kometa upotrebljavajući metod najmanjeg kvadrata, do koga je došao nezavisno od Gausa.} simbol je funkcija od $x$ i $p$ definisana na sledeći način:
+	\[  \left ( \frac{x}{p} \right ) = \left\{
+	\begin{array}{ll}
+		1 & ako\ je\ x\ kvadratni\ ostatak\ po\ modulu\ p\ i\ x\ \not\equiv\ 0\pmod p \\
+		-1 & ako\ je\ x\ kvadratni\ neostatak\ po\ modulu\ p\\
+		0 & ako\ je\ x\ \equiv\ 0\pmod p  \\
+	\end{array} 
+	\right. \]
+\end{definition}
+
+\begin{definition}
+	Za svako $x \in \mathbb{N}$ i za svaki pozitivan neparan celobrojni $m$, Jakobijev\footnote{\textenglish{Carl Gustav Jacobi (1804-1851)} je bio nemački matematičar koji je razvio teoriju eliptičkih funkcija, dao je veliki doprinos razvoju teorije brojeva, diferencijalnog i integralnog računa. Mnogi pojmovi u matematici nose njegovo ime: Jakobijev simbol, Jakobijan, Jakobijeve eliptičke funkcije, Jakobijeva transformacija, Jakobijevi polinomi...} simbol $\left ( \frac{x}{m} \right )$ je definisan kao proizvod Ležandrovih simbola koji odgovaraju faktorizaciji na proste faktore od $m$:
+	$$\left (\frac{x}{m} \right )= \left ( \frac{x}{p_{1}} \right ) ^{\alpha_{1}} \left ( \frac{x}{p_{2}} \right ) ^{\alpha_{2}} \dots \left ( \frac{x}{p_{k}} \right ) ^{\alpha_{k}}$$
+	gde je $m = p_{1}^{\alpha_{1}}p_{2}^{\alpha_{2}}...p_{k}^{\alpha_{k}}$.
+\end{definition}
+
+Jakobijev simbol je nastao generalizacijom Ležandrovog simbola. Ukoliko je $m$ neparan prost broj, Jakobijev simbol $\left ( \frac{x}{m} \right )$ je jednak Ležandrovom simbolu. Kao kod Ležandrovog simbola, ukoliko je $\left (\frac{a}{m} \right )=-1$ onda je $a$ kvadratni neostatak po modulu $n$ ali ako je $\left (\frac{a}{m} \right )=1$, $a$ može i ne mora biti kvadratni ostatak.
+
+\begin{npra}
+	\label{primer77}
+	Računanje kvadratnog ostatka broja $5$ po modulu $77$:
+	$$\left (\frac{5}{77} \right ) = \left (\frac{5}{7} \right )\left (\frac{5}{11} \right )$$
+	Iz primera \ref{kvost7i11} poznato je da je broj $5$ kvadratni neostatak po modulu $7$ i kvadratni ostatak po modulu $11$, pa se na osnovu definicije \ref{defLez} može zaključiti:
+	$$\left (\frac{5}{77} \right ) = -1 \cdot 1 = -1$$
+	Pa je $5$ kvadratni neostatak po modulu $77$.
+\end{npra}
+
+
+\chapter{Kriptografski značaj}
+Matematika kriptografije je inicirana primenama u stvarnom svetu. Najosnovnija i prvobitna primena  je želja da se privatno komunicira u prisustvu prisluškivača koji osluškuje komunikaciju. Sa pojavom računara kao sredstva za komunikaciju, pojavljuju se brojne druge primene, od verifikacije autentičnosti podataka i pristupnih privilegija do omogućavanja složenih finansijskih transakcija preko interneta koje uključuju više strana, od kojih svaka ima svoje poverljive informacije.
+
+\section{Upotreba dokaza nultog znanja u kriptografiji}
+
+\textenglish{Goldreich, Micali} i \textenglish{Wigderson} su u radu \textenglish{\it How to Prove All NP Statements in Zero-Knowledge} 1987. godine dokazali da se za svaki problem iz \textenglish{NP} klase problema može konstruisati dokaz nultog znanja\cite{inproceedings}. Ova činjenica nameće dokaze nultog znanja kao veoma moćan alat u modernoj kriptografiji. Veza kriptografije i dokaza nultog znanja nalazi se u konceptu zaštite poverljivih informacija i osiguravanja bezbednosti podataka. Kriptografija omogućava alate za zaštitu informacija, dok dokazi nultog znanja pružaju sigurnu proveru tih informacija bez otkrivanja poverljivih podataka. Dokazi nultog znanja koriste se kao metoda za očuvanje sigurnosti i poverljivosti u teorijskim osnovama kriptografije, u zadacima poput generatora pseudo-nasumičnih brojeva i  enkripcije. Na primer, dokazi nultog znanja omogućavaju dokazivanje autentičnosti podataka bez otkrivanja samih podataka u složenim finansijskim transakcijama u koje je uključeno više strana sa svojim sopstvenim poverljivim informacijama\cite{goldwasser2002mathematicalfoundationsmoderncryptography}.\\
+
+Dokazi nultog znanja su uveli jedinstven pristup u oblasti kriptografije i izdvojili su se od drugih kriptografskih protokola koji su usmereni na privatnost u distribuiranim sistemima. U tabeli \ref{tab1}, dokazi nultog znanja su upoređeni sa kriptografskim metodama homomorfnog šifrovanja i sigurnih višestranih proračuna (\textenglish{Secure Multiparty Computation}). Svi ovi metodi za svrhu imaju verifikaciju informacija i očuvanje privatnosti\cite{lavin2024surveyapplicationszeroknowledgeproofs}. Homomorfno šifrovanje omogućava izvođenje proračuna nad šifrovanim podacima bez potrebe za dešifrovanjem\cite{HE}. Dok sigurnosni višestrani proračuni omogućavaju nepoverljivu saradnju više strana koje zajedno računaju zadatu funkciju preko njihovih ulaza koji ostaju privatni\cite{4568388}. 
+
+% Please add the following required packages to your document preamble:
+% \usepackage{graphicx}
+\begin{table}[H]
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{|p{0.1\linewidth}|p{0.3\linewidth}|p{0.3\linewidth}|p{0.3\linewidth}|}
+			\hline
+			Metod & Univerzalnost                                                                                                   & Sigurnosne \newline pretpostavke & Kompleksnost \newline proračuna \\
+			\hline
+			\hline
+			\rotatebox{90}{ Znanja } \newline \rotatebox{90}{Dokazi Nultog}  & Pruža širok spektar protokola koji podržava raznovrsne funkcije, od autentifikacije do pametnih ugovora. \newline &  Oslanja se na složenost kreiranja dokaza bez izlaganja osetljivih podataka.                       &  Pri kreiranju dokaza kompleksnost može biti velika ali je pri verifikaciji ona izražena u polinomijalnom vremenu.                       \\ \hline
+		 \rotatebox{90}{Šifrovanje } \newline  \rotatebox{90}{Homomorfno }    &   Omogućava bezbedne proračune nad šifrovanim podacima, idealan je za uslove računarstva u  oblaku.   \newline   \newline  &   Zavisi od šeme koja se koristi, što su algebarski izazovi u šemi kompikovaniji to je metod sigurniji.                     &      Koristi složene algebarske operacije i održava homomorfizam nad šifrovanim podacima.                   \\ \hline
+			\rotatebox{90}{ Proračuni } \newline \rotatebox{90}{Sigurnosni Višestrani}   & Usmeren je na kolaborativne zadatke, u kojima pojedinačne strane ne otkrivaju individuelne podatke.    &  Sigurnost se zasniva na poštenoj većini unutar grupe učesnika.                        &      Zavisi od složenosti protokola i broja učesnika. Svaki učesnik izvršava proračune nad svojim i nad podacima drugih učesnika.                \\ \hline
+		\end{tabular}%
+	}
+	\caption{Poređenje kriptografskih metoda}
+	\label{tab1}
+\end{table}
+
+\section{\textenglish{Goldwasser–Micali} kriptografski sistem}
+U tradicionalnoj računarskoj složenosti ili složenosti komunikacije, cilj je da se prenese što je moguće više znanja na što efikasniji način. Budući da se svi učesnici smatraju dobrim prijateljima, ne vodi se računa o tome ako se prenese više informacija nego što je neophodno. Međutim, situacija u vezi sa kriptografskim protokolima značajno se razlikuje. U ovom slučaju, efikasnost prenosa znanja nije problem, već je ključni izazov osigurati da se ne prenese previše informacija. Kriptografski sistem koji će biti posmatran u nastavku uvodi bitne koncepte za ovu problematiku\cite{quadResCrpt}.\\
+
+\textenglish{Goldwasser–Micali} kriptografski sistem je algoritam sa enkripcijom\\ asimetričnog ključa razvijen od strane  \textenglish{Shafi Goldwasser i Silvio Micali} 1982 godine. Ovo je jedan od prvih kriptosistema koji formalno definiše i dostiže semantičku sigurnost. \textbf{Semantička sigurnost} garantuje da napadač iz šifrovane poruke ne može izvući nikakvo znanje o originalnoj poruci\cite{CRPTsytGM10.1145/800070.802212}.
+
+ \begin{definition}
+ 	Šema za šifrovanje je semantički sigurna ako za svaki algoritam $A$ koji se izvršava u polinomijalnom vremenu, postoji algoritam $B$ koji se takođe izvršava u polinomijalnom vremenu takav da, za svake dve funkcije $f,\ h\ :\ \{0,1\}^{*} \rightarrow \{0,1\}^{*}$ i sve sekvence parova $(X_{n},z_{n})_{n \in \mathbb{N}}$, gde je $X_{n}$ nasumična promenljiva koja uzima vrednosti iz skupa $\{0,1\}^{n^{2}}$ i $|z_{n}|$ je ograničena nekom polinomijalnom funkcijom u odnosu na parametar $n$, važi:
+ 	$$\Pr[A(E(X_{n})h(X_{n}),z_{n})\ =\ f(X_{n})]\ < \ \Pr[B(h(X_{n}),z_{n})\ =\ f(X_{n})] + \mu(n)$$
+ 	gde je $\mu$ zanemarljiva funkcija.
+ \end{definition}
+ 
+Ovaj kriptografski sistem se koristi za šifrovanje pojedinačnih bitova i  temelji se na problemu kvadratnog ostatka. Postupak šifrovanja je probabilistički, što znači da svaki put kada se šifruje isti bit dobije se drugačiji šifrat. {\bf Probabilističko šifrovanje} se postiže uvođenjem nasumičnog odabira brojeva prilikom šifrovanja i omogućava da se prilikom šifrovanja istog bita više puta dobija različiti šifrat\cite{CRYPTOgoldreich2001foundations}\cite{GOLDWASSER1984270}.\\
+
+\textenglish{Goldwasser–Micali} kriptografski sistem sadrži tri algoritma:
+\begin{itemize}
+	\item {\bf Generisanje ključeva}
+	\begin{enumerate}
+		\item Nasumično i nezavisno jedan od drugog generišu se dva velika prosta broja $p$ i $q$.
+		\item Računa se $m = p \cdot q$.
+		\item Odabira se broj $y$, takav da nije kvadratni ostatak po modulu $m$.
+		\item Javni ključ dobija vrednost $(m,y)$,
+		\item Privatni ključ postaje faktorizacija $(p,q)$
+	\end{enumerate}
+	\item {\bf Šifrovanje poruke}
+	\begin{enumerate}
+		\item Prilikom šifrovanja poruke $b$ potrebno je prvo izdeliti poruku na bite $(b_{1},b_{2},...,b_{n})$.
+		\item Za svaki bit $b_{i}$ bira se nasumičan broj $r_{i}$ iz skupa $\{1,2,...,m-1\}$ i na osnovu njega se računa  šifrat $c=(c_{1},c_{2},...,c_{n})$ po sledećim pravilima:
+		\begin{itemize}
+			\item Ako je $b_{i}=0$, šifrat je   $c_{i}\equiv r_{i}^{2} \pmod m$, odnosno kvadratni ostatak.
+			\item Ako je $b_{i}=1$, šifrat je   $c_{i}\equiv r_{i}^{2}\cdot y \pmod m$, odnosno kvadratni neostatak.
+		\end{itemize}
+	\end{enumerate}
+	\item {\bf Dešifrovanje poruke}\\
+	Dešifrovanje poruke se vrši korišćenjem privatnog ključa $(p,q)$ kako bi se odredilo da li je šifrat $c$ kvadratni ostatak po modulu $m$. Ako je $c_{i}$ kvadratni ostatak, bit poruke je $b_{i} = 0$, ako nije, bit poruke je $b_{i}=1$. 
+\end{itemize}
+
+
+\begin{npra}
+	\label{GMprm}
+	Ovaj primer demonstrira \textenglish{Goldwasser–Micali} kriptosistem, u primeru ključ nije generisan sa velikim prostim brojevima radi jednostavnije demonstracije algoritma.
+	\begin{itemize}
+		\item Neka su $p=7$ i $q=11$ prosti brojevi koji će se koristiti za generisanje ključeva. Iz primera \ref{primer77} poznato je da je $5$ kvadratni neostatak po modulu $77$. Za javni ključ postavlja se par $(5,77)$, dok je privatni ključ $(7,11)$.
+		\item Neka je poruka koja se enkriptuje $m_{1}m_{2}m_{3}=101$. I neka su za svaki bit izabrani nasumični brojevi $b_{1}=2$,$b_{2}=9$ i $b_{3}=4$ na osnovu kojih se računaju šifrati na sledeći način:
+		\begin{itemize}
+			\item[-] $c_{1}\equiv 2^{2}\cdot 5 \pmod{77} = 20 \pmod{77}$
+			\item[-] $c_{2}\equiv 9^{2} \pmod{77} = 4 \pmod{77}$
+			\item[-] $c_{3}\equiv 4^{2}\cdot 5 \pmod{77} = 3 \pmod{77}$
+		\end{itemize}
+		\item Poruka se šalje u obliku $(c_{1},c_{2},c_{3})$ i može se dešifrovati na sledeći način:
+		\begin{itemize}
+			\item[-] $\left (\frac{20}{77} \right ) = \left (\frac{77}{20} \right ) = \left (\frac{17}{20} \right ) = \left (\frac{20}{17} \right ) = \left (\frac{3}{17} \right ) = -1\ \rightarrow$ prvi bit je 1.
+			\item[-] $\left (\frac{4}{77} \right ) = \left (\frac{4}{7} \right ) \left (\frac{4}{11} \right ) = 1\cdot1 = 1\ \rightarrow$ prvi bit je 1 ili 0. Pa se na osnovu Jakobijevog simbola ne može sa sigurnošću odrediti kvadratni ostatak, ali je trivijalno da važi $2^{2} \equiv 4 \pmod{77}$ pa je u pitanju kvadratni ostatak, tj. ovaj bit jednak je nuli.
+			\item[-] $\left (\frac{3}{77} \right ) = \left (\frac{3}{7} \right )\left (\frac{3}{11} \right ) = -1 \cdot 1 = -1\ \rightarrow$ treći bit je 1.
+		\end{itemize}
+	\end{itemize}
+	Nakon dešifrovanja šifrovane poruke dobijena je ista poruka kao originalna "101".
+\end{npra}
+
+Iz primera \ref{GMprm} se može naslutiti koliko bi kompleksan ovaj algoritam bio za ogromne proste brojeve. Pored toga ovaj algoritam nije naročito efikasan u slučaju šifrovanja velikih poruka, jer bi šifrovao svaki bit ponaosob. Pa upravo zbog svoje neefikasnosti, ovaj algoritam nije široko korišćen u praksi. Iako nepraktičan za svakodnevnu upotrebu, ovaj algoritam je jako značajan zbog svojih teorijskih osnova i omogućavanja semantičke sigurnosti. Pored toga ovaj kriptosistem je uveo termin probabilističkog šifrovanja koji je bitan jer je većina ranijih kriptografskih sistema bila deterministička, odnosno iste poruke bi uvek rezultirale istim šifratom, pa je bilo lakše hakovati ih.\\
+Ovaj kriptosistem je postavio temelj za dalji razvoj modernih kriptografskih sistema. Neki od kriptografskih sistema inspirisanih \textenglish{Goldwasser–Micali} kriptosistemom su \textenglish{Paillier} sistem za šifrovanje, Homomorfni kriptosistemi, probabilistički šifrovački sistemi, sistemi bazirani na teoriji brojeva kao i sistemi sa nultim znanjem.
+
+\chapter{Interaktivni dokazi}
+
+Tjuringova mašina, koju je 1936. godine uveo engleski matematičar i logičar \textenglish{Alan M. Turing}\footnote{\textenglish{Alan Mathison Turing}(1912-1954) je bio engleski logičar, matematičar i kriptograf, formalizovao je koncept algoritma i izračunavanja na Tjuringovoj mašini, smatra se ocem modernog računarstva\cite{BeaversManuscript-BEAATM}.}, predstavlja idealizovani matematički model koji redukuje logičku strukturu bilo kog računarskog uređaja na njegove osnovne elemente. Sastoji se od beskonačno duga\v cke trake, glave koja može izvoditi različite operacije na traci, i kontrolnog mehanizma u glavi koji može pohranjivati upute iz konačnog skupa instrukcija. Traka je podeljena na kvadrate, od kojih je svaki prazan ili na njemu mo\v ze pisati jedan od konačnog broja simbola. Glava trake može se kretati po traci, čitati, pisati, brisati simbole i menjati unutrašnje stanje mašine. Rezultat rada mašine, tj. rešenje matematičkog problema, može se pročitati kada se mašina zaustavi.
+
+\section{Sistemi za dokazivanje u \textenglish{\textenglish{NP} } klasi}
+Pre samih dokaza nultog znanja razli\v cite tvrdnje u ra\v cunarstvu su bile dokazivane. Uspostavljanjem komunikacije izme\dj u Tjuringovih ma\v sina dokazivani su \textenglish{NP}  problemi dati slede\' com definicijom.
+
+\begin{definition}
+	\textenglish{Nondeterministic Polynomial time (\textenglish{NP} )} je klasa problema za koje se mo\v ze proveriti da li postoji re\v senje u polinomijalnom vremenu uz pomo\' c nedeterminizma.
+\end{definition}
+
+Sistemi za dokazivanje u \textenglish{NP}  klasi se sastoje od dve Tjuringove ma\v sine $A$ i $B$ (slika \ref{nptm}), respektivno dokaziva\v c i verifikator, koje me\dj usobno komuniciraju. Dokaziva\v c je ma\v sina koja radi u eksponencijalnom vremenu, a verifikator ma\v sina koja radi u polinomijalnom vremenu. Obe ma\v sine su deterministi\v cke, \v citaju zajedni\v cki ulaz i me\dj usobno komuniciraju na vrlo jednostavan na\v cin koji se sastoji iz slede\' cih koraka.
+\begin{itemize}
+	\item Na zajedni\v cki ulaz dokaziva\v ca $A$ i verifikatora $B$ sti\v ze string $x$ koji pripada $\textenglish{NP} $ jeziku $L$.
+	\item Dokaziva\v c $A$ izra\v cunava string $y$. Du\v zina stringa $y$ je ograni\v cena polinomom u odnosu na du\v zinu stringa $x$.
+	\item Dokaziva\v c $A$ zapisuje string $y$ na posebnu traku sa koje verifikator $B$ mo\v ze da \v cita.
+	\item Verifikator $B$ proverava da li je ispunjeno $f_{L}(y)=x$, gde je $f_{L}$ funkcija koja se mo\v ze izra\v cunati u polinomijalnom vremenu u odnosu na jezik $L$. Ako je uslov ispunjen verifikator zaustavlja rad i prihvata string $x$ kao validan. 
+\end{itemize}
+
+Ovim postupkom se na jednostavan na\v cin mo\v ze proveriti ispravnost potencijalnog re\v senja slo\v zenog problema u polinomijalnom vremenu. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.67\linewidth]{npTM.jpg}
+	\caption{Sistem za dokazivanje u \textenglish{NP}  klasi}
+	\label{nptm}
+\end{figure}
+
+\begin{npra}
+	Jedan od klasi\v cnih $\textenglish{NP} $ problema je SAT problem ili problem zadovoljivosti. To je problem odlu\v civanja koji za zadati bulovski izraz određuje da li postoji neka dodela vrednosti $\top$ i $\bot$  tako da ceo izraz ima vrednost $\top$. Bulovski izraz je sa\v cinjen samo iz operatora $\wedge$, $\vee$, $\neg$, zagrada i promenljivih.
+\end{npra}
+
+Za razliku od \textenglish{NP}  dokaza koji su ograni\v ceni prethodno opisanim na\v cinom komunikacije, u radu \cite{mathBook} definisan je novi koncept dokaza koji prevazilazi okvire dokaza koji se mogu napisati na papiru. Interaktivni dokazi bele\v ze dosta op\v stiji na\v cin komunikacije dokaza. Ideja je bila napraviti dokazni sistem koji se mo\v ze nositi sa dokazima koji se mogu objasniti u u\v cionici gde predavač ima mogućnost da interaguje sa primaocima dokaza. Takođe primaoci dokaza mogu postavljati pitanja i dobijati odgovore od dokazivača. Dokazi koji se zapisuju bez potrebe za ikakvom interakcijom su dosta kompleksniji od interaktivnih dokaza jer oni moraju odgovoriti na svako moguće pitanje koje bi bilo ko mogao da postavi unapred. Kontinuirana interakcija prilikom dokazivanja u mnogome olakšava dokazivanje.
+\subsection{Interaktivna Tjuringova ma\v sina}
+
+
+Kako bi se uveli interaktivni dokazi potrebno je proširiti standardnu Tjuringovu mašinu. U nastavku je prikazan koncept interaktivne Tjuringove mašine.
+\begin{definition}
+	Interaktivna Tjuringova mašina (\textenglish{ITM}) je Tjuringova mašina koja sadrži sledeće trake:
+	\begin{itemize}
+		\item Ulazna traka - traka sa koje se samo čita, na nju pristižu ulazni podaci.
+		\item Radna traka - traka za obradu i privremeno skladištenje podataka tokom rada mašine.
+		\item Nasumična traka - traka koja predstavlja jedini izvor nasumičnosti za mašinu. Sadrži beskonačnu sekvencu nasumičnih bitova koja se uvek čita sa leva na desno. Kada se kaže da \textenglish{ITM} baca novčić, to znači da se sa nasumične trake čita sledeći bit.
+		\item Komunikaciona traka za čitanje - traka koju \textenglish{ITM} koristi za čitanje podataka koji pristižu od neke druge mašine.
+		\item Komunikaciona traka za pisanje - traka koju \textenglish{ITM} koristi za pisanje podataka koje šalje drugoj mašini.
+	\end{itemize}
+\end{definition}
+
+\begin{definition}
+	Dve \textenglish{ITM}  $A$ i $B$  čine interaktivni, uređeni par Tjuringovih ma\v sina $(A,B)$ koje zadovoljavaju slede\' ca svojstva:
+	\begin{itemize}
+		\item \textenglish{ITM} $A$ i $B$ dele istu ulaznu traku
+		\item Komunikaciona traka za čitanje \textenglish{ITM} $B$ je komunikaciona traka za pisanje \textenglish{ITM} $A$ i obrnuto.
+	\end{itemize}
+\end{definition}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.67\linewidth]{ITMS.jpg}
+	\caption{Interaktivni uređeni par Tjuringovih mašina  $(A,B)$}
+\end{figure}
+
+\subsection{Komunikacija para interaktivnih Tjuringovih mašina}
+ Kod parova interaktivnih Tjuringovih mašina je najbitnije međusobno povezano delovanje dve ma\v sine a ne izvršenje samo jedne mašine. Stoga je lakše opisati ponašanje para \textenglish{ITM}-ova nego jedne mašine. Pre opisa komunikacije para \textenglish{ITM}-ova dat je pregled osobina koje par \textenglish{ITM}-ova treba ispunjavati:
+\begin{itemize}
+	\item Ekskluzivnost, tako da, pre završetka, tačno jedna od dve mašine radi u bilo kom trenutku.
+	\item Privatnost, tako da svaka od dve mašine može zadržati deo informacija za sebe.
+	\item Komunikacija, tako da svaka od dve mašine može odlučiti da podeli određene informacije (često vezane za njihove privatne informacije) sa drugom mašinom putem komunikacionih traka\cite{finalreport}.
+\end{itemize}
+
+Uređeni par \textenglish{ITM}-ova $(A,B)$ komunicira tako što mašina $B$ započinje računanje. Mašine se stalno smenjuju, tako da samo jedna mašina u svakom trenutku ima aktivnu ulogu. Mašina koja ima aktivnu ulogu može vršiti interne proračune, pisati i čitati sa odgovarajućih traka. Ukoliko je, na primer, mašina $A$ aktivna, ona šalje poruke mašini $B$ pišući po komunikacionoj traci. Pa je $i$-ta poruka mašine $A$ mašini $B$ ceo string koji mašina $A$ napiše na komunikacionu traku tokom svog $i$-tog poteza u aktivnom stanju. Bilo koja mašina u bilo kom trenutku može prekinuti računanje celog para.
+
+Ako se posmatra računanje para $(A,B)$ sa ulazom $x$ koje se sastoji iz $n$ poteza. Neka je $a_{i}$ $i$-ta poruka ma\v sine $A$ i $b_{i}$ $i$-ta poruka ma\v sine $B$. Onda je {\bf tekst računanja} definisan kao sekvenca $\{b_{1}, a_{1} ...b_{n}, a_{n}\}$, gde je $a_{n}$ prazna poruka ukoliko mašina $B$ zaustavlja računanje u $n$-tom potezu.
+
+Tekst svih mogućih računanja mašina $A$ i $B$ sa ulazom $x$ označava se sa $(A,B)[x]$. Skup $(A,B)[x]$ ima strukturu verovatnosnog prostora, opisuje sve moguće \texttt{исходе} slučajnog procesa, zajedno sa njihovim verovatnoćama. Slučajni proces u ovom slučaju je korišćenje nasumičnih bitova sa nasumične trake prilikom izvođenja kalkulacija. Verovatnoća svakog računanja u $(A,B)[x]$ se uzima na osnovu bacanja novčića obe mašine.
+
+\section{Interaktivni sistemi za dokazivanje}
+U nastavku je data definicija interaktivnih sistema za dokazivanje i njeno pojašnjenje.
+\begin{definition}
+	Neka je $L\subseteq \{0,1\}^{*}$ jezik i $(A,B)$ par interaktivnih Tjuringovih mašina. $\langle A,B\rangle$ je interaktivni sistem za dokazivanje za jezik $L$ ako $A$ (dokazivač) ima neograničenu moć, dok $B$ verifikator radi u polinomijalnom vremenu i oni zadovoljavaju sledeće osobine:
+	\begin{enumerate}
+		\item Za svako $x \in L$ koje je dato kao ulaz u $\langle A,B\rangle$, verifikator $B$ se zaustavlja i prihvata sa verovatnoćom najmanje $1-\frac{1}{n^{k}}$ za svako $k$ i dovoljno veliko $n$.
+		\item Za svaki \textenglish{ITM} $A'$ i za svako $x \notin L$ koje je zadato kao ulaz u $\langle A',B\rangle$, $B$ prihvata sa verovatnoćom najviše $\frac{1}{n^{k}}$ za svako $k$ i dovoljno veliko $n$.
+		
+		Gde $n$ označava dužinu ulaza, dok se verovatnoće uzimaju samo preko $B$-ovih sopstvenih bacanja novčića.
+	\end{enumerate}
+\label{defIntPrf}
+\end{definition}
+
+Kada se kaže da dokazivač $A$ ima neograničenu moć, podrazumeva se da dokazivač ima neograničeno vreme i neograničene resurse. Nije ograničen vremenom potrebnim za izvođenje svojih proračuna da bi dobio dokaz i ima neograničene resurse. Za razliku od verifikatora koji je mašina ograničena polinomijalnim vremenom, dokazivač ima beskonačnu memoriju i procesorsku snagu što mu omogućava da generiše dosta kompleksne dokaze.
+Prvi uslov u definiciji \ref{defIntPrf}, uslov kompletnosti,  znači da ako $x \in L$, onda se verifikatoru $B$ može dokazati da je teorema tačna sa velikom verovatnoćom preko algoritma mašine $A$. Dakle, mašina $B$ može u polinomijalnom vremenu lako proveriti da je tačna teorema zaista tačna. Drugim uslovom, uslovom ispravnosti, omogućeno je da ako $x \notin L$ ne postoji strategija kojom bi se verifikator $B$ ubedio u suprotno sa nekom nezanemarljivom verovatnoćom, tj. nije moguće dokazati netačnu teoremu. Bitno je da $B$ uopšte ne mora verovati mašini $A$ sa kojom interaguje, već samo mora da veruje sopstvenoj nasumičnosti. Na sledećem primeru prikazan je primer interaktivnog sistema za dokazivanje.
+
+\begin{npra}
+	\label{IntbezZK}
+	Neka je $L=\{(m,x) \;|\; x\in Z^{*}_{m}\; \mathrm{ je}\; \mathrm{kvadratni}\; \mathrm{neostatak}\}$. Verifikator $B$ započinje dokazivanje tvrdnje dokazivača tako što odabira $n = |m|$ nasumičnih članova skupa $Z^{*}_{m}$, $\{r_{1},r_{2},...,r_{n}\}$ i  za svako $i$, $1\leq i\leq n$, on baca novčić. Zavisno od rezultata bacanja novčića verifikator kreira $t_{i}$. Ukoliko je rezultat glava, verifikator kreira $t_{i} \equiv r_{i}^{2} \pmod m$, a ako je dobijeno pismo $t_{i} \equiv x \cdot r_{i}^{2} \pmod m$. Nakon izvršenih proračuna verifikator $B$ šalje $t_{1}, t_{2},...,t_{n}$ dokazivaču $A$. Dokazivač koristi svoje neograničene resurse da izračuna koji od primljenih $t_{i}$ su kvadratni ostaci i verifikatoru šalje tu informaciju. Verifikator proverava da li se povratne informacije poklapaju sa njegovih poslednjih $n$ bacanja novčića i ako su sve informacije tačne $B$ prihvata dokazivanje tvrdnje.
+\end{npra}
+
+U prethodnom primeru se mo\v ze videti da ako $x$ jeste kvadratni neostatak, dokazivač $A$ će moći tačno da odredi koji $t_{i}$ su takođe kvadratni neostaci, a koji nisu jer zna faktorizaciju $m$ i ima neograničenu računarsku moć. Ako pak $x$ nije kvadratni neostatak po modulu $m$ onda su $t_{i}$ nasumični kvadratni ostaci i dokazivač će odgovoriti tačno sa verovatnoćom $\frac{1}{2^{n}}$.
+
+\section{Interaktivni sistemi za dokazivanje sa nultim znanjem}
+Kako bi se definisali interaktivni sistemi za dokazivanje sa nultim znanjem potrebno je uvesti pojam polinomske nerazlučivosti. To je koncept koji se često koristi u kriptografiji da opiše situaciju u kojoj su dve verovatnosne distribucije toliko slične da ne postoji efikasan algoritam koji će sa sigurnosti moći da ih razlikuje u polinomijalnom vremenu u odnosu na dužinu ulaza. Formalna definicija polinomske nerazlučivosti je data u nastavku\cite{intSZKdef}. 
+\begin{definition}
+	Neka $p_{A}^{D(x,y)}$, za svaki algoritam $A$,  označava verovatnoću da algoritam $A$ na zadati ulaz $(x,y)$ kao izlaz vrati jedinicu. Uređeni par $(x,y)$ pripada verovatnosnoj distribuciji $D(x,y)$. Skupovi distribucija $\{D(x,y)\}_{x;y \in Dom}$ i $\{D'(x,y)\}_{x;y \in Dom}$ su polinomski nerazlučivi ako za svaki probabilistički algoritam $A$ koji radi u polinomijalnom vremenu u odnosu na dužinu ulaza $x$ i za svaku konstantu $c>0$ gde postoji $N_{0}$ takvo da je za svako $x$, $|x| > N_{0}$, važi:
+	$$|p_{A}^{D(x,y)} - p_{A}^{D'(x,y)}| \leq |x|^{-c}$$
+\end{definition}
+
+\begin{definition}
+	Interaktivni sistem za dokazivanje za jezik $L$ je sistem nultog znanja ako za sve probabilističke mašine $V^{*}$ koje rade u polinomijalnom vremenu, postoji probabilistički algoritam $M_{V^{*}}$ u polinomijalnom vremenu koji za zadati ulaz $x$ vraća verovatnosnu distribuciju $M_{V^{*}}(x)$ takvu da su skupovi $\{M_{V^{*}}(x)\}_{x \in L}$ i $\{\langle P(x), V^{*}(x) \rangle \}_{x \in L}$ polinomski nerazlučivi.
+\end{definition}
+
+ U sledećem primeru biće dat interaktivni sistem za dokazivanje sa nultim znanjem koji dokazuje istu tvrdnju kao primer \ref{IntbezZK}. U pitanju je problem kvadratnog neostatka gde treba izračunati $Q_{m}(x)$ za $m \in \mathbb{N}$ i $x \in \mathbb{Z}^{*}_{m}$. Nije teško odrediti kvadratni ostatak po modulu $m$ ako je faktorizacija $m$ poznata, ali ako nije ne postoji efikasan algoritam da se kvadratni ostatak odredi\footnote{Jedan od otvorenih problema teorije brojeva je upravo pitanje da li moguće rešiti problem faktorizacije celobrojnih brojeva u polinomijalnom vremenu}. Jakobijev simbol $\left ( \frac{x}{m} \right )$ pruža dodatne informacije o kvadratnom ostatku, naime ukoliko $\left ( \frac{x}{m} \right ) = -1$, onda je $Q_{m}(x) = 1$. Ali ako je $\left ( \frac{x}{m} \right ) = 1$ izračunavanje $Q_{m}(x)$ predstavlja težak problem.
+
+\begin{npra}[Interaktivni sistem za dokazivanje sa nultim znanjem] 
+	Neka je $\langle A,B \rangle$ par interaktivnih Tjuringovih mašina. Dokazivač $A$ ima moć da izračuna da li važi $(y,m) \in L$, tj. da li je $y$ kvadratni ostatak po modulu $m$, pri čemu važi da je $\left ( \frac{y}{m}\right ) = 1$ i $n=\log_{2}m$. Verifikator $B$ generiše brojeve koji mogu biti:
+	\begin{enumerate}
+		\item $x \equiv r^2 \pmod m$
+		\item $x \equiv y\cdot r^2 \pmod m$
+	\end{enumerate}
+	gde je $r$ nasumično izabrano. Dokazivanje se vrši kroz iteracije u sledećim koracima:
+	\begin{itemize}
+		\item {\bf Korak 1} \\
+		Mašina $B$ odabira nasumičan broj $r_{0}$ iz $\mathbb{Z}^{*}_{m}$ i baca novčić $C_{x}$. Ako je $C_{x}=0$ onda $B$ postavlja $x\equiv r_{0}^{2} \pmod n$, ili ako je $C_{x}=1$ onda $B$ postavlja $x \equiv y \cdot r_{0}^{2} \pmod n$ i šalje $x$ dokazivaču $A$.\\
+		Nakon toga verifikator $B$ odabira dva nasumična skupa $T$ i $S$ veličine $n$:
+		$$T = \{t_{1},t_{2},...,t_{n}\ |\ t_{i} \equiv r^{2}_{i} \pmod m\}$$
+		$$S = \{t_{n+1},t_{n+2},...,t_{2n}\ |\ t_{i} \equiv y \cdot r^{2}_{i} \pmod m\}$$
+		Verifikator šalje dokazivaču elemente unije oba skupa $T\cup S$ u nasumičnom redosledu.
+		\item {\bf Korak 2} \\
+		Dokazivač $A$ odabira nasumični podskup $Z \subseteq T\cup S$ veličine $n$ i šalje ga nazad verifikatoru $B$.
+		\item {\bf Korak 3} \\
+		Za svako $z \in Z$, verifikator šalje dokazivaču $r$ takvo da je $z \equiv r^{2} \pmod m $ ili $z \equiv y \cdot r^{2} \pmod m $.
+		Neka se veličine skupova $T-Z$ i $S-Z$ razlikuju za $d$. Verifikator odabira $d$ nasumičnih elemenata iz većeg skupa, $t_{i_{1}},...,t_{i_{d}}$ i šalje njihove $r_{i_{1}},...,r_{i_{d}}$ dokazivaču ($t_{i_{j}}\equiv r^{2}_{i_{j}} \pmod m$ ili $t_{i_{j}}\equiv y\cdot r^{2}_{i_{j}} \pmod m$ za određena $1 \leq i_{j}\leq 2n$).\\
+		Zatim $B$ određuje dva nova skupa $X$ i $Y$:
+		$$X = T-Z -\{t_{i_{1}},...,t_{i_{d}}\}$$
+		$$Y = S-Z - \{t_{i_{1}},...,t_{i_{d}}\}$$
+		Na osnovu početnih vrednosti iz prvog koraka $B$ kreira još dva nova skupa $X'$ i $Y'$ na sledeći način: \\
+		Ako je $x\equiv r_{0}^{2} \pmod \ m$:
+		$$X' = \{r_{0} \cdot r_{i} \equiv \sqrt{x \cdot t_{i}} \pmod n \ | \ t_{i} \in X\}$$
+		$$Y' = \{y\cdot r_{0} \cdot r_{i} \equiv \sqrt{y \cdot x \cdot t_{i}} \pmod n \ | \ t_{i} \in Y\}$$
+		Dok ako je $x\equiv y\cdot r_{0}^{2} \pmod \ m$:
+		$$X' = \{y\cdot r_{0} \cdot r_{i} \equiv \sqrt{y \cdot x \cdot t_{i}} \pmod n \ | \ t_{i} \in X\}$$
+		$$Y' = \{y\cdot r_{0} \cdot r_{i} \equiv \sqrt{x \cdot t_{i}} \pmod n \ | \ t_{i} \in Y\}$$
+		Nakon kreiranja ova dva skupa, verifikator šalje dokazivaču njihovu uniju $X'\cup Y'$ u nasumičnom redosledu.
+		\item {\bf Korak 4} \\
+		Dokazivač $A$ proverava da li je $X'\cup Y'$ dato u formi  specificiranoj korakom 3. odnosno da li važi da je svako $w \in X'\cup Y'$ takvo da je  $w^{2} \equiv t_{i}\cdot x \pmod m$ ili $w^{2} \equiv t_{i}\cdot x \cdot y \pmod m$ za $t_{i} \in X \cup Y$. Pored toga, proverava i da li je $|X'\cup Y'| > \frac{n}{3}$. Ako uslovi nisu ispunjeni dokazivač proglašava da  verifikator vara i zaustavlja komunikaciju. U suprotnom dokazivač $A$ šalje verifikatoru vrednost $v$ koja sadrži dokazivanu informaciju o kvadratnom ostatku.
+		\item {\bf Korak 5} \\
+		Ako $v \neq C_{x}$ onda verifikator otkriva da ga je dokazivač lagao, u suprotnom prelazi na sledeću iteraciju,  u kojoj se svi koraci izvršavaju ispočetka.\\
+		Kada broj iteracija bude veći ili jednak broju $n$, $B$ prihvata dokaz.
+	\end{itemize}
+\label{prviZKPI}
+\end{npra}
+Primer \ref{prviZKPI} predstavlja prvi interaktivni dokaz nultog znanja, koji je predstavljen u radu \cite{mathBook}. U ovom radu detaljno je prikazano i rigorozno dokazano da prikazani interaktivni sistem zadovoljava uslove interaktivnog dokaznog sistema i da zaista poseduje svojstvo nultog znanja.
+
+
+
+\chapter{Neinteraktivni dokazi}
+Neinteraktivni dokazi nultog znanja su prvi put definisani u radu \textenglish{\it Non-Interactive Zero-Knowledge and Its Applications}. Rad  prezentuje značajan iskorak u polju kriptografije time što dokazuje da interakcije između dokazivača i verifikatora nisu neophodne u dokazima nultog znanja. Nulto znanje bez interakcije je omogućeno uvođenjem pojma {\it zajednički nasumični string} koga dele verifikator i dokazivač\cite{10.1145/62212.62222}.
+
+
+\begin{definition}
+	Uređeni par probabilističkih Tjuringovih mašina $(P,V)$ se naziva neinteraktivnim sistemom za dokazivanje za jezik $L$ ako mašina $V$ radi u polinomijalnom vremenu i važi sledeće:
+	\begin{itemize}
+		\item Kompletnost: Za svako $x \in L$
+		$$Pr(V(x,R,P(x,R))=1)\geq \frac{2}{3}$$
+		gde je $R$ nasumična promenljiva uniformne distribucije koja pripada $\{0,1\}^{poly(|x|)}$.
+		\item Ispravnost: Za svako $x \notin L$ i svaku mašinu $B$
+		$$Pr(V(x,R,B(x,R))=1)\leq \frac{1}{3}$$
+		gde je $R$ nasumična promenljiva uniformne distribucije koja pripada $\{0,1\}^{poly(|x|)}$.
+	\end{itemize}
+	Uniformno izabrani string $R$ se naziva zajednički nasumični string.
+\end{definition}
+%ovo znaci da je verovatnoca da verifikator prihvati dokaz P(x,R) ako ima x i R je velika a da prihvati dokaz koji je los mala, dokaz je los jer je generisan za nevalidni input x koji ne ispunjava pravila jezika L tj ne pripada jeziku L 
+\begin{definition}
+	Neinteraktivni sistem za dokazivanje $(P,V)$ za jezik $L$ nosi nulto znanje ako postoji probabilistički algoritam $M$ u polinomijalnom vremenu takav da su skupovi $\{(x, R_{|x|}, P(x,R_{|x|}))\}_{x \in L}$ i $\{M(x)\}_{x \in L}$ računski nerazlučivi, pri čemu je $R_{n}$ nasumična promenljiva uniformne distribucije koja pripada $\{0,1\}^{poly(n)}$.
+\end{definition}
+
+Probabilistički algoritam $M$ se često naziva i simulator zato što on može da generiše izlaze koji su nerazlučivi od izlaza pravog sistema za dokazivanje.\\
+
+%First Ensemble: {(x,R∣x∣,P(x,R∣x∣))} x∈L
+
+%This represents the collection of triples (x,R∣x∣,P(x,R∣x∣)) for all x n in L.
+%Here, x is the input, R∣x∣​ is a random string of length polynomial in the size of x, and P(x,R∣x∣​) is the proof generated by the prover using the random string R∣x∣​.
+
+%Second Ensemble: {M(x)}x∈L
+
+%This represents the outputs generated by the simulator M when given the same input x from the language L.
+ %This means that no efficient (polynomial-time) algorithm can tell the difference between the outputs produced by the real prover P and the outputs produced by the simulator M with more than a negligible probability.\\
+ U nastavku \' ce biti detaljnije prikazan  neinteraktivni sistem za dokazivanje sa nultim znanjem \textenglish{ZK-SNARK}, pored njega biće pomenuti i \textenglish{ZK-STARK} i \textenglish{Bulletproofs} sistemi za dokazivanje.
+
+\section{\textenglish{ZK-SNARK}} 
+\textenglish{ZK-SNARK} (\textenglish{Zero-Knowledge Succinct Non-Interactive Argument of Knowledge}) je protokol nultog znanja koji pravi sa\v zeti dokaz koji  mo\v ze biti proveren brzo i  ne iziskuje interaktivnu komunikaciju dokazivača i verifikatora. Predstavljen je u radu\cite{zksnark184425} iz 2013. godine. \\
+Ovim  protokolom su  zadovoljena ranije pominjana svojstva kompletnosti, ispravnosti i nultog znanja. Sažetost dokaza generisanih uz pomoć \textenglish{ZK-SNARK} protokola se ogleda u maloj veličini dokaza i efikasnoj verifikaciji. \\
+Veličina generisanih dokaza je konstantna ili raste logaritamski u odnosu na veličinu aritmetičkog kola kojim se ispituje tačnost zadate tvrdnje. Pa je veličina dokaza kompleksnih problema gotovo jednaka veličini dokaza jednostavnih problema i obično iznosi par stotina bajtova. \\
+Verifikacija  dokaza je kratka i izvršava se u mnogo kraćem vremenskom periodu nego računanja u aritmetičkom kolu\cite{snark}. 
+\\
+
+    \textenglish{ZK-SNARK} se izvršava iz pet koraka:
+    \begin{enumerate}
+    	\item {\bf Aritmetička reprezentacija kola}: Temelj \textenglish{ZK-SNARK} dokaza je matematički iskaz koji je enkodiran u aritmetičko kolo. Ovo kolo je dizajnirano tako da računa određenu funkciju (u nastavku će biti prikazan primer sa proverom kvadratnog ostatka). Aritmetičko kolo u sebi sadrži:
+    	\begin{enumerate}
+    		\item Ulazi - vrednosti koje verifikator i dokazivač koriste u svojim izračunavanjima. Ulazi mogu biti javni ili privatni, privatni ulazi su poznati samo dokazivaču.
+    		\item Ograničenja - za svaku operaciju koja se vrši u proračunu, mogu se postaviti ograničenja u vidu polinomskih jednačina.
+    		\item Izlazi - rezultati koji se dobijaju nakon proračuna.
+    	\end{enumerate}
+    
+    	Aritmetička kola se reprezentuju \textenglish{Rank-1 Consistent System (R1CS)} formatom. On transformiše logičke i aritmetičke operacije u skup linearnih ograničenja nad konačnim poljem.
+    	\item {\bf Ceremonija postavljanja ključeva}: Ključni deo ovog protokola je ceremonija postavljanja kriptografskih klju\v ceva  koja mora biti pouzdana. U tom doga\dj aju potrebno je kreirati klju\v ceve koji se koriste u nastavku protokola:
+    	\begin{itemize}
+    		\item Ključ za dokazivanje - koristi se od strane dokazivača, da bi se izgenerisao  \textenglish{ZK-SNARK} dokaz.
+    		\item Ključ za verifikaciju - koristi se od strane verifikatora, da bi se utvrdila validnost izgenerisanog dokaza.
+    	\end{itemize} 
+     Pri generisanju ključeva bitno je koristiti  nasumičnost koja mora ostati tajna. Kada bi procureo tajni na\v cin kreiranja ovih klju\v ceva (korišćena nasumičnost), oni bi se mogli iskoristiti da se naprave la\v zni dokazi. Zbog svojstvenih karakteristika privatnosti \textenglish{ZK-SNARK} protokola, ne bi bilo načina da se potvrdi da su falsifikovani dokazi zaista falsifikovani. Zato je bitno uni\v stiti sve osetljive informacije koje su korišćene u procesu kreiranja ključeva nakon njihovog kreiranja.
+    	\item {\bf Svedok}: Svedok se sastoji iz javnih i tajnih ulaza koje dokazivač koristi kako bi zadovoljio ograničenja iz aritmetičkog kola. \textenglish{ZK-SNARK} dokaz tvrdi da dokazivač uvek poznaje validnog svedoka koji zadovoljava aritmetičko kolo.
+    	\item {\bf Dokazivanje}: Dokazivač generiše dokaz uz pomoć svedoka. Dokaz potvrđuje poznavanje pravog rešenja za problem koji se dokazuje.
+    	\item {\bf Verifikacija}: Verifikator proverava validnost dokaza koji je dokazivač izgenerisao. Koristi verifikacioni ključ i javne ulaze. Verifikacija u \textenglish{ZK-SNARK} dokazima je izuzetno efikasna.
+    \end{enumerate}
+
+	Navedeni koraci \textenglish{ZK-SNARK} dokaza se uglavnom sažimaju u tri algoritma\cite{Nitulescu2020zkSNARKsAG}:
+	\begin{itemize}
+		\item Algoritam podešavanja (obuhvata aritmetičku reprezentaciju kola, generisanje ključeva i svedoka)
+		\item Algoritam dokazivanja 
+		\item Algoritam verifikacije
+	\end{itemize}
+	
+	U nastavku će prethodno opisani koraci biti objašnjeni na primeru jednostavnog \textenglish{ZK-SNARK} dokaza. 
+    
+    \subsection{Problem kvadratnog ostatka u programskom jeziku \textenglish{Python}}
+    Ovaj deo rada demonstrira neinteraktivni dokaz nultog znanja na već viđenom problemu kvadratnog ostatka. Dokaz će biti prikazan kroz programski kod programskog jezika \textenglish{Python}.
+    
+    \subsubsection{\textenglish{Circom} jezik i kompajler i njihov udeo u aritmetičkoj reprezentaciji kola}
+    Kao što je prethodno opisano za početak procesa dokazivanja u \textenglish{ZK-SNARK} protokolu potrebno je aritmetičko kolo. Ono se može zadati kroz programski kod napisan u \textenglish{Circom} jeziku.\\
+    Programski jezik \textenglish{Circom}  je jezik specifičan za domen, njime se opisuju aritmetička kola koja se koriste za generisanje dokaza nultog znanja\cite{circomGH}. Programski jezik \textenglish{Circom} se kompajlira istoimenim kompajlerom. Prva verzija ovog kompajlera je napisana u jeziku \textenglish{Javascript}, a druga je napisana u \textenglish{Rust} programskom jeziku\cite{circom}. 
+     Jedna od najbitnijih pojedinosti \textenglish{Circom} jezika je njegova modularnost. On dozvoljava programeru da definiše templejte, koji predstavljaju parametrizovana kola iz kojih se mogu graditi veća i kompleksnija kola. Pored mogućnosti da definiše svoje templejte, programer može koristiti javno dostupnu \textenglish{Circom} biblioteku sa već postojećim templejtima. Kompleksna \textenglish{Circom} kola koja su napravljena uz pomoć manjih templejta su lakša za testiranje i debagovanje.\\
+     
+    Kako bi se napravilo novo aritmetičko kolo za problem kvadratnog ostatka potrebno je kreirati novi templejt. Na sledeći način je definisan templejt koji je korišćen u ovom radu:
+\begin{english}
+\begin{lstlisting}[language=c, caption={quadratic\_residue.circom},captionpos=b]
+template QuadraticResidueCheck() {
+	signal input x;     // Input value to check
+	signal input p;     // Prime modulus
+	signal input y;     // Candidate square root
+	
+	signal output isQuadraticResidue;
+	
+	signal ySquared;
+	ySquared <-- y * y;
+	
+	signal diff;
+	diff <-- ySquared - x;
+	
+	signal remainder;
+	remainder <-- diff % p;
+	
+	signal c;
+	if (remainder == 0){
+		c <-- 1;
+	} else {
+		c <-- 0;
+	}
+	isQuadraticResidue <== c;
+}
+
+component main = QuadraticResidueCheck();
+\end{lstlisting}
+\end{english}
+
+
+ Dato aritmetičko kolo potrebno je kompajlirati kako bi se generisao  \textenglish{R1CS} fajl  koji sadrži prethodno definisano aritmetičko kolo u formi skupa povezanih ograničenja. Ovaj fajl će biti korišćen za kreiranje dokaza. Pored toga potrebno je generisati i \textenglish{WASM}  fajl koji omogućava računanje svedoka. \\
+ 
+ U nastavku je prikazana komanda za kompajliranje  aritmetičkog kola definisanog $quadratic\_residue.circom$ fajlom:\\
+\begin{english}
+\begin{lstlisting}[language=bash]
+$ circom quadratic_residue.circom --r1cs --wasm --sym
+\end{lstlisting}
+\end{english}
+
+\subsubsection{\textenglish{ZK-SNARK} dokaz uz pomoć \textenglish{python-snarks} biblioteke}
+Kada je aritmetičko kolo kompajlirano i  kreirani su potrebni fajlovi omogućen je prelazak na sledeći korak \textenglish{ZK-SNARK} dokaza, ceremoniju postavljanja ključeva.\\
+ U ceremoniji postavljanja ključeva i ostalim koracima biće korišćena \textenglish{python-snarks} biblioteka. Ova biblioteka nije redovno održavana i ne podržava sve verzije \textenglish{Circom} kompajlera ali je dovoljno dobra za demonstraciju primera posmatranog u ovom radu. Široko korišćena je biblioteka \textenglish{snarkjs}, ona je ažurna i kompatibilna sa najnovijim verzijama \textenglish{Circom} kompajlera.\\ U ovom primeru za postavljanje ključeva zadužena je metoda $setup\_zk()$ koja se poziva nad objektom klase $Groth$ inicijalizovanim \textenglish{R1CS} fajlom. Ova metoda generiše ključeve za dokazivanje i validaciju na osnovu ograničenja aritmetičkog kola. Nakon toga prelazi se na kreiranje svedoka.
+\begin{english}
+\begin{lstlisting}[language=Python]
+import os
+from python_snarks import Groth, Calculator,
+			  gen_proof, is_valid
+ 		
+gr = Groth(os.path.dirname(
+		os.path.realpath(__file__)) +
+ 		"/circuit/quadratic_residue.r1cs")
+gr.setup_zk()
+\end{lstlisting}
+\end{english}
+ Za kreiranje svedoka potrebno je instancirati objekat klase $Calculator$ koristeći $WASM$ fajl. Nad tom instancom poziva se metoda $calculate$ koja računa svedoka koristeći ulazne vrednosti. U ovom slučaju javne ulazne vrednosti su $x$ i $p$ koje predstavljaju moduo i broj za koji se ispituje da li je kvadratni ostatak. Privatna ulazna vrednost je $y$, ona predstavlja kandidata za kvadratni koren. 
+ 
+\begin{english}
+\begin{lstlisting}[language=Python]
+wasm_path = os.path.dirname(
+		os.path.realpath(__file__)) +
+ 		"/circuit/quadratic_residue.wasm"
+c = Calculator(wasm_path)
+witness = c.calculate({"x": 3, "p": 11, "y": 6})
+\end{lstlisting}
+\end{english}
+
+ 
+ Izračunati svedok se zajedno sa ključem za dokazivanje prosleđuje kao parametar funkcije $gen\_proof$ u cilju generisanja dokaza. 
+ 
+\begin{english}
+\begin{lstlisting}[language=Python]
+proof, publicSignals = gen_proof(
+		gr.setup["vk_proof"], witness)
+\end{lstlisting}
+\end{english}
+
+ Kada je dokaz generisan, verifikator može  proveriti validnosti dokaza koristeći funkciju $is\_valid$. Ova funkcija kao parametre prima: verifikacioni ključ, dokaz i javne parametre. Izlaz iz ove funkcije je logička vrednost koja pokazuje da li je dokaz validan.
+\begin{english}
+\begin{lstlisting}[language=Python]
+result = is_valid(gr.setup["vk_verifier"], 
+		proof, publicSignals)
+\end{lstlisting}
+\end{english}
+%   \begin{english}
+%	    \begin{lstlisting}[language=Python]
+% 	import os
+% 	from python_snarks import Groth, Calculator, gen_proof, is_valid
+% 	
+% 	## 1. trusted setup
+% 	gr = Groth(os.path.dirname(os.path.realpath(__file__)) +
+% 			"/circuit/quadratic_residue.r1cs")
+% 	gr.setup_zk()
+% 	
+% 	## 2. creating witness and proving
+% 	wasm_path = os.path.dirname(os.path.realpath(__file__)) +
+% 			"/circuit/quadratic_residue.wasm"
+% 	c = Calculator(wasm_path)
+% 	witness = c.calculate({"x": 3, "p": 11, "y": 6})
+ %	proof, publicSignals = gen_proof(gr.setup["vk_proof"], witness)
+% 	
+% 	## 3. verifying
+ %	result = is_valid(gr.setup["vk_verifier"], proof, publicSignals)
+%	    \end{lstlisting}
+%	\end{english}
+    
+    \subsection{\textenglish{Zcash}}
+    \textenglish{Zcash} je jedna od najznačajnijih primena \textenglish{ZK-SNARK} protokola zato što on ujedno predstavlja i prvu \v siroko kori\v s\' cenu primenu dokaza nultog znanja u praksi. Dokazima nultog znanja osigurava za\v sti\' cene transakcije u kojima po\v siljalac, primalac i koli\v cina resursa prenetih transakcijom ostaju privatni\cite{ZC, articleZcash}. \\
+    
+    \textenglish{Zcash} je kriptovaluta koja je fokusirana na privatnosti i anonimnosti transakcija. Ugrubo nastao je tako što je grupa naučnika na Bitkoinov otvoreni kod dodala dokaze nultog znanja\cite{ZCBtk}. Motivacija za tim je nedostatak privatnosti Bitkoina gde su transakcije verifikovane i snimljene na javnom blokčejnu, pa svako može pristupiti korisničkim balansima i podacima o transakcijama.\\
+    
+    Ova kriptovaluta implementira \textenglish{Decentralized Anonymous Payment (DAP)} šemu pod nazivom \textenglish{Zerocash} koja je detaljno opisana u radu iz 2014. godine\cite{zerocash}. Razlika između \textenglish{DAP} šeme i standardnog Bitkoin sistema jeste u tome što Bitkoin sistem koristi transparentne transakcije, dok \textenglish{DAP} šema omogućava korisnicima da vrše zaštićene transakcije (\textenglish{shielded} transakcije). Ove transakcije skrivaju osetljive informacije, tj. skrivaju informacije o pošiljaocu i primaocu, kao i iznos transakcije. Međutim \textenglish{Zcash} pored zaštićenih transakcija omogućava i transparentne transakcije slične onima koje Bitkoin koristi. Stoga korisnici mogu sami izabrati nivo privatnosti koji je njima potreban\cite{zCashSpecif}.\\
+    
+    Provera validnosti transakcija bez otkrivanja podataka o transakciji omogućena je korišćenjem \textenglish{ZK-SNARK} protokola. Pomoću ovog protokola učesnici u transakciji mogu da dokažu da imaju informacije koje su potrebne za izvršenje transakcije (na primer privatne ključeve), bez otkrivanja tih informacija trećoj strani. Zaštićene transakcije mogu biti u potpunosti enkriptovane u blokčejnu, ali se i dalje mogu verifikovati kao validne pod uslovima koncenzusa koristeći \textenglish{ZK-SNARK} protokol\cite{ZcashSNARK}.\\
+    
+    
+    \begin{figure}[H]
+    	\centering
+    	\includegraphics[width=0.23\linewidth]{zcash.png}
+    	\caption{\href{https://github.com/zcash}{\textenglish{Zcash} logo}}
+    \end{figure}
+    
+\section{\textenglish{ZK-STARK}} \textenglish{ZK-STARK}(\textenglish{Zero-Knowledge Scalable Transparent Argument of Knowledge}) je protokol predstavljen u radu\cite{stark} iz 2018 godine. Protokol je sli\v can prethodno objašnjenom protokolu, najbitnije razlike se ogledaju u pojmovima skalabilnosti i transparentnosti. \\
+
+    Skalabilnost je jedna od klju\v cnih osobina ovog protokola, ona omogu\' cava na\v cin da se kreira sa\v zet i efikasan dokaz za \v sirok spektar prora\v cuna. Pa je ovaj protokol pogodan za razli\v cite aplikacije uklju\v cuju\' ci blokčejn i decentralizovane sisteme. \textenglish{ZK-STARK} je dosta br\v zi u generisanju i verifikovanju dokaza kako veli\v cina svedoka raste, sa pove\' canjem svedoka blago se linearno pove\' cavaju vremena da se izgeneri\v se i verifikuje dokaz.\\
+    
+    \textenglish{ZK-STARK} je dizajniran da bude transparentan. Njegova sigurnost se ne oslanja na nedokazane pretpostavke i kompleksne matemati\v cke strukture. Nasumi\v cnost koja se koristi za generisanje parametara za dokazivanje i verifikaciju je javno dostupna te nema potrebe za ceremonijom postavljanja klju\v ceva kojoj se mora verovati. 
+    
+\begin{center}
+	\begin{tabular}{ |p{0.4\linewidth}|p{0.4\linewidth}| } 
+		\hline 
+		\textenglish{ZK-STARK}  & \textenglish{ZK-SNARK}  \\ 
+		\hline \hline
+		Transparentan & Zahteva ceremoniju \newline postavljanja ključeva \\ \hline
+		Dokazi su veći,\newline sporije se proveravaju & Dokazi su manji,\newline brzo se verifikuju \\ \hline
+		Dokazi se generišu brže & Dokazi se generišu sporije \\ \hline
+		Zasnovan na kripto-\newline primitivnim heš funkcijama & Zasnovan na kriptografiji eliptičkih kriva  \\ \hline
+		Podržava skalabilnost & Veća složenost povlači sporije generisanje dokaza\\ \hline
+		Otporan na napade \newline kvantnih računara & Nije otporan na napade \newline kvantnih računara\\ 
+		\hline
+	\end{tabular}
+\end{center}
+    
+ \section{\textenglish{Bulletproofs}} 
+ \textenglish{Bulletproofs} protokol je prvi put predstavljen u radu\cite{bullet} iz 2018. godine kao protokol sa neprobojnim sigurnosnim pretpostavkama, kratak kao metak. Dizajniran je tako da u određenim scenarijima bude skalabilniji i efikasniji  od \textenglish{ZK-SNARK} protokola. Najbolje se primenjuje u dokazima opsega, gde dokaziva\v c \v zeli da poka\v ze da se tajna vrednost nalazi unutar nekog opsega bez otkrivanja ostalih informacija o tajnoj vrednosti. Ovaj protokol  nultog znanja generi\v se kratke dokaze logaritamske veli\v cine u odnosu na veli\v cinu svedoka i nije mu potrebna pouzdana ceremonija postavke klju\v ceva.  \textenglish{Bulletproofs} protokol se kao i \textenglish{ZK-SNARK} oslanja na kriptografiju eliptičnih kriva, čija sigurnost koja je zasnovana na tome da je izuzetno teško izračunati diskretni logaritam u eliptičkim krivama. Za klasične računare, diskretni logaritamski problem na eliptičkim krivama je eksponencijalno težak ali je u kvantnim računarima ovaj problem rešiv u polinomijalnom vremenu.  \\
+ 
+    Ovaj protokol je usvojen od strane raznih kriptovaluta poput \href{https://www.getmonero.org/}{Monera}. Pri prelasku na {\it} \textenglish{Bulletproofs} zapa\v zeno je smanjenje od 80\% u veli\v cinama transakcija.
+\section{Poređenje neinteraktivnih protokola}
+Na slici \ref{poSSB} prikazan je odnos prethodno opisanih neinteraktivnih protokola. Najveća mana i slaba tačka \textenglish{ZK-SNARK} protokola nalazi se u ceremoniji postavljanja ključeva. U protokolu \textenglish{ZK-STARK} te ceremonije nema, jer on koristi transparentne heš protokole sa polinomskim \textenglish{IOP}\cite{10.1007/978-3-030-97121-2_19}. \textenglish{Bulletproofs} protokol koristi argumente unutrašnjeg proizvoda zasnovane na eliptičkim krivama kojima nije potrebno pouzdano podešavanje ključeva.\\
+
+\textenglish{ZK-SNARK} ima konstantnu veličinu dokaza, dokazi su kratki i ne zavise od kompleksnosti problema. Nešto veći dokazi kreiraju se kroz \textenglish{Bulletproofs} protokol, oni rastu logaritamski sa porastom kompleksnosti, dok  \textenglish{ZK-STARK} generiše najveće dokaze koji su polilogaritamski. Ali, bez obzira što su dokazi ovog protokola najduži, oni se  generišu u kvazilinearnom vremenu pa se time i najbrže generišu, jer ostala dva protokola iziskuju linearno vreme. Kada je u pitanju vreme verifikacije dokaza, najmanje vremena je potrebno \textenglish{ZK-SNARK} protokolu, a najviše \textenglish{Bulletproofs} protokolu\cite{info15080463}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{poredjenje.png}
+    \caption{{Pore\dj enje protokola}}
+    \label{poSSB}
+\end{figure}

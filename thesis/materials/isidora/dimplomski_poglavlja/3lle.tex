@@ -1,0 +1,169 @@
+\chapter{Lokalno linearno potapanje} 
+
+Lokalno linearno potapanje (\textenglish{LLE}) je predstavljeno od strane \textenglish{Sam Roweis} i \textenglish{Lawrence Saul}-a 2000. godine. Glavna ideja je bila napraviti metod koji redukuje dimenzionalnost nelinearnih mnogostrukosti, uz pomo\' c deli\' ca koji \v cuvaju lokalnu geometriju. \textenglish{LLE} poku\v sava da sa\v cuva globalnu geometriju tako \v sto spaja deli\' ce originalne mnogostrukosti u mnogostrukost manje dimenzije.  Bazira se na pretpostavci da ako podaci le\v ze na mnogostrukosti male dimenzionalnosti koja je lokalno linearna, onda se svaka ta\v cka mo\v ze rekonstruisati iz okolnih ta\v caka sa odgovaraju\' cim te\v zinama. Te\v zine treba da budu iste u prostoru ni\v ze dimenzije u kome se mnogostrukost nalazi nakon redukcije dimenzionalnosti. \textenglish{LLE} nije izometrijska tehnika, ne o\v cuvava razdaljine, pa \v cesto ne uspeva najbolje da oslika mapiranje dalekih ta\v caka\cite{kratkoOSVakomAlg, lle}.\\
+\\
+\section{Koraci algoritma}
+\textenglish{LLE} se sastoji iz tri koraka \cite{lleSteps}:
+\begin{enumerate}
+    \item Prvi korak je pronala\v zenje k-najbli\v zih suseda \textenglish{(k-NN)} svih ta\v caka.
+    Koriste se Euklidska rastojanja izme\dj u svake dve ta\v cke. 
+
+    \item U drugom koraku se izra\v cunavaju te\v zine potrebne za rekonstruisanje svake ta\v cke. Pri tome mora va\v ziti slede\' ce:
+    \begin{itemize}
+        \item Svaka ta\v cka mora biti rekonstruisana od odabranih suseda.
+        \item Te\v zine ne smeju biti jednake nuli.
+        \item Redovi matrice te\v zina moraju biti jednaki jedinici.
+        \item Mora se minimizovati funkcija gre\v ske
+        $$\epsilon(W) = \sum_{i}|x_{i} - \sum_{j}w_{ij}x_{j}|^{2}$$
+    \end{itemize}
+    \item Poslednji korak je ugra\dj ivanje ta\v caka u prostor ni\v ze dimenzije. Ta\v cke se ugra\dj uju uz pomo\' c prethodno definisanih te\v zina, minimizuju\' ci funkciju ispod.
+    $$\Phi(y) = \sum_{i}|y_{i} - \sum_{j}w_{ij}y_{j}|^{2}$$
+\end{enumerate}
+
+
+        
+\begin{center}
+    \begin{figure}[H]
+        \centering\includegraphics[width=1\linewidth]{lle.png}
+        \caption{Koraci \textenglish{LLE} algoritma}
+        \label{zvezdodek}
+    \end{figure}
+\end{center}
+        
+        
+
+\section{Varijacije \textenglish{LLE} algoritma} 
+Pored standardnog \textenglish{LLE} algoritma koji je gore opisan postoje jo\v s tri njegove alternative. 
+
+\subsection{Modifikovano lokalno linearno potapanje}
+Glavni problem \textenglish{LLE} algoritma je problem regularizacije. Regularizacija je tehnika koja se koristi radi prevencije pretreniravanja modela, ona pobolj\v sava performanse modela ma\v sinskog u\v cenja. Problem regularizacije je pogotovo izra\v zen kada je broj suseda ve\' ci nego broj dimenzija originalne mnogostrukosti \cite{mlleSK}.\\
+\\
+Jedan od na\v cina da se  problem regularizacije prevazi\dj e je kori\v s\' cenje vi\v sestrukih te\v zina u svakom skupu susednih ta\v caka. Tom izmenom u algoritmu dobijamo \textenglish{MLLE} - Modifikovano Lokalno Linearno Potapanje. 
+
+\subsection{Hesijanovo karakteristi\v cno preslikavanje}
+Hesijanovo karakteristi\v cno preslikavanje ({\textenglish{Hessian Eigenmapping}}) ili Hesijanovo lokalno linearno potapanje (\textenglish{HLLE}) su osmislili \textenglish{LoDonoho} i \textenglish{Grimes} 2003. godine. \textenglish{HLLE} je jo\v s jedan metod re\v savanja problema regularizacije standardnog \textenglish{LLE} algoritma. U ovom re\v senju se koristi metod Hesijanove kvadratne forme. Ona se koristi da bi se povratila lokalna linearna struktura u svakom skupu susednih ta\v caka pri ugra\dj ivanju u ni\v ze dimenzije \cite{hlleSK}.
+
+$$(H_{f})_{i,j} = \frac{\partial ^{2}f}{\partial x_{i}\partial x_{j}}$$
+\begin{center}
+    Hesijanova matrica
+\end{center}
+
+%  The major
+% contribution of this approach is that it proposes a global, isometric method, which, unlike Isomap,
+% can be applied to non-convex data sets. The requirement to estimate second derivatives from possi-
+% bly noisy, discrete data makes the algorithm more sensitive to noise than the others reviewed here.
+
+
+\section{\textenglish{Local Tangent Space Alignment}}
+\begin{minipage}{0.6\textwidth}
+            \begin{flushleft}
+                 {\it\textenglish{Local Tangent Space Alignment}} (\textenglish{LTSA}) tehni\v cki nije varijanta \textenglish{LLE} algoritma ali je konceptualno prili\v cno sli\v can pa se stavlja u ovu kategoriju. \textenglish{LTSA} se od \textenglish{LLE} algoritma razlikuje u na\v cinu prepoznavanja lokalne geometrije susednih ta\v caka. Za razliku od \textenglish{LLE} algoritma koji koristi razdaljine, \textenglish{LTSA} koristi tangentne prostore \cite{ltsaSK}.
+            \end{flushleft}
+        \end{minipage}
+        \hfill
+        \begin{minipage}{0.4\textwidth}
+            \begin{flushright}
+                \begin{figure}[H]
+                \centering
+                \includegraphics[width=0.7\linewidth]{Image_Tangent-plane.png}
+                \caption{Tangentni prostor ta\v cke}
+                \label{zvezdodek}
+            \end{figure}
+            \end{flushright}
+        \end{minipage}
+
+% Wang et al. (2005) propose an adaptive version of the local tangent space alignment (LTSA)
+% of Zhang and Zha (2004), a local dimensionality reduction method that is a variant of LLE. Wang
+% et al. address a limitation of most of the approaches presented in this section, which is the use of
+% 415
+% MORDOHAI AND MEDIONI
+% a fixed number of neighbors (k) for all points in the data. Inappropriate selection of k can cause
+% problems at points near boundaries, or if the density of the data is not approximately constant. The
+% authors propose a method to adapt the neighborhood size according to local criteria and demonstrate
+% its effectiveness on data sets of varying distribution. Using an appropriate value for k at each point
+% is important for graph-based methods, since the contributions of each neighbor are typically not
+% weighted, making the algorithms very sensitive to the selection of k.
+
+\section{\textenglish{LLE}  u \textenglish{scikit-learn} biblioteci}
+Analogno do sad razmatranim algoritmima, u kodu ispod je pokazan na\v cin na koji se \textenglish{LLE} koristi  u {\it \textenglish{scikit-learn}} biblioteci.
+\\
+\\Slo\v zenost ovog algoritma je $O[D\log(k)N\log(N)] + O[DNk^{3}] + O[dN^{2}]$. \\gde je $N$ broj ta\v caka skupa podataka, $D$ dimenzija polaznog skupa podataka, $k$ broj najbli\v zih suseda i  $d$ redukovana dimenzija podataka. Cena odabiranja suseda je $O[D\log(k)N\log(N)]$, cena konstrukcije te\v zina je $O[DNk^{3}]$ i cena ugra\dj ivanja u ni\v ze dimenzije je $O[dN^{2}]$ \cite{SKLDOC}.
+\begin{english}
+    \begin{lstlisting}[language=Python]
+        from sklearn.manifold import LocallyLinearEmbedding
+    
+        # Create instance of the Isomap class
+        lle = LocallyLinearEmbedding(n_components=2,
+                                     n_neighbors=15)
+        # Fit and transform data using Isomap
+        X_lle = lle.fit_transform(sr_points)
+    
+        # Plot the transformed data with LLE
+        fig = plt.figure(figsize=(6, 6))
+        plt.scatter(X_lle[:, 0], X_lle[:, 1], c=sr_color, 
+                                    cmap=plt.cm.cool)
+        plt.title(f'Transformed Swiss Roll with LLE')
+        plt.show()
+    \end{lstlisting}
+\end{english}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{lle15n.png}
+    \caption{Grafi\v cki prikaz transformisanih podataka uz pomo\' c \textenglish{LLE} algoritma}
+    \label{zvezdodek}
+\end{figure}
+
+Sa slike grafi\v ckog prikaza izlaza algoritma mo\v ze se zapaziti da \textenglish{LLE} ne uspeva da smanji dimenziju po\v cetne mnogostrukosti verodostojno. To se de\v sava zato \v sto \textenglish{LLE} aproksimira sve ta\v cke linearnom kombinacijom susednih ta\v caka. Na\v s skup podataka nije najpogodniji za takve aproksimacija jer mu veze me\dj u susednim ta\v ckama variraju. U nastavku je prikazano kako to rade alternative ovog algoritma.
+
+ 
+
+\subsection{Varijacije \textenglish{LLE} algoritma}
+U {\it \textenglish{scikit learn}} biblioteci postoji implementacija za sve tri, gore navedene, varijacije \textenglish{LLE} algoritma. Da bi se koristile potrebno je samo podesiti parametar {\it \textenglish{method}} pri instanciranju klase {\it \textenglish{LocallyLinearEmbedding}}. Podrazumevana vrednost parametra je {\it \textenglish{standard}}, pa se pokre\' ce osnovna verzija \textenglish{LLE} algoritma sve dok se suprotno ne naglasi.\\
+\\
+Slo\v zenosti algoritama su slede\' ce:
+\begin{itemize}
+    \item Modifikovani \textenglish{LLE} ima slo\v zenost sli\v cnu originalnom algoritmu. Jedini dodatak je konstrukcija dodatnih te\v zina $O[D\log(k)N\log(N)] + O[DNk^{3}] +  O[N(k-D)k^{2}] + O[dN^{2}]$ 
+    \item \textenglish{HLLE} na originalni algoritam dodaje cenu Hesijanovih procena $O[D\log(k)N\log(N)] + O[DNk^{3}] + O[Nd^{6}] + O[dN^{2}]$ 
+    \item \textenglish{LTSA} ima slo\v zenost sli\v cnu standardnom \textenglish{LLE} algoritmu $O[D\log(k)N\log(N)] + O[DNk^{3}] + O[k^{2}d] + O[dN^{2}]$ 
+\end{itemize}
+
+\begin{english}
+    \begin{lstlisting}[language=Python]
+    LLE = LocallyLinearEmbedding(method='modified') #MLLE
+    LLE = LocallyLinearEmbedding(method='hessian') #Hessian LLE
+    LLE = LocallyLinearEmbedding(method='ltsa') #LTSA
+    \end{lstlisting}
+\end{english}
+
+        \begin{minipage}{0.3\textwidth}
+            \begin{flushleft}
+                 \begin{figure}[H]
+                    \centering
+                    \includegraphics[width=1\linewidth]{mlle.png}
+                    \label{zvezdodek}
+                \end{figure}
+            \end{flushleft}
+        \end{minipage}
+        \hfill
+        \begin{minipage}{0.3\textwidth}
+            \begin{flushleft}
+                \begin{figure}[H]
+                \centering
+                \includegraphics[width=1\linewidth]{hlle.png}
+                \label{zvezdodek}
+            \end{figure}
+            \end{flushleft}
+        \end{minipage}
+        \hfill
+        \begin{minipage}{0.3\textwidth}
+            \begin{flushright}
+                \begin{figure}[H]
+                \centering
+                \includegraphics[width=1\linewidth]{ltsa.png}
+                \label{zvezdodek}
+            \end{figure}
+            \end{flushright}
+        \end{minipage}
+        \\
+    Na dvodimenzionalnim podacima dobijenim alternativama \textenglish{LLE} algoritma mo\v ze se videti dosta bolja predstava podataka nego u standardnom algoritmu. Najbolje se pokazao algoritam modifikovanog lokalno linearnog potapanja.

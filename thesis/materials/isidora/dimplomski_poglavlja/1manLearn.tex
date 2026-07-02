@@ -1,0 +1,91 @@
+\chapter{\textenglish{Manifold learning}}
+Mnogostrukost ili {\it\textenglish{manifold}} predstavlja pojam koji poma\v ze u klasifikovanju prostora po dimenzijama. Za svaki prirodan broj postoji Euklidski prostor te dimenzije koji ima karakteristike sli\v cne Dekartovoj ravni. Prava je primer Euklidskog prostora dimenzije 1 dok je ravan primer dvodimenzionalnog Euklidskog prostora. {\it\textenglish{Manifold}} je generalizacija Euklidskog prostora takva da lokalno ima svojstva Euklidskog prostora dok ih globalno ne mora imati.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.87\linewidth]{1dMans.png}
+    \caption{Primer jednodimenzionalnih mnogostrukosti}
+    \label{zvezdodek}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.87\linewidth]{2dimMans.PNG}
+    \caption{Primer dvodimenzionalnih mnogostrukosti}
+    \label{zvezdodek}
+\end{figure}
+
+{\it\textenglish{Manifold learning}} je tehnika nelinearne redukcije dimenzija. Popularna je i brzo se razvija. Pripada oblasti ma\v sinskog u\v cenja, obi\v cno  bez nadzora (eng. \textenglish{unsupervised learning}). U\v ci strukturu vi\v sedimenzionalnih podataka analizom istih. {\it\textenglish{Manifold learning}}  se pojavljuje 2000. godine  sa slede\' com hipotezom \cite{manl1}.
+{\it\textenglish{Manifold learning}} je tehnika nelinearne redukcije dimenzija. Popularna je i brzo se razvija. Pripada oblasti ma\v sinskog u\v cenja, obi\v cno  bez nadzora (eng. \textenglish{unsupervised learning}). U\v ci strukturu vi\v sedimenzionalnih podataka analizom istih. {\it\textenglish{Manifold learning}}  se pojavljuje 2000. godine  sa slede\' com hipotezom \cite{manl1}.
+
+\begin{hypotheses}
+Mnogi vi\v sedimenzionalni skupovi podataka koji se pojavljuju u realnosti zapravo le\v ze u  mnogostrukosti manje dimenzije u koju je ugra\dj en  po\v cetni vi\v sedimenzionalni prostor.
+\end{hypotheses}
+
+Posledica hipoteze {\it\textenglish{manifold learning}}-a je mogu\' cnost predstavljanja vi\v sedimenzionalnih podataka sa manje parametara nego \v sto bi inicijalno bilo potrebno.\\
+\\
+Kao \v sto je ve\' c re\v ceno, cilj {\it\textenglish{manifold learning}}-a je pronala\v zenje re\v senja problema redukcije dimenzija, \v cija je definicija  slede\' ca:
+
+\begin{definition}
+Neka je dat skup $n$ ta\v caka $x_{1}, ..., x_{n}$ koji pripada mnogostrukosti $M \subset \mathbb{R}^{l}$, potrebno je prona\' ci skup ta\v caka $y_{1}, ..., y_{n}$ koji pripada mnogostrukosti $M \subset \mathbb{R}^{m}$, gde je $m\ll l$ takav da $y_{i}$ reprezentuje $x_{i}$.
+\end{definition}
+\section{Primene u svakodnevnom \v zivotu}
+{\it\textenglish{Manifold learning}} se koristi u svakodnevnom \v zivotu da bi se smanjila dimenzionalnost podataka. U nastavku je navedeno nekoliko primera:
+\begin{itemize}
+    \item Prepoznavanje lica: {\it\textenglish{Manifold learning}} tehnike poput Lokalno linearnog potapanja (\textenglish{LLE}) i {\it\textenglish{Isomap}}-a se koriste da bi se smanjila dimenzionalnost vektora facijalnih osobina. Na taj na\v cin olak\v sava prepoznavanje i klasifikaciju lica sa slika.
+    \item Obrada prirodnog jezika: Tehnike poput \textenglish{Word2Vec} i  \textenglish{t-SNE} algoritma se koriste kod mapiranja vi\v sedimenzionalnih vektora re\v ci u manje dimenzije, tako da se semanti\v cki odnosi me\dj u  re\v cima o\v cuvaju. To omogu\' cava lak\v si rad sa re\v cima i njihovu vizuelizaciju.
+    \item Bioinformatika: {\it\textenglish{Manifold learning}} mo\v ze da se primeni na visokodimenzionalne podatke ekspresije gena kako bi se identifikovali \v sabloni i klasteri gena koji se vezuju za odre\dj ene bolesti. Ovo poma\v ze u otkrivanju biomarkera.
+    \item Sistemi za preporuke: {\it\textenglish{Manifold learning}} mo\v ze da se koristi kako bi se smanjila dimenzionalnost podataka o interakciji izme\dj u korisnika i proizvoda. Ovo poma\v ze u preporu\v civanju proizvoda i sadr\v zaja korisnicima na osnovu njihovih preferencija i pona\v sanja.
+\end{itemize}
+
+Na slici ispod prikazan je najjednostavniji primer redukcije dimenzija iz svakodnevnog \v zivota. Re\v c je o prikazu povr\v sine Zemlje koja je sme\v stena u tri dimenzije preko geografske karte koja je sme\v stena u dve dimenzije. Geografske karte su se pojavile mnogo pre pojave {\it\textenglish{manifold learning}}-a \v sto pokazuje da su ljudi i ranije imali potrebu da pojednostave odre\dj ene strukture redukcijom dimenzija. Iako dvodimenzionalni prikaz Zemlje na karti deformi\v se geometriju Zemlje upotreba karte je mnogo rasprostranjenija nego upotreba globusa zbog njene jednostavnosti.  
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.87\linewidth]{sphere-projectionWw.png}
+    \caption{Svakodnevni primer redukcije dimenzija}
+    \label{zvezdodek}
+\end{figure}
+
+\section{\textenglish{Swiss roll}}
+{\it\textenglish{Swiss roll}} je skup trodimenzionalnih podataka koji \' ce biti kori\v s\' cen u narednim sekcijama. U njemu se  nalazi dvodimenzionalna mnogostrukost u obliku uvijenog pravougaonika. U nastavku rada bi\' ce kori\v s\' cene razli\v cite tehnike {\it \textenglish{manifold learning}}-a sa ciljem dobijanja odmotanog pravougaonika. Potrebno je sniziti dimenzionalnost po\v cetnih trodimenzionalnih podataka na dvodimenzionalne podatke.
+\\
+\\U ovom radu bi\' ce kori\v s\' cena {\it\textenglish{scikit-learn}} biblioteka programskog jezika {\it\textenglish{python}} \cite{SKL}. Ona u sebi ima modul {\it\textenglish{datasets}} koji sadr\v zi razne generatore uzoraka. Bi\' ce kori\v s\' cen generator za {\it\textenglish{swiss roll}}. \\
+Kako bi se izgenerisao skup podataka {\it\textenglish{swiss roll}}  potrebno je prvo importovati modul  {\it\textenglish{datasets}}. Zatim je potrebno instancirati i prikazati podatke. Pri instanciranju skupa podataka pode\v savaju se slede\' ci parametri:
+\begin{itemize}
+    \item {\it\textenglish{n samples}}: Broj ta\v caka skupa podataka.
+    \item {\it\textenglish{noise}}: Standardna devijacija Gausovog \v suma.
+    \item {\it\textenglish{random state}}: Odre\dj uje generisanje nasumi\v cnih brojeva pri formiranju skupa podataka. Ukoliko postoji potreba za reprodukcijom izlaza funkcije ova vrednost se treba definisati.
+\end{itemize}
+
+\begin{english}
+\begin{lstlisting}[language=Python]
+    from sklearn import datasets
+    import matplotlib.pyplot as plt
+
+    # Initiate swiss roll dataset
+    sr_points, sr_color = datasets.make_swiss_roll(
+        n_samples=1900, random_state=0, noise=0.5)
+
+    # Plot the data
+    fig = plt.figure(figsize=(8, 6))
+    ax = fig.add_subplot(111, projection="3d")
+    fig.add_axes(ax)
+    ax.scatter(sr_points[:, 0], sr_points[:, 1], 
+        sr_points[:, 2], c=sr_color, s=50, 
+        alpha=0.8, cmap=plt.cm.cool)
+    ax.set_title("Swiss Roll in Ambient Space")
+    ax.view_init(azim=-66, elev=12)
+    _ = ax.text2D(0.8, 0.05, s="n_samples=1900", 
+        transform=ax.transAxes)
+
+    plt.show()
+\end{lstlisting}
+\end{english}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.87\linewidth]{swissRoll.png}
+    \caption{\textenglish{Swiss roll}}
+    \label{zvezdodek}
+\end{figure}
+

@@ -1,0 +1,34 @@
+\setcounter{chapter}{-1}
+\chapter{Uvod}
+Pojam dokaza je opšte poznat i \v siroko kori\v s\' cen u raznim oblastima različitih nauka. Najtipi\v cniji primer dokaza je matemati\v cki dokaz. Matemati\v cki dokaz se u osnovi sastoji iz fiksnog broja koraka pomo\' cu kojih se iz op\v ste prihva\' cenih \v cinjenica (aksioma) dolazi do tvrdnje koja je dokazivana. Dokazi nultog znanja imaju isti cilj kao i matemati\v cki dokazi, da validiraju ispravnost neke tvrdnje, me\dj utim na\v cin na koji to rade je druga\v ciji. 
+
+Inicijalno, dokazi nultog znanja su bili interaktivni, pa su bili sli\v cniji dokazima u zakonu ili debati nego matematičkim dokazima, jer se istinitost tvrdnje u ovakvim dokazima verifikuje  dinami\v ckom interakcijom vi\v se strana.
+
+ Interakcija može biti skupa i spora, pa su  uloženi napori da se ona vremenom izbaci iz dokaza nultog znanja, koji na taj način postaju neinteraktivni. Neinteraktivni dokazi mogu se porediti sa dokazima iz matematike ili formalne logike. Analogno dokazima u naučnim radovima, neinteraktivni dokazi nultog znanja trebaju biti univerzalni i sadržati sve potrebne informacije za validaciju bez ikakve dodatne interakcije. Ali za razliku od dokaza u naučnim radovima, neinteraktivni dokazi nultog znanju ne smeju otkrivati nikakve dodatne informacije osim činjenice da je dokazivana tvrdnja tačna.\\
+
+U ovom radu biće obrađivani protokoli dokaza nultog znanja, njihova osnovna podela na interaktivne i neinteraktivne dokaze, njihov značaj i primene. \\
+U prvom poglavlju biće data istorijski prva definicija  dokaza nultog znanja, praćena primerom primene ovog koncepta u svakodnevici. U drugom poglavlju biće izloženi elementi dokaza nultog znanja, podela na interaktivne i neinteraktivne dokaze, kao i osnovni matematički aparat potreban za razumevanje definicija interaktivnih i neinteraktivnih dokaza. Pored toga u drugom poglavlju zadat je problem kvadratnog ostatka koji će se provlačiti kroz ceo rad sa ciljem da se na istom problemu demonstriraju oba tipa dokaza nultog znanja. U sledećem, trećem, poglavlju biće prikazan kriptografski značaj protokola nultog znanja. Biće predstavljen \textenglish{Goldwasser-Micali} kriptografski sistem koji nosi veliki značaj za dokaze nultog znanja i smatra se njihovom pretečom. U četvrtom poglavlju biće prikazan detaljni postupak razvoja koncepta interaktivnih dokaza nultog znanja, kroz sistematičan prikaz koraka koji su doveli do formiranja ovog koncepta. U petom poglavlju biće data definicija neinteraktivnih dokaza nultog znanja. U ovom poglavlju će biti razmatrana i upoređena tri najpoznatija protokola ovog tipa: \textenglish{ZK-SNARK, ZK-STARK} i \textenglish{Bulletproofs}, sa akcentom na \textenglish{ZK-SNARK} protokol, za koji će biti prikazan primer dokaza u programskom jeziku  \textenglish{Python}. U poslednjem poglavlju će biti predstavljene brojne primene ovog koncepta, čime će se obuhvatiti širok spektar oblasti  kojima se dokazi nultog znanja mogu efikasno primeniti.
+
+\chapter{Definicija dokaza nultog znanja}
+Dokazi nultog znanja su se prvi put pojavili 1985. godine, u radu {\it \textenglish{The knowledge complexity of interactive proof systems}} koji su objavili \textenglish{Shafi Goldwasser} \footnote{\textenglish{Shafi Goldwasser} je američko-izraelska naučnica, dobitnica je brojnih nagrada među kojima se posebno izdvaja Tjuringova nagrada koju je osvojila 2012. godine sa \textenglish{Silvio Micali} za njihova revolucionarna otkrića u kriptografiji, između ostalog upravo za dokaze nultog znanja.}, \textenglish{Silvio Micali}\footnote{\textenglish{Silvio Micali} je italijanski naučnik i osnivač \textenglish{Algorand} blokčejna i kriptovalute\cite{chen2017algorand}. Njegova istraživanja pored dokaza nultog znanja su fokusirana na sigurnosne protokole i pseudonasumične brojeve.}, i \textenglish{Charles Rackoff}\footnote{\textenglish{Charles Weill Rackoff} je američki naučnik iz oblasti kriptografije poznat po \textenglish{Luby–Rackoff } šifrovanju blokova i dokazima nultog znanja.}. U tom radu je data definicija dokaza nultog znanja koja se i danas koristi \cite{mathBook}.
+
+\begin{definition}
+    Protokol nultog znanja je metod kojim jedna strana (dokaziva\v c) mo\v ze dokazati drugoj strani (verifikatoru) da je odre\dj ena tvrdnja ta\v cna, bez otkrivanja bilo kakvih informacija osim \v cinjenice da je odre\dj ena tvrdnja ta\v cna. 
+\end{definition}
+
+Navedeni rad daje matemati\v cke osnove ovog metoda i navodi prve primere dokaza nultog znanja. Dokazi nultog znanja su se od tada konstantno unapre\dj ivali, prona\v sli su upotrebu u realnosti i danas su \v siroko kori\v s\' ceni. Zahvaljujući ovom radu postavljena je osnova za mnoge kriptografske protokole koji se i danas koriste.\\% Decenijama su dokazi nultog znanja evoluirali uz zna\v cajan doprinos istra\v ziva\v ca poput \\
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{zkp.png}
+    \caption{\href{https://schor.medium.com/on-zero-knowledge-proofs-in-blockchains-14c48cfd1dd1}{Vizuelni opis dokaza nultog znanja}}
+\end{figure}
+
+U nastavku je dat primer u kome se  mogu koristiti dokazi nultog znanja kao i  benefiti njihovog  kori\v s\' cenja. \\
+\begin{npra}
+Postoji tvrdnja "{\it Ja imam vi\v se od 18 godina}" koju korisnik \v zeli da doka\v ze nekom servisu. Kako bi korisnik to dokazao potrebno je da dostavi va\v ze\' ci identifikacioni dokument, poput li\v cne karte ili paso\v sa, koji sadr\v zi njegovu godinu ro\dj enja. Dostavljanjem li\v cnog dokumenta servisu korisnik se izla\v ze riziku, rizikuje svoju privatnost. Najve\' ca opasnost koja vreba korisnika je kra\dj a identiteta. Ona se de\v sava usled hakerskih napada jer servisi skladi\v ste podatke u centralizovanim bazama podataka. \\
+U ovakvim situacijama bolje je koristiti dokaze nultog znanja koji nisu podlo\v zni rizicima standardnog pristupa. Protokol nultog znanja koristi, kao ulaz, po\v cetnu tvrdnju na osnovu koje generi\v se sa\v zet dokaz njene istinitosti. Dokaz pru\v za garanciju da je tvrdnja istinita bez upotrebe informacije koja je kori\v s\' cena da se on napravi. Stoga kako bi korisnik dokazao servisu da ima vi\v se od 18 godina potrebno je da prilo\v zi dokaz nultog znanja. Servis treba da proveri da su  odgovaraju\' ca svojstva dokaza ta\v cna i zna\' ce da je dokazivana tvrdnja ta\v cna. U nastavku \' ce biti razmatrano koja su to svojstva, kakvi sve nulti dokazi postoje i kako funkcioni\v su. 
+\end{npra}
+
+
+%Key milestones in the development of ZKPs

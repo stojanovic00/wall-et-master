@@ -1,0 +1,87 @@
+\documentclass[11pt, oneside]{report}
+
+\usepackage[b5paper, margin=1in]{geometry}
+\linespread{1.25}
+\usepackage{xcolor}
+\usepackage[colorlinks=false, linkbordercolor=white, citebordercolor=white,
+    filebordercolor=white, urlbordercolor=white]{hyperref}
+
+\usepackage{pdfpages}
+\usepackage{polyglossia}
+
+\usepackage[backend=biber, style=numeric]{biblatex}
+\addbibresource{references.bib}
+
+%% Cirilica - kuca se latinica, mapiranje je pretvara u cirilicu na izlazu
+\usepackage{fontspec}
+\setmainfont{Carlito}
+\newfontfamily{\cyrillicfont}{Carlito}[Mapping=ascii-to-serbian]
+\newfontfamily{\cyrillicfonttt}{Carlito}
+\setmainlanguage[Script=Cyrillic]{serbian}
+\setotherlanguage{english}
+
+\DefineBibliographyStrings{english}{
+  urlfrom = {Dostupno na},
+}
+
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{subfigure}
+\usepackage{graphicx}
+\usepackage{placeins}
+\usepackage{csquotes}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead{}
+\fancyhead[L]{\textenglish{EIP-7702} vi\v sepotpisni nov\v canik}
+\fancyhead[R]{Aleksandar Stojanovi\' c}
+\fancyfoot{}
+\fancyfoot[C]{\thepage}
+
+\usepackage{titlesec}
+\titlespacing{\chapter}{0pt}{*4}{*2.5}
+\titleformat{\chapter}{\normalfont\huge\bf}{\thechapter}{20pt}{\huge\bf}
+
+\input{formatting}
+\setcounter{tocdepth}{2}
+
+\usepackage[format=plain,labelfont=bf,up,textfont=it,up]{caption}
+
+\usepackage{listings}
+\usepackage{wrapfig}
+\renewcommand{\figurename}{Slika}
+\renewcommand{\lstlistingname}{Листинг}
+\renewcommand{\contentsname}{Sadr\v zaj}
+
+\begin{document}
+
+\graphicspath{ {./slike/} }
+
+\input{titlepage}
+
+% Kljucna dokumentacijska informacija (A4 strane, uklapaju se u B5)
+\includepdf[pages=-,fitpaper=false]{special_pages/Kljucna-dokumentacijska-informacija.pdf}
+
+% Zadatak (A4 strana, uklapa se u B5)
+\includepdf[pages=-,fitpaper=false]{special_pages/zadatak.pdf}
+
+% Izjava mentor/kandidat (A4 strana, uklapa se u B5)
+\includepdf[pages=-,fitpaper=false]{special_pages/Izjava Mentor Kandidat.pdf}
+
+\tableofcontents
+
+\addtocontents{toc}{~\hfill\textbf{Str.}\par}
+
+\input{0uvod}
+\input{1osnovniKoncepti}
+\input{2implementacija}
+\input{zakljucak}
+
+\printbibliography[title = {Literatura}]\addcontentsline{toc}{chapter}{Literatura}
+
+% Biografija kandidata (na kraju, posle literature)
+\input{biografija}
+
+\end{document}

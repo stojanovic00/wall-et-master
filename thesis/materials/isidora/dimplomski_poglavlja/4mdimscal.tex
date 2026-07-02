@@ -1,0 +1,112 @@
+\chapter{Multidimenzionalno skaliranje}
+Multidimenzionalno skaliranje (\textenglish{MDS}) je tehnika koja ilustruje prostorni odnos izme\dj u podataka. Predstavljena je 1994. godine, od strane britanskih nau\v cnika \textenglish{Trevor Cox} i \textenglish{Michael Cox}. Cilj ove tehnike je da otkrije strukturu podataka smestiv\v si je u mali broj dimenzija \cite{kratkoOSVakomAlg, mdsUvod, mdsUvod2}.
+\\
+\\
+\textenglish{MDS} tehnika se ne primenjuje direktno na matricu podataka kao ostali algoritmi o kojima \' ce biti re\v ci kasnije. Primenjuje se na matricu udaljenosti (naziva se jo\v s i matricom sli\v cnosti ili matricom razlike). Postoji vi\v se tehnika multidimenzionalnog skaliranja. U ovom radu govori\' ce se o klasi\v cnom multidimenzionalnom skaliranju. Kod klasi\v cnog multidimenzionalnog skaliranja originalne udaljenosti \' ce biti u
+istoj metrici (skali merenja) kao i udaljenosti izme\dj u podataka nakon primene \textenglish{MDS-a}. \cite{mds}\\
+\\
+\npr Potrebno je rekonstruisati dvodimenzionalnu mapu dr\v zave ako su nam poznate udaljenosti izme\dj u gradova. Udaljenosti izme\dj u gradova date su u slede\' coj tabeli (u stotinama kilometara).
+
+%rad 1
+\begin{english}
+\begin{center}
+\begin{tabular}{|c c c c c|} 
+ \hline
+ & A & B & C & D \\  
+ \hline\hline
+ A & 0.0 & 6.0 & 6.0 & 2.5 \\ 
+ \hline
+ B & 6.0 & 0.0 & 9.5 & 7.8 \\
+ \hline
+ C & 6.0 & 9.5 & 0.0 & 3.5 \\
+ \hline
+ D & 2.5 & 7.8 & 3.5 & 0.0 \\
+ \hline
+\end{tabular}
+\end{center}
+\end{english}
+
+U slu\v caju malog broja gradova mogu\' ce je ru\v cno pomerati ta\v cke po papiru, dok se ne zadovolje sve razdaljine iz tabele. Uz pomo\' c \textenglish{MDS}-a ovaj problem se mo\v ze re\v siti i za ve\' ce skupove podataka. \\
+Matrica udaljenosti ima \v cetiri elementa, oni ne moraju le\v zati u istoj ravni. Postavlja se pitanje koliko  je dimenzija najmanje potrebno da se verodostojno prika\v zu dobijeni podaci. U ovom primeru je poznato da se podaci mogu reprezentovati u dve dimenzije jer se povr\v sina Zemlje lokalno mo\v ze aproksimirati  Euklidskom ravni. Uop\v steno, kada se vizuelizuje matrica udaljenosti realnih podataka, zadavanje dimenzionalnosti podataka nije trivijalno.  Kako bi se dobili najbolji rezultati naj\v ce\v s\' ce je neophodno isprobati vi\v se dimenzija iz nekog opsega vrednosti.
+
+
+\noindent
+\begin{minipage}{0.35\linewidth}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.87\linewidth]{gradovi.png}
+    \caption{Vizuelizacija podataka}
+    \label{mdsMap1}
+\end{figure}
+\end{minipage}
+\begin{minipage}{0.3\linewidth}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.87\linewidth]{gradovirot.png}
+    \caption{Rotirani podaci}
+    \label{mdsMap1Rot}
+\end{figure}
+\end{minipage}
+\begin{minipage}{0.35\linewidth}
+\begin{figure}[H]
+    \centering
+    \includegraphics[clip,width=0.87\linewidth]{gradoviinv.png}
+    \caption{{\it\textenglish{Mirror image}} podataka}
+    \label{mdsMap1flip}
+\end{figure}
+\end{minipage}
+\\
+\\
+Nakon primene \textenglish{MDS}-a mo\v ze se primetiti da postoji vi\v se mogu\' cih reprezentacija podataka iz tabele, kao \v sto je prikazano na slici iznad. Sve reprezentacije verodostojno oslikavaju date podatke i mogu se dobiti osnovnim geometrijskim transformacijama od bilo koje reprezentacije podataka.
+
+\section{Koraci algoritma}
+Algoritam klasi\v cnog multidimenzionalnog skaliranja po\v cinje sa poznatom matricom udaljenosti izme\dj u $n$ objekata. Matrica udaljenosti se sastoji od $\delta_{ij}$ vrednosti, u $i$-tom redu i $j$-toj koloni, koje predstavljaju distance izme\dj u objekata $i$ i $j$. Pored toga, fiksira se broj dimenzija $t$ na koje algoritam mapira objekte. Uop\v steno algoritam se odvija iz slede\' cih koraka, oni mogu varirati od implementacije do implementacije.
+
+\begin{enumerate}
+    \item Po\v cetna konfiguracija je pretpostavka koordinata svakog od $n$ objekata u $t$ dimenzija $(x_{1}, x_{2}, ..., x_{t})$
+    \item Ra\v cunaju se Euklidske razdaljine $d_{ij}$ u po\v cetnoj konfiguraciji, gde je $d_{ij}$ Euklidska razdaljina izme\dj u objekta $i$ i objekta $j$. 
+    \item Formira se funkcija regresije $d_{ij}$ na $\delta_{ij}$, kako je ve\' c pomenuto $\delta_{ij}$ je razdaljina izme\dj u objekta $i$ i objekta $j$ dobijena iz ulaznih parametara. Regresija mo\v ze biti linearna, polinomijalna, logisti\v cka, monotona... Na primer linearna regresija podrazumeva slede\' ce:
+    $$d_{ij} = \alpha + \beta_{ij} + \epsilon_{ij}$$
+
+    gde je $\epsilon_{ij}$ gre\v ska, dok su $\alpha$ i $\beta$ konstante.
+    Prilagođene udaljenosti dobijene iz jednačine regresije nazivaju se dispariteti ($\hat{d}_{ij} = \alpha + \beta_{ij}$)
+
+    \item Kako bi se ocenilo koliko  je fit dobar , gleda se koliko su blizu udaljenosti $d_{ij}$ od dispariteta $\hat{d}_{ij}$. Jedan od na\v cina da se to odredi je Kruskal-ova stres formula: 
+    %Kruškal
+    $$Stress - 1 = \sqrt{\frac{\sum(d_{ij} - \hat{d}_{ij})^{2}}{\sum \hat{d}^{2}_{ij}}}$$
+    \item Koordinate $(x_{1}, x_{2}, ... x_{t})$ svakog objekta se pomeraju malo tako da se stres smanji.
+\end{enumerate}
+
+    Koraci 2 do 5 se ponavljaju sve dok stres i dalje mo\v ze da se smanjuje. Kao rezultat dobija se $n$ objekata u $t$ dimenzija. Koordinate objekata se koriste da bi se napravila vizuelizacija objekata u $t$ dimenzija i uo\v cili odnosi me\dj u njima. Najbolje je kada se re\v senje mo\v ze na\' ci u 3 ili manje dimenzija jer je tada grafi\v cka reprezentacija trivijalna.
+
+\section{Multidimenzionalno skaliranje u \textenglish{scikit-learn} biblioteci}
+Sada \' ce biti prikazano  kako se obja\v snjeni algoritam koristi u {\it\textenglish{python}}-u. Za po\v cetak se  uvezuju moduli {\it\textenglish{metrics}} i {\it\textenglish{manifold}}. Modul {\it\textenglish{metrics}} u sebi sadr\v zi funkciju {\it\textenglish{pairwise distances}} koja  je potrebna da bi se izra\v cunala matrica udaljenosti kojom ovaj algoritam po\v cinje. Iz modula {\it\textenglish{manifold}} se koristi klasa \textenglish{MDS}  i metoda {\it\textenglish{fit transform}}  koja operi\v se nad matricom udaljenosti i vra\' ca koordinate podataka ugra\dj enih u prostor ni\v ze dimenzije \cite{SKLDOC}. 
+
+\begin{english}
+\begin{lstlisting}[language=Python]
+    from sklearn.metrics import pairwise_distances
+    from sklearn.manifold import MDS
+
+    # Initiate swiss roll dataset
+    sr_points, sr_color = datasets.make_swiss_roll(n_samples=1900, 
+                            random_state=0, noise=0.5)
+                            
+    # Compute pairwise Euclidean distances
+    distance_matrix = pairwise_distances(sr_points, 
+                                         metric='euclidean')
+    # Create an instance of the MDS class
+    mds = MDS(n_components=2, dissimilarity='precomputed',
+              max_iter=300, random_state=0)
+    # Fit and transform the data using MDS
+    X_mds = mds.fit_transform(distance_matrix)
+\end{lstlisting}
+\end{english}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{MDS_roll.png}
+    \caption{Grafi\v cki prikaz transformisanih podataka uz pomo\' c multidimenzionalnog skaliranja}
+    \label{mdsMap1}
+\end{figure}
+
+O\v cekivani izlaz algoritma, tj. prikaz podataka u dvodimenzionalnom prostoru nakon redukcije dimenzija ta\v caka iz po\v cetnog skupa je pravougaonik. Dvodimenzionalni skup podataka koji je dobijen ne odgovara o\v cekivanom jer je \textenglish{MDS} linearna tehnika redukcije dimenzija. Pretpostavlja da odnosi izme\dj u ta\v caka mogu biti reprezentovani linearnim transformacijama. Jo\v s jedan od problema je to \v sto \textenglish{MDS} koristi Euklidska rastojanja, pa pretpostavlja da su neke ta\v cke na krivoj bli\v ze nego \v sto zaista jesu.

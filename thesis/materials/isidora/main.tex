@@ -1,0 +1,144 @@
+\documentclass[11pt, oneside]{report}
+\usepackage{IEEEtrantools}
+
+\usepackage[b5paper, margin=1in]{geometry}
+\linespread{1.25}
+\usepackage{mathptmx}
+\usepackage{xcolor}
+\usepackage[colorlinks=false, linkbordercolor=white,  citebordercolor=white, 
+    filebordercolor=white,    urlbordercolor=white]{hyperref}
+
+
+\usepackage{pdfpages}
+\usepackage{polyglossia}
+
+\usepackage[backend=biber, style=numeric]{biblatex}
+\addbibresource{references.bib}
+\renewcommand\bibname{Literatura}
+
+%% Cirilica
+\usepackage{fontspec}
+\setmainfont{Carlito}
+%\newfontfamily\cyrillicfont{Carlito}[Script=Cyrillic]
+\newfontfamily{\cyrillicfont}{Carlito}[Mapping=ascii-to-serbian]
+\newfontfamily{\cyrillicfonttt}{Carlito}
+\setmainlanguage[Script=Cyrillic]{serbian}
+\setotherlanguage{english}
+\newcommand{\mathbox}[1]{\mbox{\foreignlanguage{english}{#1}}}
+
+\DefineBibliographyStrings{english}{
+  urlfrom = {Dostupno na},
+}
+
+
+%% pretty captions
+%\usepackage{caption}
+
+%%% allows you to create Rules, Definitions, Lemmas, Theorems etc.
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+
+\usepackage{float}
+
+\newtheorem{theorem}{Teorema}
+\newtheorem{definition}{Definicija}
+\newtheorem{lemma}{Lema}
+\newtheorem{npra}{Primer}
+\newtheorem{hypotheses}{Hipoteza}
+\numberwithin{definition}{chapter}
+\numberwithin{theorem}{chapter}  
+\numberwithin{lemma}{chapter}  
+\numberwithin{npra}{chapter}  
+\numberwithin{equation}{chapter} 
+
+ \usepackage[super]{nth} 
+
+ \usepackage{subfigure}
+ 
+\usepackage{graphicx}
+\usepackage{placeins}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{csquotes}
+
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0.4pt}
+%\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead{}
+\fancyhead[L]{Dokazi nultog znanja} %%% CHANGE AS APPROPRIATE (you may need to use a shortened form of the title)
+\fancyhead[R]{Isidora Poznanovi\' c} %%% CHANGE AS APPROPRIATE
+\fancyfoot{}
+\fancyfoot[C]{\thepage}
+
+\usepackage{titlesec}
+\titlespacing{\chapter}{0pt}{*4}{*2.5}
+
+\titleformat{\chapter}{\normalfont\huge\bf}{\thechapter}{20pt}{\huge\bf}
+%% prevents Chapter 1 (then new line and Introduction) - turns into 1. Introduction
+
+\input{formatting}
+\setcounter{tocdepth}{2} % allow only sections (not subsections in table of contents)
+
+\usepackage[format=plain,labelfont=bf,up,textfont=it,up]{caption}
+
+% \usepackage{titlesec}
+
+% \titleformat{\section}  % which section command to format
+%   {\fontsize{14}{16}\bfseries} % format for whole line
+%   {\thesection} % how to show number
+%   {1em} % space between number and text
+%   {} % formatting for just the text
+%   [] % formatting for after the text
+
+% \titleformat{\subsection}  % which section command to format
+%   {\fontsize{20}{20}\sffamily} % format for whole line
+%   {\S\thesubsection} % how to show number
+%   {2em} % space between number and text
+%   {\color{blue}} % formatting for just the text
+%   [] % formatting for after the text
+
+\usepackage{listings}
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\renewcommand{\figurename}{Slika}
+\renewcommand{\lstlistingname}{Листинг}
+\renewcommand{\contentsname}{Sadr\v zaj}
+\renewcommand{\proof}{\noindent{\bf Dokaz.\ }}
+\renewcommand{\qed}{\hfill $\square$ \bigskip}
+\def\cp{\,\square\,}
+\newcommand{\npr}{{\bf Primer. }}
+\begin{document}
+
+% %PDF za kljucnu dokumentaciju
+% \includepdf[pages={1},noautoscale=true,scale=1.25,offset=-0.2cm 0.1cm,clip]{word_stranice/titleravan.pdf}
+% \includepdf[pages={1,2},noautoscale=true,scale=1.25,offset=0cm -4.5cm,clip]{word_stranice/komisija.pdf}
+\includepdf[pages={1,2,3},noautoscale=true,scale=0.85,offset=-0.7cm 0cm,clip]{naslovna+kdi.pdf}
+\includepdf[pages={1},noautoscale=true,scale=0.85,offset=-0.7cm 0cm ,clip]{zadatak.pdf}
+\includepdf[pages={1,2},noautoscale=true,scale=0.85, offset=-0.1cm -10,clip]{izjava+bio.pdf}
+
+\graphicspath{ {./slike/} }
+
+% \input{titlepage}
+%\input{Abstract} %% any other "Front matter" should go here before the table of contents - format in a style similar to the file Abstract.tex
+\tableofcontents 
+
+\addtocontents{toc}{~\hfill\textbf{Str.}\par} % comment this line out if you want to remove "Page"
+
+\input{0uvod} % standard chapter format
+\input{1OsnovniKoncepti}
+\input{5Primene}
+% \input{2imap}
+% \input{3lle}
+% \input{5spectral}
+% \input{6tsne}
+\input{7zakljucak}
+%\appendix
+%\input{appendix}  % uncomment out these two lines of code if you have an appendix!
+% you can have more than one appendix if (really) needed.
+\printbibliography[title = {Literatura}]\addcontentsline{toc}{chapter}{Literatura}
+
+\end{document}

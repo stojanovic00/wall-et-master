@@ -1,0 +1,62 @@
+\chapter{Laplasovo karakteristi\v cno preslikavanje}
+Laplasovo karakteristi\v cno preslikavanje (eng. {\it\textenglish{Laplacian Eigenmaps}} ili {\it\textenglish{Spectral embedding for non-linear dimensionality reduction}}) je razvijeno 2003. godine od strane \textenglish{M. Belkin} i \textenglish{P. Niyogi}. Ovaj algoritam ra\v cuna normalizovan Laplasov graf iz grafa susedstva ulaznih podataka. \v Cuva lokalne osobine tako \v sto o\v cuvava svojstva koja se uo\v cavaju u oblasti grupisanja podataka. Laplasovo karakteristi\v cno preslikavanje se mo\v ze smatrati generalizacijom \textenglish{LLE} algoritma, idejno su isti, razlika je u na\v cinu odabiranja te\v zina. Kao i \textenglish{LLE}, Laplasovo preslikavanje na ulazu mora dobiti dimenzionalnost po\v cetne mnogostrukosti i ne o\v cuvava izometriju \cite{kratkoOSVakomAlg, leigUvod}.
+
+
+\section{Koraci algoritma}
+Laplasovo karakteristi\v cno preslikavanje se sastoji iz slede\' cih koraka \cite{LaplSteps}.
+\begin{enumerate}
+    \item Konstrukcija grafa susedstva. \\Izme\dj u svake dve ta\v cke $i$ i $j$ povla\v ci se grana ukoliko su ta\v cke $x_{i}$ i $x_{j}$  blizu. Ta\v cke su blizu ukoliko se nalaze u istoj $\epsilon$ okolini ili ukoliko se odabiraju metodom \textenglish{k-NN}.
+    \item Odabiranje te\v zina. \\Postoje dva na\v cina za odabiranje te\v zina $W \in Mat_{n \times n}(\mathbb{R})$:
+    \begin{itemize}
+        \item {\it\textenglish{Heat kernel}}:
+            \begin{equation}
+              W_{ij} =
+                \begin{cases}
+                  exp(-\frac{||x_{i}-x_{j}||^{2}}{t}) & \text{ako su $x_{i}$ i $x_{j}$ povezani}\\
+                  0 & \text{u suprotnom}
+                \end{cases} 
+            \end{equation}
+        \item {\it\textenglish{Simple-minded}}:
+            \begin{equation}
+              W_{ij} =
+                \begin{cases}
+                  1 & \text{ako su $x_{i}$ i $x_{j}$ povezani}\\
+                  0 & \text{u suprotnom}
+                \end{cases}
+            \end{equation}
+    \end{itemize}
+    \item Izra\v cunavanje karakteristi\v cnih vektora.\\ Neka je $D$ dijagonalna matrica te\v zina $W$, definisana kao $D_{ii} = \sum_{j=1}^{n} W_{ji}$ i neka je Laplasova matrica $L = D - W$. Potrebno je re\v siti svojstvenu jedna\v cinu $$Lf = \lambda Df$$ Nakon re\v savanja jedna\v cine dobijaju se parovi sopstvenih vrednosti i sopstvenih vektora \\ $(\lambda_{0}, f_{0}, ..., (\lambda_{n-1}, f_{n-1}))$ gde su sopstvene vrednosti sortirane na slede\' ci na\v cin:
+    $$0 = \lambda_{0} \leq \lambda_{1} \leq ... \leq \lambda_{n-1} $$ Kada se izostavi $f_{0}$, koristi se prvih $m$ sopstvenih vektora za preslikavanje na $m$-dimenzionalni Euklidski prostor.
+    $$x_{i} \rightarrow (f_{1}(i), ..., f_{m}(i))$$
+\end{enumerate}
+
+\section{Laplasovo karakteristi\v cno preslikavanje u {\it\textenglish{scikit-learn}} biblioteci}
+Kao i do sada, da bi se dobio dvodimenzionalni prikaz razmatranog skupa podataka mo\v ze se instancirati postoje\' ca klasa iz modula \textenglish{scikit-learn} biblioteke.\\
+\\Slo\v zenost ovog algoritma je $O[D\log(k)N\log(N)] + O[DNk^{3}] + O[dN^{2}]$, \\gde je $N$ broj ta\v caka skupa podataka, $D$ dimenzija polaznog skupa podataka, $k$ broj najbli\v zih suseda i  $d$ redukovana dimenzija podataka. Standardni \textenglish{LLE} i Laplasovo karakteristi\v cno preslikavanje imaju istu kompleksnost\cite{SKLDOC}.
+
+\begin{english}
+\begin{lstlisting}[language=Python]
+    from sklearn.manifold import SpectralEmbedding
+
+    # Create instance of the SpectralEmbedding class
+    le = SpectralEmbedding(n_components=2, n_neighbors=10)
+    # Fit and transform data using Laplacian Eigenmaps
+    X_le = le.fit_transform(sr_points)
+
+    # Plot the transformed data with Laplacian Eigenmaps
+    fig = plt.figure(figsize=(6, 6))
+    plt.scatter(X_le[:, 0], X_le[:, 1], c=sr_color, 
+        cmap=plt.cm.cool)
+    plt.title(f'Transformed Swiss Roll with Laplacian Eigenmaps')
+    plt.show()
+\end{lstlisting}
+\end{english}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{le10.png}
+    \caption{Grafi\v cki prikaz transformisanih podataka uz pomo\' c Laplasovog karakteristi\v cnog preslikavanja}
+    \label{mdsMap1}
+\end{figure}
+
+Iz grafi\v ckog prikaza podataka sa slike iznad mo\v ze se re\' ci da Laplasovo karakteristi\v cno preslikavanje nije u stanju da redukuje dimenzije zadatog skupa podataka. Predstava podataka je potpuno iskrivljena. Laplasovo karakteristi\v cno preslikavanje ne mo\v ze da smanji dimenzije {\it \textenglish{swiss roll}}-a jer je on linearna metoda a  povr\v s je nelinearna..

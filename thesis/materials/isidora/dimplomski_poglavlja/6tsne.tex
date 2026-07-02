@@ -1,0 +1,171 @@
+\chapter{\textenglish{T-distributed Stochastic Neighbor Embedding}}
+
+Za {\it\textenglish{t-Distributed Stochastic Neighbor Embedding}} \textenglish{(t-SNE)} se prvi put čulo 2008. godine kada su \textenglish{Lorens van der Marten} i \textenglish{Džefri Hinton} predstavili ovu tehniku u časopisu \textenglish{Journal of Machine Learning Research}. \textenglish{t-SNE} je jo\v s jedan od algoritama za smanjivanje dimenzije podataka, oslanja se na algebarsku topologiju. Sam naziv algoritma govori da je re\v c o stohasti\v ckom algoritmu (u sebi sadr\v zi elemente nasumi\v cnosti) koji se bavi ugra\dj ivanjem skupova susednih \v cvorova preko t-distribucije \cite{tsne, tsneUvod}. 
+
+\section{Koraci algoritma}
+Osnovna ideja algoritma je o\v cuvanje odnosa rastojanja me\dj u ta\v ckama, tako da sli\v cne ta\v cke ostanu blizu a daleke daleko. Pa se prvo mora definisati kako izra\v cunati sli\v cnost izme\dj u dve ta\v cke. Za to se koristi neka od funkcija od norme razlike ta\v caka. Norma razlike \' ce biti mala ako su u pitanju sli\v cne ta\v cke, dok ako su ta\v cke razli\v cite bi\' ce velika. Izbor funkcije i norme se mo\v ze razlikovati od implementacije do implementacije.
+Funkcija gubitka je Kulbak-Lajblerovo rastojanje, koje je definisano sa:
+$$L = \sum_{i,j} p_{i,j} log \frac{p_{i,j}}{q{i,j}}$$
+gde su $p_{i,j}$ i $q_{i,j}$ redom sli\v cnosti izmedju $i$-te i $j$-te ta\v cke u originalnoj i novoj mnogostrukosti. \\
+\\
+Potrebno je minimizovati funkciju gubitka metodom gradijentnog spusta. Mo\v zemo uo\v citi da je  Kulbak-Lajblerovo rastojanje veliko ako se bliske ta\v cke projektuju daleko, pa je samim tim i gre\v ska velika \cite{tsne}.
+\\
+Na slede\' cem primeru se mo\v ze ilustrovati \textenglish{t-SNE} algoritam korak po korak redukuju\' ci dvodimenzionalni set podataka na jednodimenzionalni \cite{tsneOnl}.\\
+\\
+\npr Na slici ispod prikazani su podaci u vidu tri klastera sa dvodimenzionalnim ta\v ckama. 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\linewidth]{clastersStart.PNG}
+    \caption{Po\v cetni set podataka }
+    \label{mdsMap1}
+\end{figure}
+
+Kada bi se podaci  samo namapirali  na $x$ ili $y$ osu projektovanjem ta\v caka, dobila bi se nerealna slika podataka u jednoj dimenziji. Plavi klasteri i roze klasteri bi bili preblizu, \v sto nije slu\v caj u originalnom setu podataka.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{clastersXosa.PNG}
+    \caption{Projekcija na $X$ osu}
+    \label{mdsMap1}
+\end{figure}
+\textenglish{t-SNE} izbegava ovakvu situaciju i odr\v zava relacije izme\dj u ta\v caka koje su vidljive u vi\v sim dimenzijama. Kroz narednih par koraka mo\v ze se videti na koji na\v cin to radi.
+
+\begin{enumerate}
+    \item Inicijalizacija ta\v caka\\
+    Sve ta\v cke originalnog seta podataka se nasumi\v cno razbacuju po jednodimenzionalnom prostoru, odnosno pravoj.
+    
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.4\linewidth]{randomProj.PNG}
+        \caption{Nasumi\v cna jednodimenzionalna projekcija }
+        \label{mdsMap1}
+    \end{figure}
+Nakon toga, preraspore\dj uju se podaci tako da ta\v cke sa sli\v cnim karakteristikama budu blizu.
+
+    \item Koncept sli\v cnosti u originalnoj dimenziji\\
+    Prvo se izabere ta\v cka koja se inicijalno posmatra i izra\v cunaju se razdaljine izme\dj u nje i svake druge ta\v cke.
+     \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.4\linewidth]{original2Ddist.PNG}
+        \caption{Distance izme\dj u originalnih ta\v caka}
+        \label{mdsMap1}
+    \end{figure}
+    Zatim se ta ta\v cka postavlja u centar normalne raspodele a ostale ta\v cke se postavljaju na odgovaraju\' ca rastojanja. Nakon toga se spajaju svaka ta\v cka sem po\v cetne ta\v cke i kriva, kao na slici ispod. Rastojanje od ta\v caka do krive predstavlja sli\v cnost.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.7\linewidth]{normalDist.PNG}
+        \caption{Sli\v cnosti ta\v caka na normalnoj distribuciji}
+        \label{mdsMap1}
+    \end{figure}
+    
+    \item Skaliranje sli\v cnosti\\
+    Podaci mogu biti raspore\dj eni u razli\v citoj gustini. Razli\v citim gustinama podataka odgovaraju razli\v cite vrednosti disperzije normalne raspodele. Ako bi se dodao novi klaster ljubi\v caste boje, njemu bi odgovarala \v sira kriva.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.4\linewidth]{clastersPrpl.PNG}
+        \caption{Novi klaster manje gustine}
+        \label{mdsMap1}
+    \end{figure}
+    \begin{minipage}{0.5\textwidth}
+        \begin{flushleft}
+             \begin{figure}[H]
+                \centering\includegraphics[width=0.8\linewidth]{blueDist.PNG}
+        \caption{Normalna raspodela manje disperzije}
+                \label{zvezdodek}
+            \end{figure}
+        \end{flushleft}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.5\textwidth}
+    \vspace{1.05cm}
+        \begin{flushright}
+            \begin{figure}[H]
+                \centering\includegraphics[width=0.99\linewidth]{prplDist.PNG}
+        \caption{Normalna raspodela ve\' ce disperzije}
+                \label{zvezdodek}
+            \end{figure}
+        \end{flushright}
+    \end{minipage}
+    \textenglish{t-SNE} algoritam ima {\it \textenglish{perplexity}} parametar, koji je jednak o\v cekivanoj gustini podataka.\\
+    \\Na isti na\v cin kao \v sto je ve\' c pokazano izra\v cunavaju se skalirane sli\v cnosti za svaku ta\v cku iz po\v cetnog skupa podataka. Sve skalirane sli\v cnosti sme\v staju se u matricu sli\v cnosti koja je prikazana na slici ispod.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.4\linewidth]{matNormD.jpeg}
+        \caption{Matrica sli\v cnosti originalnih podataka}
+        \label{mdsMap1}
+    \end{figure}
+    Mo\v ze se primetiti da je matrica simetri\v cna jer je sli\v cnost izme\dj u $x_{i}$ i $x_{j}$ jednaka sli\v cnosti izme\dj u $x_{j}$ i $x_{i}$. Dijagonala matrice je obojena tamnom bojom jer je svaka ta\v cka najsli\v cnija samoj sebi. Posmatraju\' ci tre\' cu vrstu matrice mo\v ze se uo\v citi da su ostale plave ta\v cke sli\v cnije izabranoj plavoj ta\v cki nego ta\v cke druge boje. Ta polja matrice su obojena, ali malo svetlijom bojom. Polja koja su obojena svetlo sivom bojom su toliko malo sli\v cna da je to zanemarivo.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.6\linewidth]{matNormObj.jpeg}
+        \caption{Veza izme\dj u matrice sli\v cnosti i originalnih podataka}
+        \label{mdsMap1}
+    \end{figure}
+    
+    \item Skaliranje sli\v cnosti ta\v caka u ni\v zoj dimenziji\\
+    Sada je potrebno posmatrati ranije formiranu nasumi\v cnu raspodelu ta\v caka na pravoj. Analogno ra\v cunanju sli\v cnosti u originalnoj dimenziji, i ovde se prvo fiksira jedna ta\v cka. Zatim se tra\v ze rastojanja od fiksirane ta\v cke do svake druge ta\v cke. 
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.4\linewidth]{randPrRast.PNG}
+        \caption{Nasumi\v cna jednodimenzionalna projekcija }
+        \label{mdsMap1}
+    \end{figure}
+    Fiksirana ta\v cka se postavlja u centar t-distribucije, a ostale ta\v cke na prethodno izra\v cunata rastojanja. Povezuju se ta\v cke sa krivom t-distribucije kao na slici ispod i tako se dobijaju tra\v zene sli\v cnosti. 
+    \\
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{tDistSimil.jpeg}
+        \caption{Sli\v cnosti ta\v caka na t-distribuciji}
+        \label{mdsMap1}
+    \end{figure}
+    T- distribucija se koristi da bi se izbeglo nagomilavanje svih klastera u centru distribucije, \v sto bi bio slu\v caj kod normalne raspodele.\\
+    \\
+    Formula za odre\dj ivanje vrednosti t-distribucije je slede\' ca
+    $$t = \frac{\bar{x} - \mu}{\frac{s}{\sqrt{n}}}$$
+    gde je $\bar{x}$ srednja vrednost uzorka, $\mu$ je srednja vrednost populacije, $s$ je standardna devijacija i $n$ je veli\v cina uzorka.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.5\linewidth]{nDistvsTdist.jpeg}
+        \caption{Normalna distribucija i t-distribucija}
+        \label{mdsMap1}
+    \end{figure}
+    Tako dobijene vrednosti sli\v cnosti ta\v caka ponovo se sme\v staju u matricu sli\v cnosti. Mo\v ze se primetiti da je matrica dobijena ovim putem neure\dj ena u pore\dj enju sa originalnom matricom.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.374\linewidth]{matThaos.jpeg}
+        \caption{Matrica sli\v cnosti t-distribucije}
+        \label{mdsMap1}
+    \end{figure}
+    U nastavku algoritma pomeraju se nasumi\v cno raspore\dj ene ta\v cke po pravoj tako da matrica sli\v cnosti izme\dj u korigovanih ta\v caka bude ista kao originalna matrica sli\v cnosti.
+\end{enumerate}
+
+\section{\textenglish{t-SNE} u \textenglish{scikit-learn} biblioteci}
+U slede\' cem kodu mo\v ze se prona\' ci redukovanje dimenzija po\v cetnog {\it\textenglish{swiss roll}} skupa podataka metodom \textenglish{t-SNE} \cite{SKLDOC}.
+
+\begin{english}
+\begin{lstlisting}[language=Python]
+    from sklearn.manifold import TSNE
+    
+    # Create instance of the TSNE class
+    tsne = TSNE(n_components=2, perplexity=50, 
+                random_state=0)
+    # Fit and transform data using t-SNE
+    X_tsne = tsne.fit_transform(sr_points)
+
+    # Plot the transformed data with t-SNE
+    fig = plt.figure(figsize=(6, 6))
+    plt.scatter(X_tsne[:, 0], X_tsne[:, 1], 
+                c=sr_color, cmap=plt.cm.cool)
+    plt.title(
+        f'Transformed Swiss Roll with t-SNE')
+    plt.show()
+\end{lstlisting}
+\end{english}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{tsne50.png}
+    \caption{Grafi\v cki prikaz transformisanih podataka uz pomo\' c \textenglish{t-SNE} algoritma}
+    \label{mdsMap1}
+\end{figure}
+
+Mo\v ze se uo\v citi da \textenglish{t-SNE} nije formirao o\v cekivani pravougaonik koji se dobija odmotavanjem skupa podataka. Dobijeni skup ta\v caka izgleda kao  zakrivljeni pravougaonik koji je pocepan na dva mesta. Razlog za to je \v cinjenica da je \textenglish{t-SNE} lokalni algoritam, pa bolje reprezentuje lokalnu nego globalnu strukturu podataka. Tako\dj e poznato je da \textenglish{t-SNE} ima problema sa reprezentacijom gusto pakovanih podataka. 

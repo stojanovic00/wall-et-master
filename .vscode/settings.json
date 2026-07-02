@@ -25,6 +25,29 @@
     "editor.insertSpaces": true
   },
 
+  // LaTeX Workshop - force XeLaTeX (required for fontspec + Cyrillic mapping)
+  "latex-workshop.latex.tools": [
+    {
+      "name": "latexmk-xelatex",
+      "command": "latexmk",
+      "args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-xelatex",
+        "-cd",
+        "%DOC%"
+      ]
+    }
+  ],
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "latexmk (XeLaTeX)",
+      "tools": ["latexmk-xelatex"]
+    }
+  ],
+  "latex-workshop.latex.recipe.default": "latexmk (XeLaTeX)",
+
   // Search settings (exclude build artifacts)
   "search.exclude": {
     "**/node_modules": true,

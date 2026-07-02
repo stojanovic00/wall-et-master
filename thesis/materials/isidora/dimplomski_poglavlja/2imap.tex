@@ -1,0 +1,187 @@
+\chapter{\textenglish{Isomap Embedding}}
+
+{\it\textenglish{Isomap (Isometric Feature Mapping)}} je jedan od najstarijih pristupa {\it \textenglish{manifold learning}}-a koji predstavlja nadogradnju multidimenzionalnog skaliranja. \textenglish{J. B. Tenenbaum}, \textenglish{V. de Silva} i \textenglish{J. C. Langford} su 2000. predstavili ovaj metod. {\it\textenglish{Isomap}} te\v zi mapiranju mnogostrukosti u prostor malog broja dimenzija tako da se geodetske razdaljine izme\dj u svih ta\v caka o\v cuvaju. Odnosno, cilj je da ta\v cke koje su bile blizu u originalnoj mnogostrukosti ostanu blizu i u novoj mnogostrukosti, a ta\v cke koje su bile daleko i ostanu daleko. Geodetska razdaljina izme\dj u dve ta\v cke je du\v zina najkra\' ce krive koja le\v zi na posmatranoj mnogostrukosti i spaja te dve ta\v cke. {\it\textenglish{Isomap}} mo\v ze rukovati i sa ta\v ckama koje nisu iz originalnog skupa podataka pomo\' cu interpolacije\cite{kratkoOSVakomAlg, imapUvod}.\\
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{rastojanja.png}
+    \caption{Razlika izme\dj u Euklidskog i geodetskog rastojanja}
+    \label{zvezdodek}
+\end{figure}
+
+{\it\textenglish{Isomap}} je pogodan za podatke koji su dobro uzorkovani. Ukoliko ima dosta \v suma u vidu podataka koji odska\v cu od sli\v cnih podataka (autlajeri), razdaljine izme\dj u autlajera i podataka koji nisu bliski njima  mogu biti male i time pokvariti dobijeno re\v senje. Najbolje je otkloniti \v sto je vi\v se \v suma mogu\' ce pre same primene {\it\textenglish{isomap}} algoritma.\\
+Tako\dj e bitno je da se podaci nalaze na lokalno ravnim mnogostrukostima, zato \v sto su u ovom scenariju globalne geodetske razdaljine dobro aproksimirane, pa se klasi\v cnim \textenglish{MDS}-om dobijaju dobri rezultati. Kod nepravilnijih mnogostrukosti globalne geodetske razdaljine se ne aproksimiraju najbolje. Ta\v cke koje su dosta udaljene na po\v cetnoj mnogostrukosti se aproksimiraju lo\v sije od manje udaljenih ta\v caka i to predstavlja veliki problem klasi\v cnom \textenglish{MDS}-u.
+
+\section{Koraci algoritma}
+Ulaz {\it\textenglish{isomap}} algoritama je poznata matrica podataka, sam algoritam se sastoji iz slede\' ca \v cetiri koraka\cite{isomap}:
+\begin{enumerate}
+    \item Izbor $n$ nasumi\v cnih ta\v caka iz podataka za veoma velike skupove podataka kako bi zadr\v zali naknadna izra\v cunavanja lako obradivim.
+    \item Konstrukcija povezanog grafa najbli\v zih suseda uz pomo\' c metoda $k$ najbli\v zih suseda ili $\epsilon$ okoline.
+    \item Izra\v cunavanje svih najkra\' cih putanja u grafu najbli\v zih suseda iz prethodnog koraka, naj\v ce\v s\' ce preko {\it\textenglish{Dijkstra}} algoritma ili {\it\textenglish{Floyd Warshall}} algoritma. 
+    \item Upotrebom klasi\v cnog \textenglish{MDS} algoritma koji koristi prethodno izra\v cunate najkra\' ce putanje, dobijaju se podaci projektovani na prostor ni\v ze dimenzije.
+\end{enumerate}
+
+\subsection{\textenglish{Dijkstra} algoritam}
+
+{\it\textenglish{Dijkstra}} algoritam spada u grupu pohlepnih algoritama. Njegov cilj je nala\v zenje najkra\' ce putanje od po\v cetnog do svih ostalih \v cvorova u grafu, pravljenjem stabla najkra\' cih putanja. Ovaj algoritam je kori\v s\' cen u \textenglish{GPS} ure\dj ajima za pronala\v zenje najkra\' ce putanje izme\dj u trenutne lokacije i destinacije. \v Siroko je primenjen u industriji, najvi\v se u domenima koji zahtevaju modelovanje mre\v za \cite{djikstra}.\\
+\\
+\npr Na slici je prikazan povezan te\v zinski graf, pri \v cemu te\v zine predstavljaju udaljenost \v cvorova. Potrebno je prona\' ci najkra\' ci put iz \v cvora $A$ u \v cvor $B$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{djikstra.PNG}
+    \caption{}
+    \label{zvezdodek}
+\end{figure}
+
+ Uz pomo\' c {\it\textenglish{Dijkstra}} algoritma mo\v ze se prona\' ci da je najkra\' ca putanja \\$A \longrightarrow F \longrightarrow E \longrightarrow H \longrightarrow B$.\\
+\\
+%https://www.freecodecamp.org/news/dijkstras-shortest-path-algorithm-visual-introduction/
+
+Algoritam na ulazu dobija graf i po\v cetni \v cvor. Na po\v cetku se inicijalizuje  lista distanci u kojoj se bele\v ze razdaljine svakog \v cvora od po\v cetnog \v cvora. Razdaljina po\v cetnog \v cvora od samog sebe je $0$, dok se sve ostale distance inicijalizuju na beskona\v cnost, jer jo\v s uvek nisu odre\dj ene. Pored liste distanci, inicijalizuje se i lista nepose\' cenih \v cvorova. U ovoj listi se prvobitno nalaze svi \v cvorovi grafa. U svakoj iteraciji algoritma a\v zurira se lista distanci tako \v sto se \v citaju te\v zine do susednih \v cvorova. Zatim se iz liste nepose\' cenih \v cvorova nalazi \v cvor najbli\v zi po\v cetnom \v cvoru i obele\v zava se kao pose\' cen tj. izbacuje se iz liste nepose\' cenih \v cvorova. Algoritam se izvr\v sava sve dok se lista nepose\' cenih \v cvorova ne isprazni.\\
+\\U nastavku je implementiran opisani postupak {\it\textenglish{Dijkstra}} algoritma. Kompleksnost ovog algoritma je $O(E log V)$.
+
+\begin{english}
+\begin{lstlisting}[language=Python]
+function Dijkstra(Graph, source):
+#Distance from source to source is set to 0
+       dist[source]  := 0
+       #Initializations
+       for each vertex v in Graph: 
+           if v != source
+#Unknown distance function from source to each node set to infinity
+               dist[v]  := infinity 
+           # All nodes initially in Q
+           add v to Q 
+#The main loop
+      while Q is not empty: 
+      #In the first run-through, this vertex is the source node
+          v := vertex in Q with min dist[v]
+          remove v from Q 
+    #where neighbor u has not yet been removed from Q.
+          for each neighbor u of v:
+              alt := dist[v] + length(v, u)
+              # A shorter path to u has been found
+              if alt < dist[u]:     
+                  dist[u]  := alt            
+
+\end{lstlisting}
+\end{english}
+
+% \newpage
+\subsection{\textenglish{Floyd Warshall} algoritam}
+
+{\it\textenglish{Floyd Warshall}} algoritam koristi pristup dinami\v ckog programiranja.  Za cilj ima pronala\v zenje najkra\' cih putanja izme\dj u svaka dva \v cvora u te\v zinskom grafu. Sastoji se iz $n$ iteracija gde $n$ predstavlja broj \v cvorova u grafu. U svakom koraku $k$ ra\v cunaju se udaljenosti preko $k$-tog \v cvora uz pomo\' c  izra\v cunatih udaljenosti iz prethodnog koraka \cite{FW}.\\
+\\
+% https://www.programiz.com/dsa/floyd-warshall-algorithm
+\npr Dat je usmeren te\v zinski graf prikazan na slici. {\it\textenglish{Froyd Warshall}} algoritmom potrebno je prona\' ci   najkra\' ce udaljenosti izme\dj u svaka dva \v cvora.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\linewidth]{floydwarshal.png}
+    \caption{Usmeren te\v zinski graf}
+    \label{zvezdodek}
+\end{figure}
+
+Prvo se kreira matrica $A^{0}$ dimenzija $n\times n$ gde je $n$ broj \v cvorova grafa, u ovom slu\v caju $4$. Redovi i kolone matrice predstavljaju \v cvorove grafa dok su vrednosti polja zapravo razdaljine me\dj u \v cvorovima. Glavna dijagonala matrice $A^{0}$ \' ce uvek biti ispunjena nulama jer je razdaljina svakog \v cvora od samog sebe nula. U slu\v caju da graf nije usmeren matrica $A^{0}$ \' ce biti simetri\v cna u odnosu na glavnu dijagonalu. U slu\v caju grafa sa slike formira se slede\' ca matrica gde $A^{0}[i][j]$ predstavlja razdaljinu od $i$-tog do $j$-tog \v cvora grafa. 
+$$A^{0} = \begin{bmatrix}
+0 & 3 & \infty & 5\\
+2 & 0 & \infty & 4\\
+\infty & 1 & 0 & \infty\\
+\infty & \infty & 2 & 0
+\end{bmatrix}$$
+Zatim se formira matrica $A^{1}$  tako \v sto se prepi\v su prva kolona i vrsta matrice $A^{0}$ i ostale vrednosti se ra\v cunaju po slede\' coj formuli:
+$$A^{k}[i][j]= min(A^{k-1}, A^{k-1}[i][k]+ A^{k-1}[k][j])$$
+
+Primenom ove formule dobijaju se najkra\' ce razdaljine izme\dj u svaka dva \v cvora samo preko susednih \v cvorova i \v cvora $A$. Na primer \v cvor $A^{0}[1][3]$ ima vrednost $4$, dok je $A^{0}[1][0] + A^{0}[0][3] = 2 + 5 = 7$, pa \' ce u \v cvor $A{1}[1][3]$ biti upisana vrednost 4.
+
+$$A^{1} = \begin{bmatrix}
+0 & 3 & \infty & 5\\
+2 & 0 & \infty & 4\\
+\infty & 1 & 0 & \infty\\
+\infty & \infty & 2 & 0
+\end{bmatrix}$$
+
+Kako bi se dobila matrica $A^{2}$ potrebno je primeniti istu formulu na matricu $A^{1}$, s tim \v sto se sada prepisuje druga vrsta i kolonu.
+
+$$A^{2} = \begin{bmatrix}
+0 & 3 & \infty & 5\\
+2 & 0 & \infty & 4\\
+3 & 1 & 0 & 5\\
+\infty & \infty & 2 & 0
+\end{bmatrix}$$
+
+Analogno se ra\v cuna matrica $A^{3}$. 
+
+$$A^{3} = \begin{bmatrix}
+0 & 3 & \infty & 5\\
+2 & 0 & \infty & 4\\
+3 & 1 & 0 & 5\\
+5 & 3 & 2 & 0
+\end{bmatrix}$$
+
+Na kraju se ra\v cuna matrica $A^{4}$ koja u sebi sadr\v zi najkra\' ce udaljenosti izme\dj u svaka dva \v cvora po\v cetnog grafa, \v cime je algoritam zavr\v sen.
+
+$$A^{4} = \begin{bmatrix}
+0 & 3 & 7 & 5\\
+2 & 0 & 6 & 4\\
+3 & 1 & 0 & 5\\
+5 & 3 & 2 & 0
+\end{bmatrix}$$
+
+U nastavku je implementiran opisani postupak {\it\textenglish{Floyd Warshall}} algoritma. Kompleksnost ovog algoritma je $O(V^{3})$
+
+\begin{english}
+\begin{lstlisting}[language=Python]
+def floyd_warshall(G):
+    distance = list(map(lambda i: list(map(lambda j: j, i)), G))
+
+    # Adding vertices individually
+    for k in range(nV):
+        for i in range(nV):
+            for j in range(nV):
+                distance[i][j] = 
+                min(distance[i][j], distance[i][k] + distance[k][j])
+\end{lstlisting}
+\end{english}
+
+\section{\textenglish{Isomap} u \textenglish{scikit-learn} biblioteci}
+Da bi se  pokazalo kako {\it \textenglish{Isomap}} redukuje dimenziju  skupa podataka sa po\v cetka, prvo se uvezuje klasa {\it\textenglish{Isomap}} iz modula {\it\textenglish{manifold}}. Pri instanciranju klase pored parametara koji odre\dj uju broj suseda koji se razmatra za svaku ta\v cku i ciljanog broja dimenzija, mo\v ze se podesiti i parametar {\it\textenglish{path method}}. Ovaj parametar odre\dj uje metod za pronala\v zenje najkra\' cih putanja. Mo\v ze se postaviti na tri vrednosti:
+\begin{itemize}
+    \item {\it\textenglish{auto}}: Poku\v saj odabiranja najboljeg algoritma automatski. Ovo je podrazumevana vrednost parametra.
+    \item {\it\textenglish{FW: Floyd-Warshall}} algoritam.
+    \item {\it\textenglish{D: Dijkstra}} algoritam.
+\end{itemize}
+Slo\v zenost ovog algoritma se dobija sabiranjem slo\v zenosti svakog od tri koraka preko kojih je algoritam implementiran. Prvi korak je potraga za najbli\v zim susedima koja nosi slo\v zenost  $O[D\log(k)N\log(N)]$. U drugom koraku se izra\v cunavaju najkra\' ce putanje izme\dj u \v cvorova u grafu, slo\v zenost ovog koraka je $O[N^{3}]$ ukoliko se koristi {\it\textenglish{Floyd Warshall}} algoritam ili $O[N^{2}(k + \log(N))]$ za {\it\textenglish{Dijkstra}} algoritam. Tre\' ci korak je ugra\dj ivanje u ni\v ze dimenzije koje nosi slo\v zenost $O[dN^{2}]$ \cite{SKLDOC}.
+Kada se sumiraju sve vrednosti, slo\v zenost algoritma {\it\textenglish{Isomap}} je:\\ $$O[D\log(k)N\log(N)] + O[N^{2}(k + \log(N))] + O[dN^{2}]$$.
+
+\begin{english}
+\begin{lstlisting}[language=Python]
+    from sklearn.manifold import Isomap
+    # Initiate swiss roll dataset
+    sr_points, sr_color = datasets.make_swiss_roll(n_samples=1900, 
+                            random_state=0, noise=0.5)
+
+    # Create instance of the Isomap class
+    imap = Isomap(n_neighbors=11, n_components=2)
+    # Fit and transform data using Isomap
+    X_imap = imap.fit_transform(sr_points)
+
+    # Plot results the transformed data
+    fig = plt.figure(figsize=(6, 6))
+    plt.scatter(X_imap[:, 0], X_imap[:, 1], c=sr_color, 
+                            cmap=plt.cm.cool)
+    plt.title(
+        f'Transformed Swiss Roll with ISOMAP')
+    plt.show()
+\end{lstlisting}
+\end{english}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{isomap11knn.png}
+    \caption{Grafi\v cki prikaz transformisanih podataka uz pomo\' c \textenglish{isomap} algoritma}
+    \label{zvezdodek}
+\end{figure}
+Na slici iznad jasno se vidi formirani pravougaonik. Algoritam {\it \textenglish{isomap}} je u potpunosti uspeo da redukuje dimenzije po\v cetnog skupa podataka. {\it \textenglish{Isomap}} mo\v ze rukovati sa nelinearnim podacima tako \v sto \v cuva unutra\v snju geometriju i koristi geodetske razdaljine za razliku od \textenglish{MDS} algoritma koji koristi Euklidske razdaljine.
+\nocite{*}
