@@ -16,8 +16,23 @@
     {#1}
     {\MakeSentenceCase{#1}}}
 
-\DeclareFieldFormat{urldate}{\bibsentence\mkbibbrackets{\bibstring{urlseen}\space#1}}
-\DeclareFieldFormat{url}{\bibstring{urlfrom}\addcolon\space\url{#1}}
+%% Srpske oznake u bibliografiji - eksplicitno prebaci u srpski kontekst
+%% da bi ascii-to-serbian mapiranje dalo cirilicu
+\newcommand*{\srblabel}[1]{\foreignlanguage{serbian}{#1}}
+
+%% "Dostupno na: URL" - oznaka na srpskom (cirilica)
+\DeclareFieldFormat{url}{\srblabel{Dostupno na}\addcolon\space\url{#1}}
+
+%% "Pristupljeno DD.MM.YYYY" - oznaka na srpskom (cirilica), datum evropski
+\renewbibmacro*{url+urldate}{%
+  \usebibmacro{url}%
+  \iffieldundef{urlyear}
+    {}
+    {\setunit*{\adddot\addspace}%
+     \mkbibbrackets{\srblabel{Pristupljeno}\space
+       \iffieldundef{urlday}{}{\ifnum\thefield{urlday}<10 0\fi\thefield{urlday}.}%
+       \iffieldundef{urlmonth}{}{\ifnum\thefield{urlmonth}<10 0\fi\thefield{urlmonth}.}%
+       \thefield{urlyear}}}}
 
 \renewbibmacro*{journal}{%
   \iffieldundef{journaltitle}

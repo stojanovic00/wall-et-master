@@ -9,7 +9,7 @@
 \usepackage{pdfpages}
 \usepackage{polyglossia}
 
-\usepackage[backend=biber, style=numeric]{biblatex}
+\usepackage[backend=biber, style=numeric, autolang=other]{biblatex}
 \addbibresource{references.bib}
 
 %% Cirilica - kuca se latinica, mapiranje je pretvara u cirilicu na izlazu
@@ -51,6 +51,9 @@
 
 \usepackage{listings}
 \usepackage{wrapfig}
+%% Strane reci - italic + engleski font (bez ascii-to-serbian mapiranja)
+\newcommand{\en}[1]{\textit{\textenglish{#1}}}
+
 \renewcommand{\figurename}{Slika}
 \renewcommand{\lstlistingname}{Листинг}
 \renewcommand{\contentsname}{Sadr\v zaj}

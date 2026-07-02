@@ -1,3 +1,44 @@
 \setcounter{chapter}{-1}
 \chapter{Uvod}
-Ovde ide uvod.
+
+\section{Motivacija}
+
+Upravljanje digitalnom imovinom na \en{blockchain} mre\v zama sve \v ce\v s\' ce prevazilazi individualni kontekst. Decentralizovane autonomne organizacije (\en{DAO}), kompanije i timovi \v cesto zajedni\v cki dr\v ze kriptovalute i tokene kao deo poslovnih procesa ili zajedni\v ckih fondova \cite{buterin2014}. U takvim scenarijima, odluke o tro\v senju sredstava ne treba da donosi jedna osoba, ve\' c ih treba odobriti ve\' ci broj ovla\v s\' cenih u\v cesnika.
+
+Standardni \en{Ethereum} nalog u vlasni\v stvu korisnika ne podr\v zava ovakav model upravljanja. Svaka transakcija se autorizuje isklju\v civo jednim privatnim klju\v cem, bez mogu\' cnosti definisanja praga saglasnosti ili zahtevanja odobrenja vi\v se strana \cite{antonopoulos2018}. Ovo stvara centralnu ta\v cku odlu\v civanja i centralnu ta\v cku rizika: kompromitacija tog jednog klju\v ca daje neograni\v cen pristup celokupnoj imovini, bez mogu\' cnosti zaustavljanja ili opoziva.
+
+Vi\v sepotpisni (\en{multisig}) protokoli re\v savaju ovaj problem zahtevanjem saglasnosti $M$ od $N$ potpisnika pre izvr\v savanja transakcije. Ovakav pristup je u tradicionalnim finansijama dugo prisutan - korporativni ra\v cuni zahtevaju potpise vi\v se ovla\v s\' cenih lica, a odluke o tro\v senju ve\' cih iznosa prolaze kroz formalne procese odobravanja. Digitalna imovina zaslu\v zuje isti nivo institucionalne za\v stite.
+
+\section{Domen problema}
+
+\en{Ethereum} protokol defini\v se dve vrste naloga: naloge u vlasni\v stvu spoljnih korisnika (\en{Externally Owned Account}, \en{EOA}) i naloge pametnih ugovora \cite{wood2024}. \en{EOA} je deterministi\v cki izveden iz jednog 256-bitnog privatnog klju\v ca kori\v s\' cenjem elipti\v cke kriptografije (\en{ECDSA}). Svaka transakcija mora biti potpisana tim jednim klju\v cem - nema praga saglasnosti, nema delegiranja ovla\v s\' cenja, nema mogu\' cnosti opoziva.
+
+Ovaj model ima tri klju\v cna ograni\v cenja relevantna za ovaj rad:
+
+\begin{enumerate}
+  \item \textbf{Jedinstvena ta\v cka otkaza} - kompromitacija jednog klju\v ca kompromituje ceo nalog bez mogu\' cnosti zaustavljanja transakcija ili opoziva pristupa.
+  \item \textbf{Odsustvo vi\v sepotpisne autorizacije} - nije mogu\' ce zahtevati saglasnost ve\' ceg broja strana pre izvr\v savanja transakcija visoke vrednosti, \v sto je uobi\v cajeni zahtev u korporativnim i timskim okru\v zenjima.
+  \item \textbf{Lo\v se korisni\v cko iskustvo pri transferu \en{ERC20} tokena} - standard \en{ERC20} zahteva da korisnik najpre po\v salje transakciju \texttt{approve()}, a tek zatim pametni ugovor mo\v ze pozvati \texttt{transferFrom()} u drugoj, zasebnoj transakciji. Korisnik pla\' ca naknadu za gas dva puta i potvr\dj uje dve odvojene \en{blockchain} operacije.
+\end{enumerate}
+
+Navedena ograni\v cenja posebno dolaze do izra\v zaja kod vi\v sepotpisnih nov\v canika, gde vi\v se korisnika deli vlasni\v stvo nad zajedni\v ckim sredstvima. Deponovanje \en{ERC20} tokena u takav nov\v canik klasi\v cnim pristupom zahteva dve transakcije od strane korisnika, \v sto uvodi dodatnu slo\v zenost i pove\' cava mogu\' cnost gre\v ske.
+
+\section{Predlo\v zeno re\v senje}
+
+U okviru ovog rada razvijen je \en{Ethereum} vi\v sepotpisni nov\v canik koji kombinuje dve klju\v cne tehnologije: vi\v sepotpisni pametni ugovor i \en{EIP-7702} \cite{eip7702}.
+
+Vi\v sepotpisni pametni ugovor implementira obrazac $M$-od-$N$: transakcija se mo\v ze izvr\v siti tek kada $M$ od ukupno $N$ definisanih potpisnika da saglasnost. Na taj na\v cin, kompromitacija jednog privatnog klju\v ca nije dovoljna za neovla\v s\' cen pristup zajedni\v ckim sredstvima.
+
+\en{EIP-7702} je mehanizam uveden \en{Ethereum} nadogradnjom \en{Pectra} (2025) koji omogu\' cava da \en{EOA} privremeno izvr\v si kod pametnog ugovora u okviru jedne transakcije, bez trajne promene tipa naloga \cite{eip7702}. Ovo direktno re\v sava tre\' ce ograni\v cenje: korisnik mo\v ze u jednoj transakciji atomski i odobriti i deponovati \en{ERC20} token u vi\v sepotpisni ugovor, jer \en{EOA} privremeno preuzima logiku pomo\' cnog ugovora koji spaja \texttt{approve()} i \texttt{deposit()} u jedan korak, nakon \v cega se delegacija odmah opoziva.
+
+Sistem je realizovan kao ekstenzija za \en{Chromium}-bazirane pretra\v ziva\v ce (\en{Chrome}, \en{Brave}, \en{Edge}) i testiran na \en{Sepolia} testnoj mre\v zi \en{Ethereum} platforme.
+
+\section{Struktura rada}
+
+Rad je organizovan na slede\' ci na\v cin:
+
+U \textbf{prvom poglavlju} opisuju se tehni\v cke osnove neophodne za razumevanje implementacije: \en{Ethereum} model naloga i transakcija, pametni ugovori, vi\v sepotpisni protokoli i \en{EIP-7702} mehanizam. Posebna pa\v znja posve\' cena je na\v cinu na koji \en{EIP-7702} unapre\dj uje korisni\v cko iskustvo u pore\dj enju sa postoje\' cim re\v senjima, koja se tako\dj e analiziraju u ovom poglavlju.
+
+U \textbf{drugom poglavlju} detaljno se opisuje implementacija sistema: arhitektura ekstenzije, upravljanje nov\v canikom, implementacija vi\v sepotpisnog ugovora i tok depozita \en{ERC20} tokena putem \en{EIP-7702} delegacije.
+
+U \textbf{tre\' cem poglavlju} iznose se zaklju\v cci, isti\v cu ograni\v cenja postignute implementacije i predla\v zu pravci budu\' ceg razvoja.
