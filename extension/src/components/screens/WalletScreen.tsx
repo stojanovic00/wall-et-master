@@ -17,10 +17,12 @@ const WalletScreen: React.FC<WalletScreenProps> = ({
   onViewTokens,
   onViewAddressBook,
 }) => {
-  const { wallet, address, getBalance } = useWallet();
+  const { wallet, address, getBalance, isDelegationActive, enableSmartAccount, disableSmartAccount } = useWallet();
   const [balance, setBalance] = useState<string>("");
   const [loadingBalance, setLoadingBalance] = useState<boolean>(false);
   const [copied, setCopied] = useState(false);
+  const [delegationLoading, setDelegationLoading] = useState(false);
+  const [delegationError, setDelegationError] = useState<string>("");
 
   useEffect(() => {
     const fetchBalance = async () => {
@@ -40,6 +42,22 @@ const WalletScreen: React.FC<WalletScreenProps> = ({
     };
     fetchBalance();
   }, [wallet, getBalance]);
+
+  const handleDelegationToggle = async () => {
+    setDelegationLoading(true);
+    setDelegationError("");
+    try {
+      if (isDelegationActive) {
+        await disableSmartAccount();
+      } else {
+        await enableSmartAccount();
+      }
+    } catch (e: any) {
+      setDelegationError(e.message || "Transaction failed");
+    } finally {
+      setDelegationLoading(false);
+    }
+  };
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -120,6 +138,31 @@ const WalletScreen: React.FC<WalletScreenProps> = ({
           <button className="btn btn-secondary" onClick={onViewAddressBook}>
             Address Book
           </button>
+          <hr className="hr-wallet" />
+          <div className="smart-account-section">
+            <div className="smart-account-header">
+              <span className="smart-account-label">
+                Smart Account (EIP-7702)
+              </span>
+              <div
+                className={`toggle ${isDelegationActive ? "toggle-on" : "toggle-off"} ${delegationLoading ? "toggle-disabled" : ""}`}
+                onClick={!delegationLoading ? handleDelegationToggle : undefined}
+              >
+                <div className="toggle-thumb" />
+              </div>
+            </div>
+            <p className="smart-account-desc">
+              {isDelegationActive
+                ? "Enabled - ERC20 deposits use a single transaction"
+                : "Disabled - ERC20 deposits require two transactions"}
+            </p>
+            {delegationLoading && (
+              <p className="smart-account-loading">Sending transaction...</p>
+            )}
+            {delegationError && (
+              <p className="smart-account-error">{delegationError}</p>
+            )}
+          </div>
           <hr className="hr-wallet" />
           <button className="btn btn-secondary" onClick={onUploadMultisig}>
             Multisig Contracts Management

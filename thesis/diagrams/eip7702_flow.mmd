@@ -1,0 +1,28 @@
+%%{init: {'sequence': {'messageMargin': 200, 'boxMargin': 40, 'noteMargin': 30, 'mirrorActors': false}}}%%
+sequenceDiagram
+    actor Korisnik as Корисник
+    participant EOA as EOA (паметни налог)
+    participant T as ERC20 токен уговор
+    participant M as Вишепотписни уговор
+
+    rect rgb(220, 235, 255)
+        Note over Korisnik,M: Фаза 1 - Активација (једном у подешавањима)
+        Korisnik->>EOA: тип 4 tx (authorization_list = Approver адреса)
+        Note over EOA: EVM уписује делегацијски означивач.<br/>EOA сада има код Approver уговора.
+    end
+
+    rect rgb(220, 255, 220)
+        Note over Korisnik,M: Фаза 2 - Депозит (свака следећа уплата)
+        Korisnik->>EOA: approveAndDeposit(token, multisig, iznos)
+        EOA->>T: approve(adresa_multisiga, iznos)
+        EOA->>M: deposit(iznos)
+        M->>T: transferFrom(eoa_adresa, adresa_multisiga, iznos)
+        T-->>M: пренос успешан
+        M-->>Korisnik: депозит потврђен
+    end
+
+    rect rgb(255, 235, 220)
+        Note over Korisnik,M: Фаза 3 - Опозив (опционо, када корисник искључи опцију)
+        Korisnik->>EOA: тип 4 tx (authorization_list = нулта адреса)
+        Note over EOA: EVM брише делегацијски означивач.<br/>EOA се враћа у нормално стање.
+    end

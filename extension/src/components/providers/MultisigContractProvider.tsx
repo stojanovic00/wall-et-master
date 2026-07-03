@@ -9,7 +9,7 @@ import React, {
 import { ethers } from "ethers";
 import MultiSigJson from "../../../contracts/MultiSig.json";
 import { useWallet } from "./WalletProvider";
-import { createDelegation, revokeDelegation } from "../../utils/multisig";
+import { depositTokenWithDelegation, depositTokenClassic } from "../../utils/multisig";
 import { config } from "../../config";
 
 interface MultisigContractContextType {
@@ -64,7 +64,7 @@ export interface TransactionData {
 export const MultisigContractProvider: React.FC<
   MultisigContractProviderProps
 > = ({ contractAddress, children }) => {
-  const { wallet } = useWallet();
+  const { wallet, isDelegationActive } = useWallet();
   const [contract, setContract] = useState<ethers.Contract | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -388,22 +388,14 @@ export const MultisigContractProvider: React.FC<
     if (!contract || !wallet) return;
     try {
       const multisigContractAddress = await contract.getAddress();
-      const approverContractAddress = config.APPROVER_CONTRACT;
 
-      console.log("amount", amount);
-
-      const receipt = await createDelegation(
-        wallet,
-        approverContractAddress,
-        token,
-        multisigContractAddress,
-        txHash,
-        amount // Use original amount directly
-      );
-
-      console.log("🚀 ~ receipt:", receipt);
-
-      await revokeDelegation(wallet);
+      if (isDelegationActive) {
+        console.log("Smart account active - single tx deposit");
+        await depositTokenWithDelegation(wallet, token, multisigContractAddress, txHash, amount);
+      } else {
+        console.log("Smart account inactive - classic 2-tx deposit");
+        await depositTokenClassic(wallet, token, multisigContractAddress, txHash, amount);
+      }
 
       return true;
     } catch (err: any) {

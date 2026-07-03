@@ -1,5 +1,6 @@
 import { ethers } from "ethers";
 import ApproverJson from "../../contracts/Approver.json";
+import Erc20Json from "../../contracts/ERC20.json";
 
 export async function revokeDelegation(signer: ethers.Wallet) {
   console.log("\n=== REVOKING DELEGATION ===");
@@ -28,6 +29,77 @@ export async function revokeDelegation(signer: ethers.Wallet) {
   console.log("Delegation revoked successfully!");
 
   return receipt;
+}
+
+export async function setupDelegation(signer: ethers.Wallet, targetAddress: string) {
+  console.log("\n=== SETTING UP DELEGATION ===");
+  const currentNonce = await signer.getNonce();
+  const auth = await signer.authorize({
+    address: targetAddress,
+    nonce: currentNonce,
+  });
+  const tx = await signer.sendTransaction({
+    type: 4,
+    to: signer.address,
+    authorizationList: [auth],
+  });
+  console.log("Setup delegation tx:", tx.hash);
+  await tx.wait();
+  console.log("Delegation active");
+  return tx.hash;
+}
+
+export async function depositTokenWithDelegation(
+  signer: ethers.Wallet,
+  tokenAddress: string,
+  multiSigContract: string,
+  txHash: string,
+  amount: ethers.BigNumberish
+) {
+  console.log("\n=== DEPOSIT WITH ACTIVE DELEGATION ===");
+  const delegatedContract = new ethers.Contract(
+    signer.address,
+    ApproverJson.abi,
+    signer
+  );
+  const tx = await delegatedContract["approveAndDeposit(address,address,bytes32,uint256)"](
+    tokenAddress,
+    multiSigContract,
+    txHash,
+    amount,
+    { type: 2 }
+  );
+  console.log("Deposit tx:", tx.hash);
+  return await tx.wait();
+}
+
+export async function depositTokenClassic(
+  signer: ethers.Wallet,
+  tokenAddress: string,
+  multiSigContract: string,
+  txHash: string,
+  amount: ethers.BigNumberish
+) {
+  console.log("\n=== CLASSIC DEPOSIT (2 TX) ===");
+  const tokenContract = new ethers.Contract(tokenAddress, Erc20Json.abi, signer);
+
+  console.log("Step 1: approve");
+  const approveTx = await tokenContract["approve(address,uint256)"](multiSigContract, amount);
+  await approveTx.wait();
+  console.log("Approve confirmed");
+
+  console.log("Step 2: deposit");
+  const multisig = new ethers.Contract(
+    multiSigContract,
+    [
+      "function deposit(address token, bytes32 txHash, uint256 amount) external",
+    ],
+    signer
+  );
+  const depositTx = await multisig["deposit(address,bytes32,uint256)"](tokenAddress, txHash, amount);
+  await depositTx.wait();
+  console.log("Deposit confirmed");
+  return depositTx.hash;
 }
 
 export async function createAuthorization(signer: ethers.Wallet, targetAddress: string, nonce: number) {

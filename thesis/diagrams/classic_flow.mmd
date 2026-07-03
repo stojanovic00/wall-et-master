@@ -1,0 +1,15 @@
+%%{init: {'sequence': {'messageMargin': 80, 'boxMargin': 30, 'noteMargin': 20, 'mirrorActors': false}}}%%
+sequenceDiagram
+    actor Korisnik as Корисник
+    participant T as ERC20 токен уговор
+    participant M as Вишепотписни уговор
+
+    Korisnik->>T: approve(adresa_multisiga, iznos)
+    Note over Korisnik,T: Трансакција 1 - корисник потписује и чека потврду блока
+    T-->>Korisnik: потврђено
+
+    Korisnik->>M: deposit(iznos)
+    Note over Korisnik,M: Трансакција 2 - корисник потписује и чека потврду блока
+    M->>T: transferFrom(eoa_adresa, adresa_multisiga, iznos)
+    T-->>M: пренос успешан
+    M-->>Korisnik: депозит потврђен

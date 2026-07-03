@@ -25,28 +25,38 @@
     "editor.insertSpaces": true
   },
 
-  // LaTeX Workshop - force XeLaTeX (required for fontspec + Cyrillic mapping)
+  // LaTeX Workshop - force XeLaTeX + biber (required for fontspec + Cyrillic mapping + biblatex)
+  "latex-workshop.formatting.latex": "latexindent",
+  "[latex]": {
+    "editor.formatOnSave": false,
+    "editor.wordWrap": "on"
+  },
   "latex-workshop.latex.tools": [
     {
-      "name": "latexmk-xelatex",
-      "command": "latexmk",
+      "name": "xelatex",
+      "command": "xelatex",
       "args": [
         "-synctex=1",
         "-interaction=nonstopmode",
         "-file-line-error",
-        "-xelatex",
-        "-cd",
         "%DOC%"
-      ]
+      ],
+      "env": {}
+    },
+    {
+      "name": "biber",
+      "command": "biber",
+      "args": ["%DOCFILE%"],
+      "env": {}
     }
   ],
   "latex-workshop.latex.recipes": [
     {
-      "name": "latexmk (XeLaTeX)",
-      "tools": ["latexmk-xelatex"]
+      "name": "XeLaTeX + Biber",
+      "tools": ["xelatex", "biber", "xelatex", "xelatex"]
     }
   ],
-  "latex-workshop.latex.recipe.default": "latexmk (XeLaTeX)",
+  "latex-workshop.latex.recipe.default": "XeLaTeX + Biber",
 
   // Search settings (exclude build artifacts)
   "search.exclude": {

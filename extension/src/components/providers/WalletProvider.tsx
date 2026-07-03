@@ -9,12 +9,17 @@ import { ethers } from "ethers";
 import crypto from "crypto-js";
 import MultiSigJson from "../../../contracts/MultiSig.json";
 import Erc20Json from "../../../contracts/ERC20.json";
+import { setupDelegation, revokeDelegation } from "../../utils/multisig";
+import config from "../../config/config.json";
 
 interface WalletContextType {
   wallet: ethers.Wallet | null;
   address: string;
   isLoading: boolean;
   isPasswordSet: boolean;
+  isDelegationActive: boolean;
+  enableSmartAccount: () => Promise<void>;
+  disableSmartAccount: () => Promise<void>;
   generateWallet: (password: string) => Promise<{ privateKey: string; address: string }>;
   importWallet: (privateKey: string, password: string) => Promise<void>;
   clearWallet: () => Promise<void>;
@@ -71,6 +76,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const [address, setAddress] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isPasswordSet, setIsPasswordSet] = useState<boolean>(false);
+  const [isDelegationActive, setIsDelegationActive] = useState<boolean>(false);
 
   // Initialize Infura provider
   const provider = new ethers.JsonRpcProvider(
@@ -92,6 +98,12 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
         const stored = await getStoredWallet();
         const passwordHash = await getStoredPasswordHash();
         setIsPasswordSet(!!stored && !!passwordHash);
+        if (typeof chrome !== "undefined" && chrome.storage) {
+          const delegationResult = await chrome.storage.local.get(["isDelegationActive"]);
+          setIsDelegationActive(!!delegationResult.isDelegationActive);
+        } else {
+          setIsDelegationActive(localStorage.getItem("is_delegation_active") === "true");
+        }
         if (isUnlocked && stored && passwordHash) {
           // Try to restore wallet without password
           // Decrypt with a dummy password, since we don't have it, but we can store the private key unencrypted if needed
@@ -331,6 +343,28 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     }
   };
 
+  const enableSmartAccount = async () => {
+    if (!wallet) throw new Error("No wallet loaded");
+    await setupDelegation(wallet, config.APPROVER_CONTRACT);
+    setIsDelegationActive(true);
+    if (typeof chrome !== "undefined" && chrome.storage) {
+      await chrome.storage.local.set({ isDelegationActive: true });
+    } else {
+      localStorage.setItem("is_delegation_active", "true");
+    }
+  };
+
+  const disableSmartAccount = async () => {
+    if (!wallet) throw new Error("No wallet loaded");
+    await revokeDelegation(wallet);
+    setIsDelegationActive(false);
+    if (typeof chrome !== "undefined" && chrome.storage) {
+      await chrome.storage.local.set({ isDelegationActive: false });
+    } else {
+      localStorage.setItem("is_delegation_active", "false");
+    }
+  };
+
   const lockWallet = async () => {
     setWallet(null);
     setAddress("");
@@ -553,6 +587,9 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     address,
     isLoading,
     isPasswordSet,
+    isDelegationActive,
+    enableSmartAccount,
+    disableSmartAccount,
     generateWallet,
     importWallet,
     clearWallet,
