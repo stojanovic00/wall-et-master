@@ -34,7 +34,15 @@ interface IMultiSig {
     // View functions
     function minSignatures() external view returns (uint256);
 
+    function name() external view returns (string memory);
+
     function isSigner(address signer) external view returns (bool);
+
+    function getSigners() external view returns (address[] memory);
+
+    function getAllTransactionHashes() external view returns (bytes32[] memory);
+
+    function getTxSigners(bytes32 txHash) external view returns (address[] memory);
 
     function hasSignedTx(address signer, bytes32 txHash) external view returns (bool);
 

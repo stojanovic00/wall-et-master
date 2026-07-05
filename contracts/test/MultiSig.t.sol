@@ -21,7 +21,7 @@ contract MultiSigTest is Test {
 
     function setUp() public {
         signers = [alice, bob, charlie, dave, eve];
-        multiSig = new MultiSig(signers, minSignatures);
+        multiSig = new MultiSig(signers, minSignatures, "Test Multisig");
         erc20 = new ERC20Mock();
         // Fund the contract with some ETH
         vm.deal(address(multiSig), 10 ether);
@@ -230,17 +230,17 @@ contract MultiSigTest is Test {
     function test_ConstructorValidation() public {
         address[] memory emptySigners = new address[](0);
         vm.expectRevert("Must have at least one signer");
-        new MultiSig(emptySigners, 1);
+        new MultiSig(emptySigners, 1, "");
 
         address[] memory validSigners = new address[](2);
         validSigners[0] = alice;
         validSigners[1] = bob;
 
         vm.expectRevert("Min signatures must be greater than 0");
-        new MultiSig(validSigners, 0);
+        new MultiSig(validSigners, 0, "");
 
         vm.expectRevert("Min signatures cannot exceed signer count");
-        new MultiSig(validSigners, 3);
+        new MultiSig(validSigners, 3, "");
     }
 
     function test_RevertWhen_ConstructorDuplicateSigner() public {
@@ -250,7 +250,7 @@ contract MultiSigTest is Test {
         dupSigners[2] = bob;
 
         vm.expectRevert("Duplicate signer");
-        new MultiSig(dupSigners, 2);
+        new MultiSig(dupSigners, 2, "");
     }
 
     function test_RevertWhen_ConstructorZeroAddressSigner() public {
@@ -259,7 +259,7 @@ contract MultiSigTest is Test {
         invalidSigners[1] = address(0);
 
         vm.expectRevert("Invalid signer address");
-        new MultiSig(invalidSigners, 1);
+        new MultiSig(invalidSigners, 1, "");
     }
 
     function test_SignatureCounting() public {

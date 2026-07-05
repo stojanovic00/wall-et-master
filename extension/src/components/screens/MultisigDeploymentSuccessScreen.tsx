@@ -93,7 +93,10 @@ const MultisigDeploymentSuccessScreen: React.FC<MultisigDeploymentSuccessScreenP
             <h3>Signer Addresses</h3>
             {signers.map((signer, index) => (
               <div key={signer} className="detail-row">
-                <span>Signer {index + 1}:</span>
+                <span>
+                  Signer {index + 1}
+                  {signer.toLowerCase() === deployerAddress.toLowerCase() ? " (You)" : ""}:
+                </span>
                 <div className="address-container">
                   <span className="address-text">{signer}</span>
                   <button

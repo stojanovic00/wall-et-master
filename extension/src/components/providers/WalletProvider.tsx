@@ -44,7 +44,7 @@ interface WalletContextType {
     receipt: any;
   }>;
   getBalance: () => Promise<string>;
-  deployMultiSig: (signers: string[], minSignatures: number) => Promise<string>;
+  deployMultiSig: (signers: string[], minSignatures: number, name?: string) => Promise<string>;
   sendErc20Transaction: (
     tokenAddress: string,
     to: string,
@@ -78,8 +78,12 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const [isPasswordSet, setIsPasswordSet] = useState<boolean>(false);
   const [isDelegationActive, setIsDelegationActive] = useState<boolean>(false);
 
-  // Initialize Infura provider
-  const provider = new ethers.JsonRpcProvider(config.RPC_URL);
+  // batchMaxCount: 1 disables request batching - some public RPC providers
+  // (e.g. drpc.org) don't handle batched JSON-RPC requests reliably, and one
+  // failing call in a batch can take the whole batch down with it.
+  const provider = new ethers.JsonRpcProvider(config.RPC_URL, undefined, {
+    batchMaxCount: 1,
+  });
 
   useEffect(() => {
     (async () => {
@@ -499,7 +503,8 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
 
   const deployMultiSig = async (
     signers: string[],
-    minSignatures: number
+    minSignatures: number,
+    name: string = ""
   ): Promise<string> => {
     if (!wallet) throw new Error("No wallet loaded");
     try {
@@ -514,7 +519,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
       }
 
       console.log("Deploying MultiSig contract with signers:", signers, "minSignatures:", minSignatures);
-      const contract = await factory.deploy(signers, minSignatures);
+      const contract = await factory.deploy(signers, minSignatures, name);
       
       // Wait for the contract to be deployed
       console.log("Waiting for contract deployment...");

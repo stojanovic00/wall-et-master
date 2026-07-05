@@ -12,19 +12,35 @@ import {IMultiSig} from "../interfaces/IMultiSig.sol";
 contract MultiSig is IMultiSig {
     // Validator addresses
     mapping(address => bool) private signers;
+    // Same data as `signers`, kept as an array so the full list can be read
+    // back in a single call - the mapping alone can only answer "is this one
+    // specific address a signer", not "who are all the signers".
+    address[] private signersList;
 
     // Minimum number of signatures required for quorum
     uint256 public minSignatures;
+
+    // Optional display name, set once at deployment - purely for client UI,
+    // not used in any contract logic. Storing it here (rather than only in
+    // whichever browser deployed the contract) means every signer sees the
+    // same name regardless of which client or profile they use.
+    string public name;
 
     uint256 private nonce;
 
     // Keccak256(Transaction) => Transaction
     mapping(bytes32 => Transaction) private transactions;
     mapping(address => mapping(bytes32 => bool)) private transactionSigners;
+    // All proposed tx hashes, readable in one call for the same reason as
+    // signersList above.
+    bytes32[] private allTxHashes;
+    // All addresses that have signed a given tx, readable in one call.
+    mapping(bytes32 => address[]) private txSigners;
 
     event Propose(bytes32 txHash);
     event Signed(bytes32 indexed txHash, address indexed signer);
     event Executed(bytes32 indexed txHash);
+    event Deployed(address[] signers, uint256 minSignatures);
 
     modifier onlySigner() {
         require(signers[msg.sender], "Only signers can call this function");
@@ -35,18 +51,24 @@ contract MultiSig is IMultiSig {
      * @dev Constructor - sets up validators and minimum signatures
      * @param _signers Array of validator addresses
      * @param _minSignatures Minimum number of signatures required for quorum
+     * @param _name Optional display name, may be empty
      */
-    constructor(address[] memory _signers, uint256 _minSignatures) {
+    constructor(address[] memory _signers, uint256 _minSignatures, string memory _name) {
         require(_signers.length > 0, "Must have at least one signer");
         require(_minSignatures > 0, "Min signatures must be greater than 0");
         require(_minSignatures <= _signers.length, "Min signatures cannot exceed signer count");
+
+        name = _name;
 
         for (uint256 i = 0; i < _signers.length; i++) {
             require(_signers[i] != address(0), "Invalid signer address");
             require(!signers[_signers[i]], "Duplicate signer");
             signers[_signers[i]] = true;
+            signersList.push(_signers[i]);
         }
         minSignatures = _minSignatures;
+
+        emit Deployed(_signers, _minSignatures);
     }
 
     function depositNative(bytes32 txHash) external payable {
@@ -83,6 +105,7 @@ contract MultiSig is IMultiSig {
         txHash = keccak256(abi.encodePacked(msg.sender, nonce++));
 
         transactions[txHash] = transaction;
+        allTxHashes.push(txHash);
         emit Propose(txHash);
         return txHash;
     }
@@ -110,6 +133,7 @@ contract MultiSig is IMultiSig {
         txHash = keccak256(abi.encodePacked(msg.sender, nonce++));
 
         transactions[txHash] = transaction;
+        allTxHashes.push(txHash);
         emit Propose(txHash);
         return txHash;
     }
@@ -123,6 +147,7 @@ contract MultiSig is IMultiSig {
 
         transactionSigners[msg.sender][txHash] = true;
         transaction.signedCount++;
+        txSigners[txHash].push(msg.sender);
 
         emit Signed(txHash, msg.sender);
     }
@@ -158,6 +183,18 @@ contract MultiSig is IMultiSig {
 
     function isSigner(address signer) public view returns (bool) {
         return signers[signer];
+    }
+
+    function getSigners() external view returns (address[] memory) {
+        return signersList;
+    }
+
+    function getAllTransactionHashes() external view returns (bytes32[] memory) {
+        return allTxHashes;
+    }
+
+    function getTxSigners(bytes32 txHash) external view returns (address[] memory) {
+        return txSigners[txHash];
     }
 
     function hasSignedTx(address signer, bytes32 txHash) public view returns (bool) {

@@ -4,7 +4,7 @@ import {
   TransactionData,
   useMultisigContract,
 } from "../providers/MultisigContractProvider";
-import { getMultisigTxs, addMultisigTx, getMultisigInfo } from "../../utils/multisigStorage";
+import { getMultisigTxs, addMultisigTx, getMultisigInfo, addMultisigContract } from "../../utils/multisigStorage";
 import LoadingScreen from "./LoadingScreen";
 import { getTokenAddressBook } from "../../utils/tokenAddressBookStorage";
 import { getAddressBook } from "../../utils/addressBookStorage";
@@ -135,9 +135,30 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
     return inEther ? ethers.formatEther(value) : value.toString();
   };
 
-  // Fetch transaction details for all hashes in local storage
+  // Discover every proposed tx hash directly from contract storage
+  // (getAllTransactionHashes), merged with whatever's recorded locally. A
+  // signer using a different browser profile than whoever proposed has no
+  // local record at all, so the chain has to be the source of truth. This
+  // reads the array directly rather than scanning Propose event logs, since
+  // some public RPC providers (e.g. drpc.org's free tier) hard-cap
+  // eth_getLogs block ranges and reject wider historical queries.
+  const discoverTxHashes = async (): Promise<string[]> => {
+    const local = getMultisigTxs(contractAddress);
+    if (!contract) return local;
+    try {
+      const chainHashes: string[] = await contract.getAllTransactionHashes();
+      const merged = Array.from(new Set([...local, ...chainHashes]));
+      merged.forEach((hash) => addMultisigTx(contractAddress, hash));
+      return merged;
+    } catch (err) {
+      console.error("Failed to fetch transaction hashes from contract:", err);
+      return local;
+    }
+  };
+
   const fetchTransactions = async () => {
-    const hashes = getMultisigTxs(contractAddress);
+    const hashes = await discoverTxHashes();
+    setTxHashes(hashes);
     const details = await Promise.all(
       hashes.map(async (hash) => {
         const data = await getTransactionData(hash);
@@ -163,15 +184,39 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
 
   useEffect(() => {
     fetchTransactions();
-    setTxHashes(getMultisigTxs(contractAddress));
     // eslint-disable-next-line
-  }, [contractAddress]);
+  }, [contractAddress, contract]);
 
+  // Signers similarly can't be enumerated by the isSigner mapping alone -
+  // getSigners() reads the array kept alongside it directly, so this works
+  // for any signer regardless of who deployed the contract or which browser
+  // profile they're using, with no local storage or event-log dependency.
   useEffect(() => {
     const info = getMultisigInfo(contractAddress);
     setContractName(info?.name);
     setKnownSigners(info?.signers || []);
-  }, [contractAddress]);
+
+    if (!contract) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const [signers, chainName]: [string[], string] = await Promise.all([
+          contract.getSigners(),
+          contract.name(),
+        ]);
+        if (cancelled) return;
+        setKnownSigners(signers);
+        const resolvedName = chainName || info?.name;
+        setContractName(resolvedName);
+        addMultisigContract(contractAddress, { signers, name: resolvedName });
+      } catch (err) {
+        console.error("Failed to fetch signers/name from contract:", err);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [contractAddress, contract]);
 
   useEffect(() => {
     // Fetch minimum signatures required
@@ -212,10 +257,11 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
     }
   }, [selectedTxHash, txs]);
 
-  // Reads who signed directly from the contract's Signed event log, filtered
-  // by this tx's hash - no need to know the signer list in advance. Only
-  // works for contracts deployed after the Signed event was added; older
-  // deployments simply return no logs since they never emitted it.
+  // Reads who signed directly from contract storage (getTxSigners) - no need
+  // to know the signer list in advance, and no dependency on event logs or
+  // their RPC-provider-specific block range limits. Only works for contracts
+  // deployed after this function was added; older deployments just return
+  // an empty array since txSigners was never populated for them.
   useEffect(() => {
     if (!selectedTx || !contract) {
       setSignedByList(null);
@@ -225,11 +271,7 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
     setSignedByLoading(true);
     (async () => {
       try {
-        const filter = contract.filters.Signed(selectedTx.hash);
-        const events = await contract.queryFilter(filter);
-        const signers = events.map(
-          (event) => (event as ethers.EventLog).args.signer as string
-        );
+        const signers: string[] = await contract.getTxSigners(selectedTx.hash);
         if (!cancelled) {
           setSignedByList(signers);
           setSignedByLoading(false);
@@ -259,15 +301,17 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
   }, [contractAddress]);
 
   useEffect(() => {
-    // Load recipient address book for datalist
+    // Load recipient address book for datalist, plus the current wallet itself
     const addressBook = getAddressBook();
-    setRecipientOptions(
-      Object.entries(addressBook).map(([address, name]) => ({
-        address,
-        name: String(name),
-      }))
-    );
-  }, [contractAddress]);
+    const entries = Object.entries(addressBook).map(([address, name]) => ({
+      address,
+      name: String(name),
+    }));
+    if (wallet && !entries.some((e) => e.address.toLowerCase() === wallet.address.toLowerCase())) {
+      entries.unshift({ address: wallet.address, name: "You" });
+    }
+    setRecipientOptions(entries);
+  }, [contractAddress, wallet]);
 
   // Look up the transaction as soon as a full txHash is entered on the deposit
   // tab, so its type/token are read from the contract instead of re-asked.
@@ -686,9 +730,11 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {knownSigners.map((addr) => {
+                  const isYou = wallet?.address.toLowerCase() === addr.toLowerCase();
                   const bookEntry = recipientOptions.find(
                     (r) => r.address.toLowerCase() === addr.toLowerCase()
                   );
+                  const label = isYou ? "You" : bookEntry?.name;
                   return (
                     <div
                       key={addr}
@@ -699,9 +745,9 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
                         border: '1px solid #334155',
                       }}
                     >
-                      {bookEntry && (
+                      {label && (
                         <div style={{ color: '#ffffff', fontSize: '13px', fontWeight: 600 }}>
-                          {bookEntry.name}
+                          {label}
                         </div>
                       )}
                       <div style={{ color: '#94a3b8', fontSize: '11px', fontFamily: 'monospace', wordBreak: 'break-all' }}>
@@ -1291,9 +1337,11 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
                           ) : signedByList && signedByList.length > 0 ? (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                               {signedByList.map((addr) => {
+                                const isYou = wallet?.address.toLowerCase() === addr.toLowerCase();
                                 const bookEntry = recipientOptions.find(
                                   (r) => r.address.toLowerCase() === addr.toLowerCase()
                                 );
+                                const label = isYou ? "You" : bookEntry?.name;
                                 return (
                                   <div
                                     key={addr}
@@ -1304,7 +1352,7 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
                                       wordBreak: 'break-all'
                                     }}
                                   >
-                                    ✅ {bookEntry ? `${bookEntry.name} (${addr})` : addr}
+                                    ✅ {label ? `${label} (${addr})` : addr}
                                   </div>
                                 );
                               })}

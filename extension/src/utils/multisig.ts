@@ -17,10 +17,15 @@ export async function revokeDelegation(signer: ethers.Wallet) {
   console.log("Revocation authorization created");
 
   // Send transaction with revocation authorization
+  // Explicit gasLimit: some RPC providers underestimate gas for type-4 txs,
+  // not accounting for the extra intrinsic cost EIP-7702 charges per
+  // authorization tuple, which causes an IntrinsicGas rejection at the
+  // default ~21000 estimate.
   const tx = await signer.sendTransaction({
     type: 4,
     to: signer.address,
     authorizationList: [revokeAuth],
+    gasLimit: 100000,
   });
 
   console.log("Revocation transaction sent:", tx.hash);
@@ -42,10 +47,12 @@ export async function setupDelegation(signer: ethers.Wallet, targetAddress: stri
     address: targetAddress,
     nonce: currentNonce + 1,
   });
+  // See revokeDelegation for why gasLimit is set explicitly here.
   const tx = await signer.sendTransaction({
     type: 4,
     to: signer.address,
     authorizationList: [auth],
+    gasLimit: 100000,
   });
   console.log("Setup delegation tx:", tx.hash);
   await tx.wait();

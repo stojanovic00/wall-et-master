@@ -59,8 +59,12 @@ const SendErc20Screen: React.FC<SendErc20ScreenProps> = ({ onBack, onTransaction
 
   useEffect(() => {
     setTokenAddressBook(getTokenAddressBook());
-    setAddressBook(getAddressBook());
-  }, []);
+    const book = getAddressBook();
+    if (wallet && !book[wallet.address]) {
+      book[wallet.address] = "You";
+    }
+    setAddressBook(book);
+  }, [wallet]);
 
   const handleSend = async () => {
     if (!wallet) {

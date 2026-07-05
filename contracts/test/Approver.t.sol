@@ -27,7 +27,7 @@ contract ApproverTest is Test {
         address[] memory signers = new address[](2);
         signers[0] = signer1;
         signers[1] = signer2;
-        multiSig = new MultiSig(signers, 1);
+        multiSig = new MultiSig(signers, 1, "");
     }
 
     function testSetup() public view {

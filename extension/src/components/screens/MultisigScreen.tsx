@@ -55,15 +55,19 @@ const MultisigScreen: React.FC<MultisigScreenProps> = ({
 
   useEffect(() => {
     loadSavedMultisigs();
-    // Load address book
+    // Load address book, plus the current wallet itself as a suggestion -
+    // useful here specifically since you often want to include yourself as
+    // one of the signers.
     const book = getAddressBook();
-    setAddressBook(
-      Object.entries(book).map(([address, name]) => ({
-        address,
-        name: String(name),
-      }))
-    );
-  }, []);
+    const entries = Object.entries(book).map(([address, name]) => ({
+      address,
+      name: String(name),
+    }));
+    if (wallet && !entries.some((e) => e.address.toLowerCase() === wallet.address.toLowerCase())) {
+      entries.unshift({ address: wallet.address, name: "You" });
+    }
+    setAddressBook(entries);
+  }, [wallet]);
 
   // Validate all addresses, including duplicates
   const validateAddresses = (addrs: string[]) => {
@@ -142,7 +146,7 @@ const MultisigScreen: React.FC<MultisigScreenProps> = ({
       }
       
       setError("");
-      const multiSigAddress = await deployMultiSig(filtered, minSignatures);
+      const multiSigAddress = await deployMultiSig(filtered, minSignatures, contractName.trim());
       addMultisigContract(multiSigAddress, {
         name: contractName.trim() || undefined,
         signers: filtered,

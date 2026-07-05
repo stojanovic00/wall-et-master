@@ -1,0 +1,133 @@
+\chapter{Demonstracija}
+
+Kako bi se funkcionalnosti opisane u prethodnom poglavlju prikazale u praksi, u nastavku sledi primer izvr\v savanja kompletnog scenarija nad ugovorom \texttt{MultiSig} objavljenim na \en{Sepolia} test mre\v zi. U scenariju u\v cestvuju tri ovla\v s\'cena potpisnika sa pragom od dva potpisa, od kojih su dva aktivna tokom demonstracije. Radi preglednosti, u daljem tekstu se koriste oznake \textbf{Nov\v canik 1} i \textbf{Nov\v canik 2} za ova dva naloga, dok tre\'ci potpisnik ostaje neaktivan tokom scenarija. Imena poput "Luka" ili "Aleksandar" koja se pojavljuju na pojedinim snimcima ekrana predstavljaju lokalne oznake iz adresara jednog od nov\v canika i ne uti\v cu na funkcionisanje sistema. Radi demonstracije je unapred objavljen i jednostavan \en{ERC-20} token pod nazivom \en{RSDC}, od kojeg je odgovaraju\'ca koli\v cina prosle\dj ena nalozima koji u\v cestvuju u scenariju.
+
+\section{Priprema i predlaganje transakcije}
+
+Slika~\ref{fig:demo-main} prikazuje po\v cetni ekran Nov\v canika 1, sa stanjem u \en{ETH} valuti i isklju\v cenim "pametnim" nalogom. Nov\v canik 1 zatim objavljuje novi \texttt{MultiSig} ugovor pod nazivom "\en{FTN Treasury}", sa tri ovla\v s\'cena potpisnika i pragom od dva potpisa (Slika~\ref{fig:demo-deploy}).
+
+\begin{figure}[H]
+  \centering
+  \subfigure[Po\v cetni ekran Nov\v canika 1.]{\includegraphics[width=5.3cm]{1_main_screen}\label{fig:demo-main}}
+  \hfill
+  \subfigure[Obrazac za objavljivanje ugovora.]{\includegraphics[width=5.3cm]{2_multisig_creation}\label{fig:demo-deploy}}
+  \caption{Po\v cetno stanje i objavljivanje \texttt{MultiSig} ugovora.}
+\end{figure}
+
+Nakon objavljivanja, korisniku se prikazuje glavni ekran za interakciju sa ugovorom, sa karticama za predlaganje nove vi\v sepotpisne transakcije, depozit, potpisivanje, izvr\v savanje i pregled transakcija, kao i mogu\'cno\v s\'cu pregleda liste ovla\v s\'cenih potpisnika (Slika~\ref{fig:demo-interact}). Prikaz liste potpisnika potvr\dj uje da su sva tri naloga ispravno registrovana prilikom objavljivanja ugovora (Slika~\ref{fig:demo-signers}).
+
+\begin{figure}[H]
+  \centering
+  \subfigure[Glavni ekran za interakciju sa ugovorom.]{\includegraphics[width=5.3cm]{3_multisig_main_screen}\label{fig:demo-interact}}
+  \hfill
+  \subfigure[Lista ovla\v s\'cenih potpisnika.]{\includegraphics[width=5.3cm]{4_authorized_singers}\label{fig:demo-signers}}
+  \caption{Interakcija sa ugovorom "\en{FTN Treasury}" i pregled potpisnika.}
+\end{figure}
+
+Nov\v canik 1 potom predla\v ze prenos 50 \en{RSDC} tokena na adresu Nov\v canika 2 (Slika~\ref{fig:demo-proposal}). Neposredno nakon predlaganja, pregled transakcije pokazuje da nijedan potpisnik jo\v s uvek nije potpisao predlog i da ugovor jo\v s uvek nema deponovana sredstva za ovu transakciju (Slika~\ref{fig:demo-review1}).
+
+\begin{figure}[H]
+  \centering
+  \subfigure[Predlaganje prenosa \en{RSDC} tokena.]{\includegraphics[width=5.3cm]{5_tx_proposal}\label{fig:demo-proposal}}
+  \hfill
+  \subfigure[Pregled predloga, pre potpisivanja.]{\includegraphics[width=5.3cm]{6_tx_review}\label{fig:demo-review1}}
+  \caption{Predlaganje transakcije i njen pregled neposredno nakon predlaganja.}
+\end{figure}
+
+\section{Potpisivanje transakcije}
+
+Nov\v canik 1, kao predlaga\v c transakcije, potpisuje predlog unosom identifikatora transakcije na kartici za potpisivanje (Slika~\ref{fig:demo-sign1}). Nakon potpisivanja, pregled transakcije pokazuje jedan od potrebna dva potpisa, zajedno sa adresom naloga koji je potpisao (Slika~\ref{fig:demo-review2}).
+
+\begin{figure}[H]
+  \centering
+  \subfigure[Potpisivanje od strane Nov\v canika 1.]{\includegraphics[width=5.3cm]{7_tx_signature_1}\label{fig:demo-sign1}}
+  \hfill
+  \subfigure[Pregled nakon prvog potpisa.]{\includegraphics[width=5.3cm]{8_tx_review_2}\label{fig:demo-review2}}
+  \caption{Prvi potpis transakcije, od strane predlaga\v ca.}
+\end{figure}
+
+Drugi potreban potpis obezbe\dj uje Nov\v canik 2, koji do ovog trenutka nije u\v cestvovao ni u objavljivanju ugovora ni u predlaganju transakcije. Slika~\ref{fig:demo-main2} prikazuje po\v cetni ekran Nov\v canika 2, sa sopstvenim stanjem u \en{ETH} valuti i tako\dj e isklju\v cenim "pametnim" nalogom. Nov\v canik 2 se sa istim ugovorom povezuje unosom njegove adrese na ekranu za interakciju (Slika~\ref{fig:demo-load}). Budu\'ci da su spisak potpisnika i lista predlo\v zenih transakcija deo stanja samog ugovora, Nov\v canik 2 odmah dobija ceo njihov pregled, iako pre ovog trenutka nije u\v cestvovao ni u jednoj prethodnoj transakciji.
+
+\begin{figure}[H]
+  \centering
+  \subfigure[Po\v cetni ekran Nov\v canika 2.]{\includegraphics[width=5.3cm]{9_main_screen_2nd_wallet}\label{fig:demo-main2}}
+  \hfill
+  \subfigure[Povezivanje sa postoje\'cim ugovorom.]{\includegraphics[width=5.3cm]{10_multisig_load}\label{fig:demo-load}}
+  \caption{Nov\v canik 2 se povezuje sa ugovorom koji nije sam objavio.}
+\end{figure}
+
+Nakon \v sto Nov\v canik 2 doda svoj potpis na ve\'c predlo\v zenu transakciju, ona dosti\v ze tra\v zeni kvorum od dva potpisa, \v sto se vidi u pregledu transakcije prikazanom na slici~\ref{fig:demo-review3}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=7cm]{11_tx_review_2nd_wallet_1}
+  \caption{Pregled transakcije nakon drugog potpisa, sa dostignutim kvorumom.}
+  \label{fig:demo-review3}
+\end{figure}
+
+\section{Depozit sredstava bez \en{EIP-7702} delegacije}
+
+Iako je transakcija potpisana od strane oba potrebna potpisnika, njeno izvr\v savanje jo\v s uvek nije mogu\'ce jer ugovor ne raspola\v ze dovoljnim sredstvima. Budu\'ci da "pametni" nalog kod Nov\v canika 2 nije aktiviran, depozit \en{RSDC} tokena zahteva dve odvojene transakcije. Na kartici za depozit, Nov\v canik 2 unosi identifikator transakcije i iznos od 30 tokena (Slika~\ref{fig:demo-deposit2tx}). Prva transakcija odobrava \texttt{MultiSig} ugovoru da raspola\v ze navedenim iznosom \en{RSDC} tokena u ime Nov\v canika 2 (Slika~\ref{fig:demo-approve1}).
+
+\begin{figure}[H]
+  \centering
+  \subfigure[Priprema depozita.]{\includegraphics[width=5.3cm]{12_deposit_screen_2tx}\label{fig:demo-deposit2tx}}
+  \hfill
+  \subfigure[Prva transakcija: odobrenje.]{\includegraphics[width=5.3cm]{13_deposit_2tx_tx1}\label{fig:demo-approve1}}
+  \caption{Priprema depozita i odobrenje tro\v senja tokena, bez aktivne delegacije.}
+\end{figure}
+
+Druga, zasebna transakcija zatim stvarno prenosi odobreni iznos u \texttt{MultiSig} ugovor (Slika~\ref{fig:demo-deposit1}). Nakon obe transakcije, pregled transakcije pokazuje da je ugovor primio 30 od potrebnih 50 \en{RSDC} tokena, dok transakcija i dalje \v ceka na izvr\v senje (Slika~\ref{fig:demo-review4}).
+
+\begin{figure}[H]
+  \centering
+  \subfigure[Druga transakcija: depozit tokena.]{\includegraphics[width=5.3cm]{14_deposit_2tx_tx2}\label{fig:demo-deposit1}}
+  \hfill
+  \subfigure[Pregled nakon delimi\v cnog depozita.]{\includegraphics[width=5.3cm]{15_tx_review_2nd_wallet_2}\label{fig:demo-review4}}
+  \caption{Zavr\v setak klasi\v cnog, dvotransakcionog depozita.}
+\end{figure}
+
+\section{Aktivacija \en{EIP-7702} delegacije}
+
+Preostalih 20 \en{RSDC} tokena obezbe\dj uje Nov\v canik 1, ovog puta uz aktiviranu delegaciju. Uklju\v civanjem "pametnog" naloga, Nov\v canik 1 potpisuje transakciju tipa 4 kojom se izvr\v savanje sopstvenog koda delegira na ugovor \texttt{Approver} (Slika~\ref{fig:demo-enableeip}). Nakon potvrde transakcije na mre\v zi, po\v cetni ekran Nov\v canika 1 pokazuje aktivan "pametni" nalog, uz napomenu da depozit \en{ERC-20} tokena sada zahteva samo jednu transakciju (Slika~\ref{fig:demo-eipactive}).
+
+\begin{figure}[H]
+  \centering
+  \subfigure[Potpisivanje transakcije delegacije.]{\includegraphics[width=5.3cm]{16_enable_eip}\label{fig:demo-enableeip}}
+  \hfill
+  \subfigure[Aktivirana delegacija.]{\includegraphics[width=5.3cm]{17_eip_activated}\label{fig:demo-eipactive}}
+  \caption{Aktivacija \en{EIP-7702} delegacije na ugovor \texttt{Approver}.}
+\end{figure}
+
+\section{Objedinjeni depozit uz aktivnu delegaciju}
+
+Na kartici za depozit, Nov\v canik 1 unosi preostalih 20 \en{RSDC} tokena na isti na\v cin kao i ranije Nov\v canik 2 (Slika~\ref{fig:demo-deposit2}). Budu\'ci da je delegacija aktivna, odobrenje i depozit se ovog puta izvr\v savaju u okviru jedne jedine transakcije koju Nov\v canik 1 potpisuje samo jednom (Slika~\ref{fig:demo-bundled}).
+
+\begin{figure}[H]
+  \centering
+  \subfigure[Priprema depozita, delegacija aktivna.]{\includegraphics[width=5.3cm]{18_deposit_2}\label{fig:demo-deposit2}}
+  \hfill
+  \subfigure[Objedinjeno odobrenje i depozit.]{\includegraphics[width=5.3cm]{19_deposit_2_all_in_one_tx}\label{fig:demo-bundled}}
+  \caption{Depozit preostalih tokena u jednoj transakciji.}
+\end{figure}
+
+\section{Izvr\v senje transakcije}
+
+Sa deponovanih ukupno 50 \en{RSDC} tokena, ugovor sada raspola\v ze dovoljnim sredstvima za izvr\v senje ve\'c potpisane transakcije, \v sto potvr\dj uje njen pregled (Slika~\ref{fig:demo-ready}). Bilo koji od dva potpisnika mo\v ze pokrenuti izvr\v senje unosom identifikatora transakcije na odgovaraju\'coj kartici (Slika~\ref{fig:demo-execute}).
+
+\begin{figure}[H]
+  \centering
+  \subfigure[Svi uslovi za izvr\v senje su ispunjeni.]{\includegraphics[width=5.3cm]{20_tx_review_all_requirements_done}\label{fig:demo-ready}}
+  \hfill
+  \subfigure[Izvr\v savanje potpisane transakcije.]{\includegraphics[width=5.3cm]{21_tx_execute}\label{fig:demo-execute}}
+  \caption{Izvr\v senje transakcije nakon dostizanja kvoruma i pokri\'cenih sredstava.}
+\end{figure}
+
+Nakon izvr\v senja, ugovor prenosi ukupnih 50 \en{RSDC} tokena na adresu Nov\v canika 2, a pregled transakcije menja status u "\en{Executed}", \v cime se scenario zavr\v sava (Slika~\ref{fig:demo-done}).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=7cm]{22_tx_review_executed}
+  \caption{Pregled uspe\v sno izvr\v sene transakcije.}
+  \label{fig:demo-done}
+\end{figure}

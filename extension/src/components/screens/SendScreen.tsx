@@ -54,8 +54,12 @@ const SendScreen: React.FC<SendScreenProps> = ({ onBack, onTransactionSuccess })
   }, [amount]);
 
   useEffect(() => {
-    setAddressBook(getAddressBook());
-  }, []);
+    const book = getAddressBook();
+    if (wallet && !book[wallet.address]) {
+      book[wallet.address] = "You";
+    }
+    setAddressBook(book);
+  }, [wallet]);
 
   const handleSend = async () => {
     if (!wallet) {
