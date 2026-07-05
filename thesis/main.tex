@@ -48,17 +48,34 @@
 \setcounter{tocdepth}{2}
 
 \usepackage[format=plain,labelfont=bf,up,textfont=it,up]{caption}
+%% Force lstlisting captions back onto the Cyrillic-mapped roman font -
+%% listings' own caption typesetting otherwise inherits the code (tt) font,
+%% which has no ascii-to-serbian mapping applied, leaving captions in Latin.
+\captionsetup[lstlisting]{font=rm}
 
 \usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  backgroundcolor=\color{black!4},
+  numbers=left,
+  numberstyle=\tiny\color{black!50},
+  showstringspaces=false,
+  columns=fullflexible,
+  keepspaces=true,
+  captionpos=b,
+}
 \usepackage{wrapfig}
 %% Strane reci - italic + engleski font (bez ascii-to-serbian mapiranja)
 \newcommand{\en}[1]{\textit{\textenglish{#1}}}
 
 \renewcommand{\figurename}{Slika}
-\renewcommand{\lstlistingname}{Листинг}
+\renewcommand{\lstlistingname}{Listing}
 \renewcommand{\contentsname}{Sadr\v zaj}
 
 \begin{document}
+\sloppy
 
 \graphicspath{ {./slike/} }
 

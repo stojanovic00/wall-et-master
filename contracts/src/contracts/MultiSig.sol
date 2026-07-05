@@ -23,6 +23,8 @@ contract MultiSig is IMultiSig {
     mapping(address => mapping(bytes32 => bool)) private transactionSigners;
 
     event Propose(bytes32 txHash);
+    event Signed(bytes32 indexed txHash, address indexed signer);
+    event Executed(bytes32 indexed txHash);
 
     modifier onlySigner() {
         require(signers[msg.sender], "Only signers can call this function");
@@ -121,6 +123,8 @@ contract MultiSig is IMultiSig {
 
         transactionSigners[msg.sender][txHash] = true;
         transaction.signedCount++;
+
+        emit Signed(txHash, msg.sender);
     }
 
     function execute(bytes32 txHash) external onlySigner {
@@ -148,6 +152,8 @@ contract MultiSig is IMultiSig {
 
             require(success, "Execution failed");
         }
+
+        emit Executed(txHash);
     }
 
     function isSigner(address signer) public view returns (bool) {

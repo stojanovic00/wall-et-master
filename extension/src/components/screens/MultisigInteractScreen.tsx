@@ -212,39 +212,39 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
     }
   }, [selectedTxHash, txs]);
 
-  // The contract only exposes "did this specific address sign this specific
-  // tx" (hasSignedTx) - there's no way to enumerate signers of a tx directly,
-  // so cross-check every known signer against the selected transaction.
+  // Reads who signed directly from the contract's Signed event log, filtered
+  // by this tx's hash - no need to know the signer list in advance. Only
+  // works for contracts deployed after the Signed event was added; older
+  // deployments simply return no logs since they never emitted it.
   useEffect(() => {
-    if (!selectedTx || !contract || knownSigners.length === 0) {
+    if (!selectedTx || !contract) {
       setSignedByList(null);
       return;
     }
     let cancelled = false;
     setSignedByLoading(true);
     (async () => {
-      const results = await Promise.all(
-        knownSigners.map(async (addr) => {
-          try {
-            const hasSigned = await contract["hasSignedTx(address,bytes32)"](
-              addr,
-              selectedTx.hash
-            );
-            return hasSigned ? addr : null;
-          } catch {
-            return null;
-          }
-        })
-      );
-      if (!cancelled) {
-        setSignedByList(results.filter((a): a is string => a !== null));
-        setSignedByLoading(false);
+      try {
+        const filter = contract.filters.Signed(selectedTx.hash);
+        const events = await contract.queryFilter(filter);
+        const signers = events.map(
+          (event) => (event as ethers.EventLog).args.signer as string
+        );
+        if (!cancelled) {
+          setSignedByList(signers);
+          setSignedByLoading(false);
+        }
+      } catch {
+        if (!cancelled) {
+          setSignedByList(null);
+          setSignedByLoading(false);
+        }
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [selectedTx, contract, knownSigners]);
+  }, [selectedTx, contract]);
 
   useEffect(() => {
     // Load token address book for datalist
@@ -1284,11 +1284,7 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
                           }}>
                             Signed By
                           </div>
-                          {knownSigners.length === 0 ? (
-                            <div style={{ color: '#64748b', fontSize: '12px' }}>
-                              Signer list not available for this contract.
-                            </div>
-                          ) : signedByLoading ? (
+                          {signedByLoading ? (
                             <div style={{ color: '#64748b', fontSize: '12px' }}>
                               Checking signatures...
                             </div>

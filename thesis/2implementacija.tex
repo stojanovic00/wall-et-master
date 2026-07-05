@@ -2,12 +2,271 @@
 
 \section{Arhitektura sistema}
 
-\en{WALL-ET} je pro\v sirenje pregleda\v ca (\en{web extension}) namenjeno pregleda\v cima zasnovanim na \en{Chromium} jezgru (\en{Chrome}, \en{Brave}, \en{Edge}), implementirano prema tre\' coj verziji specifikacije pro\v sirenja pregleda\v ca (\en{Chrome Extension Manifest V3}) \cite{chromemv32023}. Klijentski kod je napisan u \en{TypeScript}-u koriste\' ci \en{React} 18 biblioteku \cite{react2024}, komunikacija sa \en{Ethereum} mre\v zom (isklju\v civo \en{Sepolia} testnom mre\v zom) ostvarena je preko \en{ethers.js} biblioteke verzije 6 \cite{ethersjs2024}, \v sifrovanje privatnog klju\v ca oslanja se na \en{crypto-js} biblioteku, a spajanje izvornog koda u pakete za distribuciju obavlja \en{Webpack} 5 \cite{webpack2024}.
+\en{WALL-ET} je veb ekstenzija namenjena pregleda\v cima zasnovanim na \en{Chromium} jezgru (\en{Chrome}, \en{Brave}, \en{Edge}), implementirana prema tre\' coj verziji specifikacije veb ekstenzija (\en{Chrome Extension Manifest V3}) \cite{chromemv32023}. Klijentski kod je napisan u \en{TypeScript}-u koriste\' ci \en{React} 18 biblioteku \cite{react2024}, a komunikacija sa \en{Ethereum} mre\v zom (isklju\v civo \en{Sepolia} testnom mre\v zom) ostvarena je preko \en{ethers.js} biblioteke verzije 6 \cite{ethersjs2024}. Pametni ugovori napisani su u \en{Solidity} jeziku \cite{solidity2024} i razvijani uz pomo\' c \en{Foundry} alata za testiranje i objavljivanje \cite{foundry2024}.
 
-\en{Manifest V3} arhitektura razdvaja pro\v sirenje na nekoliko izolovanih konteksta izvr\v savanja. Korisni\v cki interfejs se izvr\v sava unutar iska\v cu\' ceg prozora (\en{popup}) - ulazna ta\v cka je \texttt{popup.tsx}, koji \en{React} stablo komponenti montira u \texttt{popup.html}. Odvojeno od \en{popup} konteksta, servisni radnik (\en{service worker}), definisan u \texttt{background.ts} i registrovan u \texttt{manifest.json} kao pozadinski proces pro\v sirenja, aktivan je nezavisno od toga da li je \en{popup} prozor trenutno otvoren. U trenutnoj implementaciji servisni radnik ima ograni\v cenu ulogu: postavlja podrazumevana pode\v savanja pri prvoj instalaciji pro\v sirenja i slu\v zi kao ta\v cka za razmenu poruka (\en{message passing}) izme\dj u delova pro\v sirenja. Sama logika nov\v canika - generisanje i \v sifrovanje klju\v ceva, potpisivanje i slanje transakcija - izvr\v sava se direktno unutar \en{popup} konteksta, gde \en{ethers.js} ima direktan pristup \en{Ethereum} mre\v zi preko udaljenog poziva procedure (\en{RPC}) \v cvora, bez posredovanja servisnog radnika.
+Ekstenzija nema sopstveni pozadinski server, niti bazu podataka, sa \en{Ethereum} mre\v zom povezuje se isklju\v civo preko udaljenog poziva procedure (\en{RPC}) \v cvora. Poslovna logika koja se deli izme\dj u vi\v se u\v cesnika, vi\v sepotpisna autorizacija i \en{EIP-7702} delegacija, u potpunosti je sme\v stena u pametne ugovore objavljene na mre\v zi (poglavlja 3.2 i 3.3), dok klijentski kod samo pakuje, potpisuje i \v salje transakcije prema tim ugovorima i \v cita njihovo stanje. Ova podela je bitna: svako pravilo (ko sme da potpi\v se, da li ima dovoljno sredstava, da li je delegacija aktivna) sprovodi se na nivou ugovora, na na\v cin koji se ne mo\v ze zaobi\' ci izmenom ili gre\v skom u klijentskom kodu.
 
-Trajno \v cuvanje podataka - \v sifrovani privatni klju\v c, \en{hash} lozinke, adresar i sa\v cuvane adrese ugovora - obavlja se preko \texttt{chrome.storage.local} asinhronog \en{API}-ja pro\v sirenja, uz \en{localStorage} kao rezervni mehanizam kada se kod pokre\' ce van konteksta pro\v sirenja pregleda\v ca (na primer tokom razvoja). Detalji \v sifrovanja i validacije privatnog klju\v ca opisani su u odeljku 3.2.
+\section{Ugovor \en{MultiSig}}
 
-Upravljanje stanjem aplikacije zasniva se na \en{React Context} obrascu: svaka klju\v cna funkcionalna celina enkapsulirana je u posebnog dobavlja\v ca (\en{provider}), sme\v stenog u \texttt{src/components/providers}, koji svoju logiku izla\v ze kroz namenski \en{React} \en{hook}. \texttt{WalletProvider} upravlja osnovnim funkcijama nov\v canika (generisanje, uvoz, \v sifrovanje, transakcije) i izla\v ze ih preko \texttt{useWallet()} \en{hook}-a, \texttt{MultisigContractProvider} enkapsulira interakciju sa vi\v sepotpisnim ugovorom preko \texttt{useMultisigContract()}, dok \texttt{RecoveryContractProvider} i \texttt{TokenProvider} na isti na\v cin obuhvataju logiku socijalnog oporavka i pra\' cenje \en{ERC20} tokena. Ovaj obrazac dr\v zi poslovnu logiku odvojenu od prikaza: komponente ekrana pozivaju \en{hook}-ove i dobijaju gotove funkcije i podatke, bez direktnog pristupa \en{ethers.js} objektima ili \texttt{chrome.storage} \en{API}-ju.
+Vi\v sepotpisna logika opisana u odeljku 2.3 implementirana je u ugovoru \texttt{MultiSig.sol}, napisanom u \en{Solidity} jeziku \cite{solidity2024}. Ugovor se objavljuje dinami\v cki - po jedan primerak za svaku grupu korisnika koja \v zeli zajedni\v cko upravljanje sredstvima - preko \texttt{ethers.js} \texttt{ContractFactory} obrasca direktno iz nov\v canika. Ne postoji jedan deljeni \en{MultiSig} ugovor za sve korisnike \en{WALL-ET} nov\v canika.
 
-Navigacija kroz aplikaciju ne koristi biblioteku za rutiranje, ve\' c jednostavan mehanizam zasnovan na uniji tipova nazvanoj \texttt{Screen}, definisanoj u \texttt{src/types/index.ts}, koja nabraja sve mogu\' ce ekrane aplikacije (\texttt{wallet}, \texttt{send}, \texttt{multisig}, \texttt{recovery-contract} i tako dalje). Glavna komponenta \texttt{App.tsx} dr\v zi trenutni ekran u lokalnom stanju i preko \texttt{switch} iskaza renderuje odgovaraju\' cu komponentu ekrana. Prelazak izme\dj u ekrana ostvaruje se prosle\dj ivanjem funkcija povratnog poziva (\en{callback}) kao \en{props}-a - na primer \texttt{onBack}, \texttt{onSendEth} ili \texttt{onTransactionSuccess} - koje komponenta ekrana poziva kada treba promeniti trenutni ekran, umesto da sama menja globalno stanje aplikacije. Ovakav pristup je dovoljan za obim \en{popup} pro\v sirenja i izbegava dodatnu zavisnost od biblioteke za rutiranje.
+\textbf{Stanje i konstruktor.} Ugovor \v cuva listu ovla\v s\' cenih potpisnika kao privatno mapiranje, prag potrebnih potpisa, broja\v c \texttt{nonce} kori\v s\' cen pri generisanju identifikatora transakcija i dva mapiranja za same predlo\v zene transakcije i evidenciju ko ih je potpisao.
+
+\begin{lstlisting}[caption={Stanje i konstruktor ugovora \texttt{MultiSig}}, label={lst:multisig-state}]
+mapping(address => bool) private signers;
+uint256 public minSignatures;
+uint256 private nonce;
+mapping(bytes32 => Transaction) private transactions;
+mapping(address => mapping(bytes32 => bool)) private transactionSigners;
+
+event Propose(bytes32 txHash);
+event Signed(bytes32 indexed txHash, address indexed signer);
+event Executed(bytes32 indexed txHash);
+
+constructor(address[] memory _signers, uint256 _minSignatures) {
+    require(_signers.length > 0, "Must have at least one signer");
+    require(_minSignatures > 0, "Min signatures must be greater than 0");
+    require(_minSignatures <= _signers.length, "Min signatures cannot exceed signer count");
+
+    for (uint256 i = 0; i < _signers.length; i++) {
+        require(_signers[i] != address(0), "Invalid signer address");
+        require(!signers[_signers[i]], "Duplicate signer");
+        signers[_signers[i]] = true;
+    }
+    minSignatures = _minSignatures;
+}
+\end{lstlisting}
+
+Bitno je uo\v citi da konstruktor niz \texttt{\_signers} nigde ne \v cuva kao niz - svaka adresa se samo upisuje kao \texttt{true} u mapiranje \texttt{signers}. Posledica ovoga je da ugovor sam po sebi nema na\v cin da nabroji sve svoje potpisnike, ve\' c mo\v ze odgovoriti isklju\v civo na pitanje "da li je data adresa potpisnik", ali ne i "koje su sve adrese potpisnici". Zbog ovog ograni\v cenja, klijentska aplikacija mora sama trajno zapisati listu potpisnika u trenutku objavljivanja ugovora (odeljak 3.4) ukoliko \v zeli da je kasnije prika\v ze korisniku.
+
+\textbf{Predlaganje transakcije.} Predlaganje transakcije generi\v se jedinstven identifikator koji slu\v zi kao klju\v c za sve naredne operacije nad tom transakcijom (potpisivanje, depozitovanje, izvr\v savanje).
+
+\begin{lstlisting}[caption={Predlaganje token transakcije}, label={lst:multisig-propose}]
+function proposeToken(address to, uint256 amount, address token) external returns (bytes32 txHash) {
+    require(to != address(0), "Invalid target address");
+    require(amount > 0, "Amount must be greater than 0");
+    require(token != address(0), "Invalid token address");
+
+    IERC20 tokenContract = IERC20(token);
+    require(tokenContract.totalSupply() > 0, "Token not deployed");
+
+    Transaction memory transaction = Transaction({
+        to: to, native: false, token: token, amount: amount,
+        proposer: msg.sender, timestamp: block.timestamp,
+        signedCount: 0, executed: false, balance: 0
+    });
+
+    txHash = keccak256(abi.encodePacked(msg.sender, nonce++));
+    transactions[txHash] = transaction;
+    emit Propose(txHash);
+    return txHash;
+}
+\end{lstlisting}
+
+Va\v zna specifi\v cnost implementacije je na\v cin izra\v cunavanja \texttt{txHash}-a: dobija se kao \texttt{keccak256(predlaga\v c, nonce)}, gde je \texttt{nonce} jedinstven broja\v c na nivou celog ugovora, deljen izme\dj u svih predlaga\v ca, a ne zaseban broja\v c po predlaga\v cu - svaki poziv \texttt{propose} funkcije, bez obzira ko ga poziva, pove\' cava isti taj broja\v c. Identifikator dakle zavisi isklju\v civo od adrese predlaga\v ca i trenutne vrednosti tog zajedni\v ckog broja\v ca u momentu poziva - ne zavisi ni na koji na\v cin od sadr\v zaja same transakcije (primaoca, iznosa ili tokena). Kako se \texttt{nonce} uvek pove\' cava nezavisno od toga ko poziva \texttt{propose}, nikoje dve transakcije na istom ugovoru, bez obzira na to ko ih je predlo\v zio, nikada ne mogu dobiti isti identifikator, ali identifikator sam po sebi ne otkriva ni\v sta o transakciji - da bi se transakcija pregledala, mora joj se pristupiti odvojenim pozivom \texttt{getTransaction(txHash)}.
+\newpage
+
+\textbf{Potpisivanje i izvr\v savanje.}
+
+\begin{lstlisting}[caption={Potpisivanje i izvr\v savanje transakcije}, label={lst:multisig-sign-execute}]
+function sign(bytes32 txHash) external onlySigner {
+    Transaction storage transaction = transactions[txHash];
+    ...//checks
+    transactionSigners[msg.sender][txHash] = true;
+    transaction.signedCount++;
+
+    emit Signed(txHash, msg.sender);
+}
+
+function execute(bytes32 txHash) external onlySigner {
+    Transaction storage transaction = transactions[txHash];
+    require(transaction.proposer != address(0), "Transaction not found");
+    require(transaction.signedCount >= minSignatures, "Not enough signatures");
+    require(!transaction.executed, "Transaction already executed");
+
+    if (transaction.native) {
+        require(transaction.balance >= transaction.amount, "Not enough balance");
+        require(address(this).balance >= transaction.amount, "Insufficient contract balance");
+        transaction.executed = true;
+        (bool success,) = transaction.to.call{value: transaction.amount}("");
+        require(success, "Execution failed");
+    } else {
+        require(transaction.balance >= transaction.amount, "Not enough balance");
+        IERC20 tokenContract = IERC20(transaction.token);
+        require(tokenContract.balanceOf(address(this)) >= transaction.amount, "Insufficient contract token balance");
+        transaction.executed = true;
+        bool success = tokenContract.transfer(transaction.to, transaction.amount);
+        require(success, "Execution failed");
+    }
+
+    emit Executed(txHash);
+}
+\end{lstlisting}
+
+Ugovor emituje doga\dj aje \texttt{Propose}, \texttt{Signed} i \texttt{Executed} prilikom predlaganja, potpisivanja i izvr\v savanja transakcije. Doga\dj aj \texttt{Signed} klijentu omogu\' cava da spisak svih potpisnika konkretne transakcije dobije jednim upitom nad istorijom doga\dj aja, filtriranim po indeksiranom polju \texttt{txHash} (\texttt{contract.queryFilter(contract.filters.Signed(txHash))} u \en{ethers.js}), bez potrebe da unapred poznaje listu potpisnika ugovora.
+
+\texttt{execute()} pre stvarnog prenosa sredstava proverava dva nezavisna uslova: da li je za konkretnu transakciju depozitovano dovoljno sredstava (\texttt{transaction.balance}) i da li ugovor trenutno zaista raspola\v ze dovoljnom koli\v cinom sredstava. Oba uslova moraju biti unapred proverena na klijentskoj strani (odeljak 3.4) kako bi se korisniku prikazala razumljiva poruka umesto da transakcija bude poslata i tek zatim odba\v cena na mre\v zi.
+
+\textbf{Deponovanje sredstava.}
+
+\begin{lstlisting}[caption={Deponovanje \en{ERC20} tokena}, label={lst:multisig-deposit}]
+function depositToken(bytes32 txHash, uint256 amount) external {
+    require(transactions[txHash].proposer != address(0), "Transaction not found");
+    require(!transactions[txHash].native, "Transaction is not a token transaction");
+
+    IERC20 tokenContract = IERC20(transactions[txHash].token);
+    tokenContract.transferFrom(msg.sender, address(this), amount);
+    transactions[txHash].balance += amount;
+}
+\end{lstlisting}
+
+Adresa tokena \v cita se direktno iz ve\' c predlo\v zene transakcije (\texttt{transactions[txHash].token}), ne prima se kao parametar poziva - poziva\v c dakle ne mo\v ze depozitovati pogre\v san token \v cak ni slu\v cajno. Poziv \texttt{transferFrom} zahteva da je pozivalac (\texttt{msg.0xef0100sender}) prethodno odobrio ovom ugovoru pravo tro\v senja bar toliko tokena koliko iznosi \texttt{amount} - upravo je taj korak odobravanja onaj koji \en{EIP-7702} delegacija (naredni odeljak) spaja sa samim pozivom \texttt{depositToken} u jednu jedinstvenu transakciju.
+
+\section{Ugovor \en{Approver} i \en{EIP-7702} delegacija}
+
+\textbf{Ugovor \en{Approver}.} \en{Approver} je ugovor \v ciji se kod delegira \en{EOA} nalogu putem \en{EIP-7702} mehanizma opisanog u odeljku 2.4. Prema svojstvu iz tog odeljka, ugovor ne sme imati logiku koja zahteva sopstveno \en{storage} stanje (\en{stateless contract}) - sve potrebne podatke prima kao parametre poziva.
+
+\begin{lstlisting}[caption={Osnovne funkcije ugovora \texttt{Approver}}, label={lst:approver-core}]
+function approveToken(
+    address token, address spender, uint256 amount
+) public returns (bool) {
+    require(token != address(0), "Invalid token address");
+    require(spender != address(0), "Invalid spender address");
+    bool success = IERC20(token).approve(spender, amount);
+    require(success, "ERC-20 approval failed");
+    return true;
+}
+
+function depositTokenToMultiSig(
+    address multiSigAddress, bytes32 txHash, uint256 amount
+) public {
+    require(multiSigAddress != address(0), "Invalid MultiSig address");
+    require(amount > 0, "Amount must be greater than 0");
+    IMultiSig(multiSigAddress).depositToken(txHash, amount);
+}
+
+function approveAndDeposit(
+    address token, address multiSigAddress, bytes32 txHash, uint256 depositAmount
+) external {
+    this.approveToken(token, multiSigAddress, depositAmount);
+    this.depositTokenToMultiSig(multiSigAddress, txHash, depositAmount);
+}
+\end{lstlisting}
+
+\texttt{approveAndDeposit} poziva prethodne dve funkcije preko \texttt{this}. Kada se ovaj kod izvr\v sava u kontekstu delegiranog \en{EOA}-a, \texttt{address(this)} unutar svakog od tih poziva uvek vra\' ca adresu \en{EOA}-a (odeljak 2.4), pa \texttt{IERC20(token).approve(...)} izvr\v sava odobrenje u ime samog \en{EOA}-a, a ne u ime \en{Approver} ugovora. Rezultat je da se u okviru jedne transakcije prvo odobrava tro\v senje tokena, a zatim odmah poziva \texttt{depositToken} na \en{MultiSig} ugovoru - obe radnje atomski uspevaju ili obe propadaju zajedno.
+
+\textbf{Konstrukcija transakcije tipa 4.} Klijentska strana konstrui\v se i potpisuje transakciju tipa 4 preko \en{ethers.js} biblioteke \cite{ethersjs2024}. Funkcija \texttt{setupDelegation} aktivira delegaciju.
+
+\begin{lstlisting}[caption={Konstrukcija ovla\v s\' cenja i transakcije tipa 4}, label={lst:setup-delegation}]
+export async function setupDelegation(signer: ethers.Wallet, targetAddress: string) {
+  const currentNonce = await signer.getNonce();
+  const auth = await signer.authorize({
+    address: targetAddress,
+    nonce: currentNonce + 1,
+  });
+  const tx = await signer.sendTransaction({
+    type: 4,
+    to: signer.address,
+    authorizationList: [auth],
+  });
+  await tx.wait();
+  return tx.hash;
+}
+\end{lstlisting}
+
+Poziv \texttt{signer.authorize(...)} predstavlja kriptografsko jezgro mehanizma - gradi \texttt{authorization} torku propisanu \en{EIP-7702} standardom (identifikator mre\v ze, ciljna adresa, \texttt{nonce}) i potpisuje je privatnim klju\v cem naloga \texttt{signer}. Transakcija se zatim \v salje kao samopoziv - polje \texttt{to} je adresa samog po\v siljaoca - jer protokol \texttt{authorization\_list} obra\dj uje nezavisno od odredi\v sta i sadr\v zaja same transakcije, pa je najjeftinija validna transakcija koja mo\v ze da ga ponese prazan poziv sopstvene adrese.
+
+\textbf{Identifikator mre\v ze.} Poziv \texttt{authorize} u primeru iznad ne navodi eksplicitno identifikator mre\v ze. \en{ethers.js} ga automatski dopunjava pozivom \texttt{provider.getNetwork()} onog \en{RPC} \v cvora na koji je \texttt{signer} povezan \cite{ethersjs2024} - u ovom radu, \en{Sepolia} testna mre\v za (\texttt{config.RPC\_URL}, odeljak 3.1). Identifikator mre\v ze u ovla\v s\' cenju tako nije eksplicitno upisan u aplikativnom kodu, ve\' c je u potpunosti implicitno nasle\dj en od mre\v ze na koju je nov\v canik povezan.
+
+\textbf{Samoposlato ovla\v s\' cenje i \texttt{nonce} vrednost.} Najosetljiviji deo implementacije jeste ta\v cna \texttt{nonce} vrednost upisana u ovla\v s\' cenje. Prema \en{EIP-7702} specifikaciji, protokol prihvata ovla\v s\' cenje samo ako se navedena \texttt{nonce} vrednost poklapa sa trenutnom \texttt{nonce} vredno\v s\' cu potpisni\v ckog naloga u trenutku kada se ovla\v s\' cenje obra\dj uje - a ta provera se izvr\v sava tek po\v sto je obi\v cna obrada same transakcije ve\' c pove\' cala \texttt{nonce} vrednost po\v siljaoca za jedan. Kada su po\v siljalac transakcije i potpisnik ovla\v s\' cenja ista adresa - \v sto je slu\v caj u ovoj implementaciji, gde nov\v canik sam sebi \v salje transakciju koja nosi sopstveno ovla\v s\' cenje - ovla\v s\' cenje mora biti potpisano za vrednost \texttt{trenutni\_nonce + 1}, a ne za \texttt{trenutni\_nonce} pro\v citan neposredno pre slanja.
+
+Potvr\dj ena transakcija sama po sebi ne dokazuje da je ovla\v s\' cenje unutar nje primenjeno: autorizacija sa neta\v cnom \texttt{nonce} vredno\v s\' cu biva odba\v cena bez da izazove neuspeh cele transakcije, pa se stvarno stanje naloga mora nezavisno proveriti pozivom \texttt{eth\_getCode}. Slede\' ci primer prikazuje stvarnu transakciju poslatu na \en{Sepolia} mre\v zi:
+
+\begin{lstlisting}[caption={Stvarna transakcija tipa 4 sa \en{Sepolia} mre\v ze (o\v citana preko \texttt{cast tx})}, label={lst:real-tx}]
+type                 4
+nonce                2
+to                   0x861b70dCA3C5477993a866bb7B44f1Db080aD842
+authorizationList    [{
+  recoveredAuthority: 0x861b70dCA3C5477993a866bb7B44f1Db080aD842,
+  signedAuthority: {
+    "chainId":"0xaa36a7",
+    "address":"0x828f4dc04158859eaef3f9add8486966c2429764",
+    "nonce":"0x3"
+  }
+}]
+input                0x
+\end{lstlisting}
+
+Transakcija sama nosi \texttt{nonce} vrednost \texttt{2}, dok potpisano ovla\v s\' cenje unutar nje nosi vrednost \texttt{3} - ta\v cno \texttt{2 + 1}, kao \v sto je obja\v snjeno iznad. Adresa u polju \texttt{to} i adresa \texttt{recoveredAuthority} (potpisnik ovla\v s\' cenja, dobijen iz potpisa) su identi\v cne, \v sto potvr\dj uje samoposlatu prirodu transakcije, a \texttt{chainId} vrednost \texttt{0xaa36a7} odgovara \en{Sepolia} mre\v zi (decimalno \texttt{11155111}). Nakon potvr\dj ivanja ove transakcije, o\v citavanje koda naloga (\texttt{eth\_getCode}) vra\' ca ta\v cno o\v cekivanu vrednost:
+
+\begin{lstlisting}[caption={Kod naloga nakon uspe\v sne delegacije}, label={lst:eth-getcode}]
+0xef0100828f4dc04158859eaef3f9add8486966c2429764
+\end{lstlisting}
+
+\v Sto je ta\v cno \texttt{0xef0100} nadovezano adresom \en{Approver} ugovora (odeljak 2.4), \v cime je potvr\dj eno da je delegacija primenjena na mre\v zi.
+
+\textbf{Opoziv delegacije.} \texttt{revokeDelegation} koristi identi\v can obrazac, sa nultom adresom kao ciljem ovla\v s\' cenja.
+
+\begin{lstlisting}[caption={Opoziv delegacije}, label={lst:revoke-delegation}]
+export async function revokeDelegation(signer: ethers.Wallet) {
+  const currentNonce = await signer.getNonce();
+  const revokeAuth = await signer.authorize({
+    address: ethers.ZeroAddress,
+    nonce: currentNonce + 1,
+  });
+  const tx = await signer.sendTransaction({
+    type: 4,
+    to: signer.address,
+    authorizationList: [revokeAuth],
+  });
+  await tx.wait();
+  return tx.hash;
+}
+\end{lstlisting}
+
+Uve\' canje za jedan ovde je ispravno primenjeno od po\v cetka jer je re\v c o istoj samoposlatoj konstrukciji - poziv \texttt{signer.getNonce()} izvr\v sava se iznova, u trenutku poziva funkcije, pa je nezavisan od toga koliko je transakcija prethodno poslato niti kada je delegacija prvobitno uspostavljena. Ovla\v s\' cenje sa nultom adresom, kada bude prihva\' ceno, bri\v se delegacijski ozna\v civa\v c iz kod slota naloga i vra\' ca ga u prvobitno stanje obi\v cnog \en{EOA}-a bez koda.
+
+\section{Klijentski pozivi ugovora}
+
+Klijentska strana pristupa oba ugovora preko \en{ethers.js} \texttt{Contract} obrasca (\en{ABI}, adresa i potpisnik spojeni u jedan lokalni objekat, odeljak 3.1) i razlikuje dva na\v cina depozitovanja tokena, u zavisnosti od toga da li je \en{EIP-7702} delegacija trenutno aktivna.
+
+\begin{lstlisting}[caption={Deponovanje uz aktivnu delegaciju - jedna transakcija}, label={lst:deposit-delegated}]
+export async function depositTokenWithDelegation(
+  signer: ethers.Wallet, tokenAddress: string,
+  multiSigContract: string, txHash: string, amount: ethers.BigNumberish
+) {
+  const delegatedContract = new ethers.Contract(signer.address, ApproverJson.abi, signer);
+  const tx = await delegatedContract["approveAndDeposit(address,address,bytes32,uint256)"](
+    tokenAddress, multiSigContract, txHash, amount, { type: 2 }
+  );
+  return await tx.wait();
+}
+\end{lstlisting}
+
+\newpage
+
+\begin{lstlisting}[caption={Deponovanje bez delegacije - dve odvojene transakcije}, label={lst:deposit-classic}]
+export async function approveTokenClassic(
+  signer: ethers.Wallet, tokenAddress: string,
+  multiSigContract: string, amount: ethers.BigNumberish
+) {
+  const tokenContract = new ethers.Contract(tokenAddress, Erc20Json.abi, signer);
+  const approveTx = await tokenContract["approve(address,uint256)"](multiSigContract, amount);
+  await approveTx.wait();
+}
+
+export async function depositTokenClassic(
+  signer: ethers.Wallet, multiSigContract: string,
+  txHash: string, amount: ethers.BigNumberish
+) {
+  const multisig = new ethers.Contract(
+    multiSigContract,
+    ["function depositToken(bytes32 txHash, uint256 amount) external"],
+    signer
+  );
+  const depositTx = await multisig["depositToken(bytes32,uint256)"](txHash, amount);
+  return await depositTx.wait();
+}
+\end{lstlisting}
+
+Zanimljivo je da je \texttt{delegatedContract} u prvom primeru instanciran sa adresom samog \texttt{signer}-a, a ne sa adresom \en{Approver} ugovora - poziv se, dakle, upu\' cuje na sopstveni nalog, koji zbog aktivne delegacije izvr\v sava \en{Approver} kod. Kada delegacija nije aktivna, isti krajnji efekat (odobrenje pa depozit) posti\v ze se sa dve nezavisne, klasi\v cne transakcije, \v cime se korisniku vra\' ca kontrola nad svakim korakom pojedina\v cno, po cenu dodatnog potpisivanja i \v cekanja na potvrdu bloka (odeljak 2.5).

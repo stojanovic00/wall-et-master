@@ -7,11 +7,13 @@ This file provides guidance to Claude Code when working on this master's thesis.
 ## Project state
 
 - **Chapter 1 - Uvod** (`0uvod.tex`): COMPLETE, APPROVED
-- **Chapter 2 - Osnove i srodna resenja** (`1osnovniKoncepti.tex`): COMPLETE, awaiting user approval
-- **Chapter 3 - Implementacija** (`2implementacija.tex`): NEXT TO WRITE
-- **Chapter 4 - Zakljucak** (`zakljucak.tex`): After chapter 3
+- **Chapter 2 - Osnove i srodna resenja** (`1osnovniKoncepti.tex`): COMPLETE, includes a "Kripto novcanik" section (custodial/non-custodial, hot/cold) inserted after 2.1
+- **Chapter 3 - Implementacija** (`2implementacija.tex`): 3.1-3.4 written (see structure below), awaiting user approval
+- **Chapter 4 - Zakljucak** (`zakljucak.tex`): NEXT TO WRITE
 
-Workflow: write one chapter → user approves → proceed to next.
+Workflow: write one chapter/section → user approves → proceed to next.
+
+**Scope note (important):** the thesis and hands-on testing focus is strictly the MultiSig contract and EIP-7702 delegation. Social Recovery is explicitly out of scope - don't propose testing, fixing, or writing about it. Native-ETH-only multisig flows are low priority (no EIP-7702 relevance). Frontend implementation detail is intentionally de-emphasized in chapter 3 - only the parts touching contract calls and type-4 transaction construction matter; see 3.1's trimmed scope below.
 
 ---
 
@@ -75,6 +77,9 @@ These rules were explicitly established by the user - do not violate them:
 10. **"pametni" (smart account context)**: put in Serbian quotes - `"pametni"`.
 11. **\cite{key1,key2}**: NO space between keys. A space causes wrong Cyrillic output (`[накамото2008, 2]` instead of `[1, 2]`).
 12. References must be specific and non-vague. Never cite just a docs homepage if a whitepaper or EIP page exists.
+13. **"pro\v sirenje pregleda\v ca" -> use "veb ekstenzija"** for "browser extension" (feminine noun, watch agreement: `ekstenzija je namenjena`, `implementirana kao`). No need for an extra `(\en{web extension})` gloss since "ekstenzija" already carries the loanword.
+14. **\texttt{lstlisting} captions go below the code**, not above (`captionpos=b`, set globally in `main.tex`'s `\lstset`).
+15. **CRITICAL - never write the thesis as a development log.** No "prva implementacija nije uključivala...", "greška je otkrivena...", "nakon ispravke...", "dodati su naknadno da bi se otklonio nedostatak". Describe the finished system's functionality directly, as if it always worked this way - even when the real story (in this session's work) was "we found a bug and fixed it." Keep any genuinely general fact learned along the way (e.g. a protocol subtlety), strip the "here's the bug we hit" framing entirely. Real transaction dumps/empirical data are still fine to include, introduced as "here is an example," never as "after the fix, this is what it showed."
 
 ---
 
@@ -123,42 +128,33 @@ Full-width/full-page figure embed:
 
 ---
 
-## Chapter 3 plan (Implementacija)
+## Chapter 3 structure (Implementacija) - as actually written
 
-File: `2implementacija.tex`. Sections:
+File: `2implementacija.tex`. Backend/contracts-focused per user's explicit direction - frontend (providers, screens, storage) intentionally kept minimal.
 
-### 3.1 Arhitektura sistema
-- Tech stack: React 18 + TypeScript + ethers.js v6 + Webpack 5 + Chrome MV3
-- Provider pattern for state management (React Context + hooks)
-- Screen-based navigation via `Screen` union type in `src/types/index.ts`
-- MV3 components: popup (React app), service worker (background), `chrome.storage.local` (encrypted key persistence)
-- Cite: `\cite{ethersjs2024,chromemv32023}`
+### 3.1 Arhitektura sistema (trimmed, ~2 paragraphs)
+- Tech stack one-liner: React 18 + TypeScript + ethers.js v6, Solidity + Foundry for contracts
+- No backend server/DB - extension talks to Ethereum only via RPC node
+- Shared business logic (multisig authorization, EIP-7702 delegation) lives entirely in the contracts (3.2/3.3), client only builds/signs/sends txs and reads state
+- Deliberately does NOT cover: MV3 popup/service-worker split, provider pattern, Screen navigation, storage details - cut per user request to not dwell on frontend
 
-### 3.2 Upravljanje novcanikom
-- Key generation: `ethers.Wallet.createRandom()` and import from private key
-- AES-256 encryption with crypto-js: `crypto.AES.encrypt(privateKey, password)`
-- Password never stored - only SHA-256 hash kept for verification
-- Decrypted key validated: `/^0x?[0-9a-fA-F]{64}$/`
-- `chrome.storage.local` async API for persistence (localStorage fallback in dev)
-- Code from `WalletProvider.tsx`
+### 3.2 Ugovor MultiSig
+- State/constructor: `signers` mapping is private with no enumeration - `nonce`, `transactions`, `transactionSigners` mappings (code listing)
+- `proposeToken`: `txHash = keccak256(msg.sender, nonce++)` - depends only on proposer+nonce, not tx content (code listing)
+- `sign`/`execute`: originally emitted no events at all (only `propose` did) - added `Signed(txHash, signer)` and `Executed(txHash)` events after identifying the gap during testing, narrated as a real before/after fix in the thesis text (parallel to the nonce+1 fix in 3.3). `execute` checks `signedCount >= minSignatures` and balance sufficiency before transferring (code listing). Client now reads `Signed` via `contract.queryFilter(contract.filters.Signed(txHash))` instead of probing `hasSignedTx` per known signer - mentioned briefly. Caveat: only new deployments emit these, already-deployed contracts are immutable.
+- `depositToken`: token address read from the stored proposal, not caller-supplied, requires prior `approve()` (code listing)
 
-### 3.3 Visepotpisni ugovor
-- `MultiSig.sol` - signers array, minSignatures threshold
-- txHash = `keccak256(nonce, to, amount, token)` - unique transaction ID
-- Propose/sign/execute flow with event `Propose(bytes32 txHash)`
-- Deployment via `ethers.ContractFactory` from extension
-- Code from `MultisigContractProvider.tsx`
+### 3.3 Ugovor Approver i EIP-7702 delegacija
+- `Approver.sol`: `approveToken`/`depositTokenToMultiSig`/`approveAndDeposit`, calls itself via `this.` so `address(this)` resolves to the delegated EOA (code listings)
+- Client-side type-4 tx construction: `setupDelegation`/`revokeDelegation` from `utils/multisig.ts`, `signer.authorize()` (code listings)
+- Chain ID auto-inherited from the connected provider (`populateAuthorization` in ethers source)
+- **Self-sponsored nonce+1 subtlety** (heavily emphasized - this was a real bug found and fixed this session): authority's nonce is already bumped by the tx's own nonce consumption by the time the authorization check runs, so a self-sponsored authorization needs `currentNonce + 1`, not `currentNonce`. Real captured Sepolia tx data included as a listing (type=4, tx nonce=2, authorization nonce=3, chainId=0xaa36a7) plus the resulting `eth_getCode` output (`0xef0100` + Approver address) as empirical proof
+- `revokeDelegation` - same self-send pattern, was already correct
 
-### 3.4 EIP-7702 delegacija za depozit tokena
-The 3-phase implementation (from `extension/src/utils/multisig.ts` and `WalletProvider.tsx`):
-- **Faza 1 - setupDelegation()**: type-4 tx, sets delegation designator once; `isDelegationActive` persisted in `chrome.storage.local`
-- **Faza 2 - depositTokenWithDelegation()**: regular type-2 tx, calls `approveAndDeposit()` on EOA address (which now has Approver code); atomic
-- **Faza 3 - revokeDelegation()**: type-4 tx with `ZeroAddress`, clears designator
-- Toggle in `WalletScreen.tsx` - "Smart Account (EIP-7702)" toggle
-- `MultisigContractProvider.depositToken()` routes based on `isDelegationActive`
-- Classic fallback: `depositTokenClassic()` - two separate txs (approve + deposit)
+### 3.4 Klijentski pozivi ugovora (brief)
+- `ethers.Contract` wrapping pattern
+- Two deposit paths as code listings: `depositTokenWithDelegation` (bundled, one tx, calls `approveAndDeposit` on own address) vs `approveTokenClassic`+`depositTokenClassic` (two separate txs)
 
-### 3.5 Korisnicki interfejs
-- Screen flow: setup/unlock -> wallet dashboard -> multisig deploy -> interact (propose/sign/execute/deposit)
-- Smart Account toggle with loading/error states
-- Cite: `\cite{ethersjs2024}`
+### Not yet written
+- Zakljucak (chapter 4)
+- Anything about Social Recovery, native-ETH-only multisig flows, or detailed frontend/UI - out of scope, see scope note above
