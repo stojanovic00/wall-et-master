@@ -79,9 +79,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const [isDelegationActive, setIsDelegationActive] = useState<boolean>(false);
 
   // Initialize Infura provider
-  const provider = new ethers.JsonRpcProvider(
-    "https://sepolia.infura.io/v3/7a796da878ac4152a6b3bfcb4fc794cb"
-  );
+  const provider = new ethers.JsonRpcProvider(config.RPC_URL);
 
   useEffect(() => {
     (async () => {

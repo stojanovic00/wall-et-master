@@ -34,9 +34,13 @@ export async function revokeDelegation(signer: ethers.Wallet) {
 export async function setupDelegation(signer: ethers.Wallet, targetAddress: string) {
   console.log("\n=== SETTING UP DELEGATION ===");
   const currentNonce = await signer.getNonce();
+  // The transaction below is self-sponsored (signer authorizes and sends the
+  // tx itself), so by the time the protocol checks the authorization's nonce
+  // against on-chain state, the tx's own nonce consumption has already
+  // incremented it once - matches the +1 revokeDelegation already uses below.
   const auth = await signer.authorize({
     address: targetAddress,
-    nonce: currentNonce,
+    nonce: currentNonce + 1,
   });
   const tx = await signer.sendTransaction({
     type: 4,
@@ -73,82 +77,36 @@ export async function depositTokenWithDelegation(
   return await tx.wait();
 }
 
-export async function depositTokenClassic(
+export async function approveTokenClassic(
   signer: ethers.Wallet,
   tokenAddress: string,
+  multiSigContract: string,
+  amount: ethers.BigNumberish
+) {
+  console.log("\n=== CLASSIC APPROVE (1/2) ===");
+  const tokenContract = new ethers.Contract(tokenAddress, Erc20Json.abi, signer);
+  const approveTx = await tokenContract["approve(address,uint256)"](multiSigContract, amount);
+  await approveTx.wait();
+  console.log("Approve confirmed:", approveTx.hash);
+  return approveTx.hash;
+}
+
+export async function depositTokenClassic(
+  signer: ethers.Wallet,
   multiSigContract: string,
   txHash: string,
   amount: ethers.BigNumberish
 ) {
-  console.log("\n=== CLASSIC DEPOSIT (2 TX) ===");
-  const tokenContract = new ethers.Contract(tokenAddress, Erc20Json.abi, signer);
-
-  console.log("Step 1: approve");
-  const approveTx = await tokenContract["approve(address,uint256)"](multiSigContract, amount);
-  await approveTx.wait();
-  console.log("Approve confirmed");
-
-  console.log("Step 2: deposit");
+  console.log("\n=== CLASSIC DEPOSIT (2/2) ===");
   const multisig = new ethers.Contract(
     multiSigContract,
     [
-      "function deposit(address token, bytes32 txHash, uint256 amount) external",
+      "function depositToken(bytes32 txHash, uint256 amount) external",
     ],
     signer
   );
-  const depositTx = await multisig["deposit(address,bytes32,uint256)"](tokenAddress, txHash, amount);
+  const depositTx = await multisig["depositToken(bytes32,uint256)"](txHash, amount);
   await depositTx.wait();
   console.log("Deposit confirmed");
   return depositTx.hash;
-}
-
-export async function createAuthorization(signer: ethers.Wallet, targetAddress: string, nonce: number) {
-  const auth = await signer.authorize({
-    address: targetAddress,
-    nonce: nonce,
-  });
-
-  console.log("Authorization created with nonce:", auth.nonce);
-  return auth;
-}
-
-export async function createDelegation(
-  signer: ethers.Wallet, 
-  targetAddress: string, 
-  tokenAddress: string, 
-  multiSigContract: string, 
-  approvalTxHash: string,
-  amount: ethers.BigNumberish
-) {
-  console.log("\n=== CREATING DELEGATION ===");
-  const currentNonce = await signer.getNonce();
-  console.log("Current nonce for signer:", currentNonce);
-
-  // Create authorization with incremented nonce for same-wallet transactions
-  const auth = await createAuthorization(signer, targetAddress, currentNonce + 1);
-
-  // Create contract instance and execute
-  const delegatedContract = new ethers.Contract(
-    signer.address,
-    ApproverJson.abi,
-    signer
-  );
-
-  const tx = await delegatedContract["approveAndDeposit(address,address,bytes32,uint256)"](
-    tokenAddress,
-    multiSigContract,
-    approvalTxHash,
-    amount,
-    {
-      type: 4,
-      authorizationList: [auth],
-    }
-  );
-
-  console.log("Transaction sent:", tx.hash);
-
-  const receipt = await tx.wait();
-  console.log("Receipt transaction:", receipt);
-
-  return receipt;
 }

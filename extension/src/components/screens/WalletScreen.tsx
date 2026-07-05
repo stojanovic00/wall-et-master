@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useWallet } from "../providers/WalletProvider";
+import { useTransactionConfirmation } from "../providers/TransactionConfirmationProvider";
 import { MdContentCopy } from "react-icons/md";
+import config from "../../config/config.json";
 
 interface WalletScreenProps {
   onSendEth: () => void;
@@ -18,6 +20,7 @@ const WalletScreen: React.FC<WalletScreenProps> = ({
   onViewAddressBook,
 }) => {
   const { wallet, address, getBalance, isDelegationActive, enableSmartAccount, disableSmartAccount } = useWallet();
+  const { showTransactionConfirmation } = useTransactionConfirmation();
   const [balance, setBalance] = useState<string>("");
   const [loadingBalance, setLoadingBalance] = useState<boolean>(false);
   const [copied, setCopied] = useState(false);
@@ -44,6 +47,21 @@ const WalletScreen: React.FC<WalletScreenProps> = ({
   }, [wallet, getBalance]);
 
   const handleDelegationToggle = async () => {
+    const confirmed = await showTransactionConfirmation({
+      type: isDelegationActive ? "delegation-revoke" : "delegation-setup",
+      to: address,
+      from: address,
+      contractAddress: config.APPROVER_CONTRACT,
+      chainId: 11155111,
+      title: isDelegationActive
+        ? "Disable Smart Account (EIP-7702)"
+        : "Enable Smart Account (EIP-7702)",
+      description: isDelegationActive
+        ? "This sends a type-4 transaction that clears your account's delegation designator, returning it to a plain EOA."
+        : "This sends a type-4 transaction that delegates your account's code execution to the Approver contract below, enabling single-transaction ERC20 deposits.",
+    });
+    if (!confirmed) return;
+
     setDelegationLoading(true);
     setDelegationError("");
     try {
@@ -156,6 +174,16 @@ const WalletScreen: React.FC<WalletScreenProps> = ({
                 ? "Enabled - ERC20 deposits use a single transaction"
                 : "Disabled - ERC20 deposits require two transactions"}
             </p>
+            {isDelegationActive && (
+              <a
+                href={`https://sepolia.etherscan.io/address/${config.APPROVER_CONTRACT}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-secondary smart-account-link-btn"
+              >
+                See Delegated Logic ↗
+              </a>
+            )}
             {delegationLoading && (
               <p className="smart-account-loading">Sending transaction...</p>
             )}

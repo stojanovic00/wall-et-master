@@ -5,10 +5,11 @@ import React, {
   ReactNode,
   useCallback,
 } from "react";
-import { ethers } from "ethers";
-import TransactionConfirmationPopup, {
+import TransactionConfirmationPrompt, {
   TransactionDetails,
-} from "../TransactionConfirmationPopup";
+} from "../TransactionConfirmationPrompt";
+
+export type { TransactionDetails };
 
 interface TransactionConfirmationContextType {
   showTransactionConfirmation: (
@@ -77,11 +78,11 @@ export const TransactionConfirmationProvider: React.FC<
   return (
     <TransactionConfirmationContext.Provider value={value}>
       {children}
-      <TransactionConfirmationPopup
+      <TransactionConfirmationPrompt
         isOpen={isOpen}
         transaction={currentTransaction}
         onConfirm={handleConfirm}
-        onReject={handleReject}
+        onCancel={handleReject}
         isLoading={isLoading}
       />
     </TransactionConfirmationContext.Provider>

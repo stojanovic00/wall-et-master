@@ -100,6 +100,9 @@ const App = () => {
   } | null>(null);
 
   // Set initial screen based on wallet state; do not overwrite 'generated' screen
+  // NOTE: currentScreen is intentionally excluded from deps - this effect must only
+  // react to auth state changes (load finishing, unlock/lock), not to navigation.
+  // Including it caused every manual screen change to immediately bounce back to "wallet".
   useEffect(() => {
     if (!isLoading) {
       if (wallet && currentScreen !== "generated") {
@@ -110,7 +113,8 @@ const App = () => {
         setCurrentScreen("setup");
       }
     }
-  }, [isLoading, wallet, isPasswordSet, currentScreen]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, wallet, isPasswordSet]);
 
   const handleGenerateWallet = async (password: string) => {
     try {

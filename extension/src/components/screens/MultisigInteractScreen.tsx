@@ -4,11 +4,12 @@ import {
   TransactionData,
   useMultisigContract,
 } from "../providers/MultisigContractProvider";
-import { getMultisigTxs, addMultisigTx } from "../../utils/multisigStorage";
+import { getMultisigTxs, addMultisigTx, getMultisigInfo } from "../../utils/multisigStorage";
 import LoadingScreen from "./LoadingScreen";
 import { getTokenAddressBook } from "../../utils/tokenAddressBookStorage";
 import { getAddressBook } from "../../utils/addressBookStorage";
 import { useWallet } from "../providers/WalletProvider";
+import { useTransactionConfirmation } from "../providers/TransactionConfirmationProvider";
 
 interface MultisigInteractScreenProps {
   onBack: () => void;
@@ -46,22 +47,25 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
   onMultisigTransactionSuccess,
 }) => {
   const {
+    contract,
     proposeNative,
     proposeToken,
     depositNative,
     depositToken,
+    approveTokenForDeposit,
+    finalizeTokenDeposit,
     sign,
     execute,
     getTransactionData,
     getMinSignatures,
     error: contractError,
   } = useMultisigContract();
-  const { wallet } = useWallet();
+  const { wallet, isDelegationActive } = useWallet();
+  const { showTransactionConfirmation } = useTransactionConfirmation();
   const [activeTab, setActiveTab] = useState<
     "propose" | "deposit" | "sign" | "execute" | "transactions"
   >("propose");
   const [proposeType, setProposeType] = useState<"native" | "token">("native");
-  const [depositType, setDepositType] = useState<"native" | "token">("native");
   const [txs, setTxs] = useState<TransactionDataLocal[]>([]); // Transactions with details
   const [error, setError] = useState("");
 
@@ -73,15 +77,28 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
   // Deposit form state
   const [depositTxId, setDepositTxId] = useState("");
   const [depositValue, setDepositValue] = useState("");
-  const [depositTokenAddress, setDepositTokenAddress] = useState("");
+  // Derived from the looked-up transaction itself - a proposed transaction has
+  // exactly one token address baked in, so the user shouldn't re-choose it here.
+  const [depositTxData, setDepositTxData] = useState<TransactionDataLocal | null>(
+    null
+  );
+  const [depositTxLookupError, setDepositTxLookupError] = useState("");
 
   // Sign/Execute form state (separate so switching tabs doesn't pre-populate the other)
   const [signTxId, setSignTxId] = useState("");
   const [executeTxId, setExecuteTxId] = useState("");
 
   const [loading, setLoading] = useState(false);
-  const [loadingType, setLoadingType] = useState<"propose" | "deposit" | "sign" | "execute" | null>(null);
+  const [loadingType, setLoadingType] = useState<"propose" | "approve" | "deposit" | "sign" | "execute" | null>(null);
   const [minSignatures, setMinSignatures] = useState<number | null>(null);
+
+  // Contract metadata recorded locally at deploy time - the contract itself
+  // has no way to enumerate its signers, only to check one address at a time.
+  const [contractName, setContractName] = useState<string | undefined>(undefined);
+  const [knownSigners, setKnownSigners] = useState<string[]>([]);
+  const [showSignersModal, setShowSignersModal] = useState(false);
+  const [signedByList, setSignedByList] = useState<string[] | null>(null);
+  const [signedByLoading, setSignedByLoading] = useState(false);
 
   const [txHashes, setTxHashes] = useState<string[]>([]);
 
@@ -151,6 +168,12 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
   }, [contractAddress]);
 
   useEffect(() => {
+    const info = getMultisigInfo(contractAddress);
+    setContractName(info?.name);
+    setKnownSigners(info?.signers || []);
+  }, [contractAddress]);
+
+  useEffect(() => {
     // Fetch minimum signatures required
     const fetchMinSignatures = async () => {
       try {
@@ -189,6 +212,40 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
     }
   }, [selectedTxHash, txs]);
 
+  // The contract only exposes "did this specific address sign this specific
+  // tx" (hasSignedTx) - there's no way to enumerate signers of a tx directly,
+  // so cross-check every known signer against the selected transaction.
+  useEffect(() => {
+    if (!selectedTx || !contract || knownSigners.length === 0) {
+      setSignedByList(null);
+      return;
+    }
+    let cancelled = false;
+    setSignedByLoading(true);
+    (async () => {
+      const results = await Promise.all(
+        knownSigners.map(async (addr) => {
+          try {
+            const hasSigned = await contract["hasSignedTx(address,bytes32)"](
+              addr,
+              selectedTx.hash
+            );
+            return hasSigned ? addr : null;
+          } catch {
+            return null;
+          }
+        })
+      );
+      if (!cancelled) {
+        setSignedByList(results.filter((a): a is string => a !== null));
+        setSignedByLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedTx, contract, knownSigners]);
+
   useEffect(() => {
     // Load token address book for datalist
     const tokenBook = getTokenAddressBook();
@@ -211,6 +268,55 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
       }))
     );
   }, [contractAddress]);
+
+  // Look up the transaction as soon as a full txHash is entered on the deposit
+  // tab, so its type/token are read from the contract instead of re-asked.
+  useEffect(() => {
+    const trimmed = depositTxId.trim();
+    if (!ethers.isHexString(trimmed, 32)) {
+      setDepositTxData(null);
+      setDepositTxLookupError("");
+      return;
+    }
+
+    const cached = txs.find(
+      (tx) => tx.hash.toLowerCase() === trimmed.toLowerCase()
+    );
+    if (cached) {
+      setDepositTxData(cached);
+      setDepositTxLookupError("");
+      return;
+    }
+
+    let cancelled = false;
+    (async () => {
+      const data = await getTransactionData(trimmed);
+      if (cancelled) return;
+      if (!data || data.proposer === ethers.ZeroAddress) {
+        setDepositTxData(null);
+        setDepositTxLookupError("Transaction not found");
+        return;
+      }
+      const local: TransactionDataLocal = {
+        hash: trimmed,
+        to: data.to,
+        amount: bigNumberishToString(data.amount, true),
+        proposer: data.proposer,
+        timestamp: bigNumberishToString(data.timestamp),
+        signedCount: bigNumberishToString(data.signedCount),
+        executed: data.executed,
+        balance: bigNumberishToString(data.balance, true),
+        native: data.native,
+        token: data.token,
+      };
+      setDepositTxData(local);
+      setDepositTxLookupError("");
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [depositTxId, txs, getTransactionData]);
 
   // Handlers for each action
   const handlePropose = async (e: React.FormEvent) => {
@@ -241,7 +347,7 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
         }
         txHash = await proposeToken(to, ethers.parseUnits(value, decimals), tokenAddress);
       }
-      if (!txHash) throw new Error("Failed to propose transaction");
+      if (!txHash) return;
       addMultisigTx(contractAddress, txHash);
       setTxHashes(getMultisigTxs(contractAddress));
       onMultisigTransactionSuccess({
@@ -269,60 +375,146 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
     setError("");
     if (!depositTxId || !depositValue)
       return setError("Transaction ID and value required");
+    if (!depositTxData) {
+      return setError(
+        depositTxLookupError || "Enter a valid, already-proposed transaction ID"
+      );
+    }
+
+    const existingTxs = getMultisigTxs(contractAddress);
+    if (!existingTxs.includes(depositTxId)) {
+      addMultisigTx(contractAddress, depositTxId);
+    }
+
+    const reportSuccess = () => {
+      onMultisigTransactionSuccess({
+        transactionType: "deposit",
+        txHash: depositTxId,
+        contractAddress,
+        transactionId: depositTxId,
+        recipientAddress: undefined,
+        amount: depositValue,
+        tokenAddress: depositTxData.native ? undefined : depositTxData.token,
+        signerAddress: wallet?.address || "",
+        chainId: 11155111, // Sepolia
+        timestamp: Date.now(),
+      });
+      setTxHashes(getMultisigTxs(contractAddress));
+    };
+
+    if (depositTxData.native) {
+      const confirmed = await showTransactionConfirmation({
+        type: "multisig-deposit",
+        to: contractAddress,
+        from: wallet?.address || "",
+        amount: depositValue,
+        txHash: depositTxId,
+        chainId: 11155111,
+        title: "Confirm Deposit",
+        description: "Deposits native ETH against this proposed transaction.",
+      });
+      if (!confirmed) return;
+
+      setLoading(true);
+      setLoadingType("deposit");
+      try {
+        const depositResult = await depositNative(depositTxId, ethers.parseEther(depositValue));
+        if (!depositResult) return;
+        reportSuccess();
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+        setLoadingType(null);
+      }
+      return;
+    }
+
+    // Token deposit - address/decimals come from the proposed transaction itself
+    // (depositTxData.token), not from user input - see the lookup effect above.
+    const tokenInfo = getTokenAddressBook()[depositTxData.token];
+    const decimals = tokenInfo?.decimals ?? 18;
+    const amountParsed = ethers.parseUnits(depositValue, decimals);
+
+    if (isDelegationActive) {
+      // Smart Account active: one confirmation, one bundled approve+deposit transaction.
+      const confirmed = await showTransactionConfirmation({
+        type: "multisig-deposit",
+        to: contractAddress,
+        from: wallet?.address || "",
+        amount: depositValue,
+        tokenAddress: depositTxData.token,
+        tokenSymbol: tokenInfo?.symbol,
+        txHash: depositTxId,
+        chainId: 11155111,
+        title: "Approve and Deposit",
+        description: "Smart Account is active - approve and deposit happen together in a single transaction.",
+      });
+      if (!confirmed) return;
+
+      setLoading(true);
+      setLoadingType("deposit");
+      try {
+        const depositResult = await depositToken(depositTxId, depositTxData.token, amountParsed);
+        if (!depositResult) return;
+        reportSuccess();
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+        setLoadingType(null);
+      }
+      return;
+    }
+
+    // Smart Account inactive: classic path, two separate transactions, each
+    // with its own confirmation before it fires.
+    const confirmedApprove = await showTransactionConfirmation({
+      type: "token-approval",
+      to: depositTxData.token,
+      from: wallet?.address || "",
+      amount: depositValue,
+      tokenAddress: depositTxData.token,
+      tokenSymbol: tokenInfo?.symbol,
+      chainId: 11155111,
+      title: "Step 1/2: Approve Token",
+      description: "Smart Account is inactive - this approves the multisig contract to spend this amount. A second transaction will then deposit it.",
+    });
+    if (!confirmedApprove) return;
+
+    setLoading(true);
+    setLoadingType("approve");
+    let approveOk = false;
+    try {
+      approveOk = await approveTokenForDeposit(depositTxData.token, amountParsed);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+      setLoadingType(null);
+    }
+    if (!approveOk) return;
+
+    const confirmedDeposit = await showTransactionConfirmation({
+      type: "multisig-deposit",
+      to: contractAddress,
+      from: wallet?.address || "",
+      amount: depositValue,
+      tokenAddress: depositTxData.token,
+      tokenSymbol: tokenInfo?.symbol,
+      txHash: depositTxId,
+      chainId: 11155111,
+      title: "Step 2/2: Deposit Token",
+      description: "Deposits the now-approved amount into the proposed transaction.",
+    });
+    if (!confirmedDeposit) return;
+
     setLoading(true);
     setLoadingType("deposit");
     try {
-      // Save depositTxId if not already saved and valid
-      const existingTxs = getMultisigTxs(contractAddress);
-      if (!existingTxs.includes(depositTxId)) {
-        const txData = await getTransactionData(depositTxId);
-        if (txData) {
-          addMultisigTx(contractAddress, depositTxId);
-        } else {
-          throw new Error("Invalid transaction ID");
-        }
-      }
-      if (depositType === "native") {
-        const depositResult = await depositNative(depositTxId, ethers.parseEther(depositValue));
-        if (!depositResult) {
-          throw new Error("Native deposit failed");
-        }
-        onMultisigTransactionSuccess({
-          transactionType: "deposit",
-          txHash: depositTxId,
-          contractAddress,
-          transactionId: depositTxId,
-          recipientAddress: undefined,
-          amount: depositValue,
-          tokenAddress: undefined,
-          signerAddress: wallet?.address || "",
-          chainId: 11155111, // Sepolia
-          timestamp: Date.now(),
-        });
-      } else {
-        if (!depositTokenAddress) return setError("Token address required");
-        const depositResult = await depositToken(
-          depositTxId,
-          depositTokenAddress,
-          ethers.parseEther(depositValue)
-        );
-        if (!depositResult) {
-          throw new Error("Token deposit failed");
-        }
-        onMultisigTransactionSuccess({
-          transactionType: "deposit",
-          txHash: depositTxId,
-          contractAddress,
-          transactionId: depositTxId,
-          recipientAddress: undefined,
-          amount: depositValue,
-          tokenAddress: depositTokenAddress,
-          signerAddress: wallet?.address || "",
-          chainId: 11155111, // Sepolia
-          timestamp: Date.now(),
-        });
-      }
-      setTxHashes(getMultisigTxs(contractAddress));
+      const depositOk = await finalizeTokenDeposit(depositTxId, amountParsed);
+      if (!depositOk) return;
+      reportSuccess();
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -349,9 +541,7 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
       }
 
       const signResult = await sign(signTxId);
-      if (!signResult) {
-        throw new Error("Transaction signing failed");
-      }
+      if (!signResult) return;
 
       onMultisigTransactionSuccess({
         transactionType: "sign",
@@ -393,9 +583,7 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
       }
 
       const executeResult = await execute(executeTxId);
-      if (!executeResult) {
-        throw new Error("Transaction execution failed");
-      }
+      if (!executeResult) return;
 
       onMultisigTransactionSuccess({
         transactionType: "execute",
@@ -444,6 +632,7 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
             }}></div>
             <h3 style={{ color: '#ffffff', marginBottom: '10px', fontSize: '16px' }}>
               {loadingType === "propose" && "📝 Proposing Transaction..."}
+              {loadingType === "approve" && "🔐 Approving Token..."}
               {loadingType === "deposit" && "💰 Processing Deposit..."}
               {loadingType === "sign" && "✍️ Signing Transaction..."}
               {loadingType === "execute" && "✅ Executing Transaction..."}
@@ -465,9 +654,79 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
           </div>
         </div>
       )}
+      {showSignersModal && (
+        <div
+          className="fixed-fullscreen-overlay"
+          onClick={() => setShowSignersModal(false)}
+        >
+          <div
+            className="loading-content"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: '#1a1f2e',
+              padding: '24px',
+              borderRadius: '12px',
+              border: '2px solid #3b82f6',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.7)',
+              textAlign: 'left',
+              minWidth: '320px',
+              maxWidth: '420px',
+              maxHeight: '70vh',
+              overflowY: 'auto',
+            }}
+          >
+            <h3 style={{ color: '#ffffff', marginBottom: '12px', fontSize: '16px' }}>
+              Authorized Signers{contractName ? ` - ${contractName}` : ""}
+            </h3>
+            {knownSigners.length === 0 ? (
+              <p style={{ color: '#94a3b8', fontSize: '13px' }}>
+                Signer list not available - this multisig wasn't deployed from
+                this wallet, so its signer list was never recorded locally.
+              </p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {knownSigners.map((addr) => {
+                  const bookEntry = recipientOptions.find(
+                    (r) => r.address.toLowerCase() === addr.toLowerCase()
+                  );
+                  return (
+                    <div
+                      key={addr}
+                      style={{
+                        background: '#0f1419',
+                        padding: '10px 12px',
+                        borderRadius: '8px',
+                        border: '1px solid #334155',
+                      }}
+                    >
+                      {bookEntry && (
+                        <div style={{ color: '#ffffff', fontSize: '13px', fontWeight: 600 }}>
+                          {bookEntry.name}
+                        </div>
+                      )}
+                      <div style={{ color: '#94a3b8', fontSize: '11px', fontFamily: 'monospace', wordBreak: 'break-all' }}>
+                        {addr}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            <div className="button-group margin-top-12">
+              <button
+                className="btn btn-secondary"
+                type="button"
+                onClick={() => setShowSignersModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="screen">
         <div className="multisig-content">
-          <h2>Interact with MultiSig Contract</h2>
+          <h2>{contractName || "Interact with MultiSig Contract"}</h2>
           <div className="form-group">
             <label>
               Contract Address:{" "}
@@ -475,6 +734,15 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
                 <span style={{ color: "red" }}>No contract address</span>
               )}
             </label>
+          </div>
+          <div className="form-group">
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setShowSignersModal(true)}
+            >
+              View Signers {knownSigners.length > 0 ? `(${knownSigners.length})` : ""}
+            </button>
           </div>
           <div className="multisig-tab-buttons">
             <button
@@ -513,30 +781,26 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
               Back
             </button>
           </div>
-          {(error || contractError) && (
-            <div className="warning">{error || contractError}</div>
+          {(contractError || error) && (
+            <div className="warning">{contractError || error}</div>
           )}
           {activeTab === "propose" && (
             <form onSubmit={handlePropose} className="margin-top-16">
-              <div className="radio-group">
-                <div className={`radio-option ${proposeType === "native" ? "selected" : ""}`}>
-                  <input
-                    type="radio"
-                    id="propose-native"
-                    checked={proposeType === "native"}
-                    onChange={() => setProposeType("native")}
-                  />
-                  <label htmlFor="propose-native">Native</label>
-                </div>
-                <div className={`radio-option ${proposeType === "token" ? "selected" : ""}`}>
-                  <input
-                    type="radio"
-                    id="propose-token"
-                    checked={proposeType === "token"}
-                    onChange={() => setProposeType("token")}
-                  />
-                  <label htmlFor="propose-token">Token</label>
-                </div>
+              <div className="toggle-btn-group">
+                <button
+                  type="button"
+                  className={`toggle-btn ${proposeType === "native" ? "active" : ""}`}
+                  onClick={() => setProposeType("native")}
+                >
+                  Native
+                </button>
+                <button
+                  type="button"
+                  className={`toggle-btn ${proposeType === "token" ? "active" : ""}`}
+                  onClick={() => setProposeType("token")}
+                >
+                  Token
+                </button>
               </div>
               <div className="form-group">
                 <label>To (recipient):</label>
@@ -597,26 +861,6 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
           )}
           {activeTab === "deposit" && (
             <form onSubmit={handleDeposit} className="margin-top-16">
-              <div className="radio-group">
-                <div className={`radio-option ${depositType === "native" ? "selected" : ""}`}>
-                  <input
-                    type="radio"
-                    id="deposit-native"
-                    checked={depositType === "native"}
-                    onChange={() => setDepositType("native")}
-                  />
-                  <label htmlFor="deposit-native">Native</label>
-                </div>
-                <div className={`radio-option ${depositType === "token" ? "selected" : ""}`}>
-                  <input
-                    type="radio"
-                    id="deposit-token"
-                    checked={depositType === "token"}
-                    onChange={() => setDepositType("token")}
-                  />
-                  <label htmlFor="deposit-token">Token</label>
-                </div>
-              </div>
               <div className="form-group">
                 <label>Transaction ID:</label>
                 <input
@@ -633,9 +877,27 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
                   ))}
                 </datalist>
               </div>
+              {depositTxLookupError && (
+                <div className="warning margin-top-4">{depositTxLookupError}</div>
+              )}
+              {depositTxData && (
+                <div className="form-group">
+                  <label>This transaction deposits:</label>
+                  <div style={{ color: "#e2e8f0", fontWeight: 600 }}>
+                    {depositTxData.native
+                      ? "Native ETH"
+                      : (() => {
+                          const info = getTokenAddressBook()[depositTxData.token];
+                          return info
+                            ? `${info.symbol} (${depositTxData.token.slice(0, 6)}...${depositTxData.token.slice(-4)})`
+                            : depositTxData.token;
+                        })()}
+                  </div>
+                </div>
+              )}
               <div className="form-group">
                 <label>
-                  Value ({depositType === "native" ? "ETH" : "Token Amount"}):
+                  Value ({depositTxData ? (depositTxData.native ? "ETH" : "Token Amount") : "ETH or Token Amount"}):
                 </label>
                 <input
                   type="number"
@@ -645,28 +907,8 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
                   placeholder="0.0"
                 />
               </div>
-              {depositType === "token" && (
-                <div className="form-group">
-                  <label>Token Address:</label>
-                  <input
-                    type="text"
-                    className="input"
-                    value={depositTokenAddress}
-                    onChange={(e) => setDepositTokenAddress(e.target.value)}
-                    placeholder="0x..."
-                    list="token-address-list"
-                  />
-                  <datalist id="token-address-list">
-                    {tokenAddressOptions.map((opt) => (
-                      <option value={opt.address} key={opt.address}>
-                        {opt.name} {opt.symbol ? `(${opt.symbol})` : ""}
-                      </option>
-                    ))}
-                  </datalist>
-                </div>
-              )}
               <div className="form-actions">
-                <button className="btn btn-primary" type="submit">
+                <button className="btn btn-primary" type="submit" disabled={!depositTxData}>
                   Deposit
                 </button>
               </div>
@@ -897,7 +1139,9 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
                                 fontSize: '13px',
                                 fontWeight: '500'
                               }}>
-                                {selectedTx.native ? '🪙 Native ETH' : `🪙 ERC-20 Token`}
+                                {selectedTx.native
+                                  ? '🪙 Native ETH'
+                                  : `🪙 ${getTokenAddressBook()[selectedTx.token]?.symbol || "ERC-20 Token"}`}
                               </div>
                               {!selectedTx.native && (
                                 <div style={{
@@ -1020,6 +1264,60 @@ const MultisigInteractScreen: React.FC<MultisigInteractScreenProps> = ({
                           }}>
                             {new Date(parseInt(selectedTx.timestamp) * 1000).toLocaleString()}
                           </div>
+                        </div>
+
+                        {/* Signed By */}
+                        <div style={{
+                          background: '#1a1f2e',
+                          padding: '12px',
+                          borderRadius: '8px',
+                          border: '1px solid #334155',
+                          marginTop: '12px'
+                        }}>
+                          <div style={{
+                            color: '#94a3b8',
+                            fontSize: '11px',
+                            fontWeight: '600',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.5px',
+                            marginBottom: '8px'
+                          }}>
+                            Signed By
+                          </div>
+                          {knownSigners.length === 0 ? (
+                            <div style={{ color: '#64748b', fontSize: '12px' }}>
+                              Signer list not available for this contract.
+                            </div>
+                          ) : signedByLoading ? (
+                            <div style={{ color: '#64748b', fontSize: '12px' }}>
+                              Checking signatures...
+                            </div>
+                          ) : signedByList && signedByList.length > 0 ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                              {signedByList.map((addr) => {
+                                const bookEntry = recipientOptions.find(
+                                  (r) => r.address.toLowerCase() === addr.toLowerCase()
+                                );
+                                return (
+                                  <div
+                                    key={addr}
+                                    style={{
+                                      color: '#10b981',
+                                      fontSize: '12px',
+                                      fontFamily: 'monospace',
+                                      wordBreak: 'break-all'
+                                    }}
+                                  >
+                                    ✅ {bookEntry ? `${bookEntry.name} (${addr})` : addr}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <div style={{ color: '#64748b', fontSize: '12px' }}>
+                              No signatures yet.
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

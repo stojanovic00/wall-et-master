@@ -4,6 +4,8 @@ import { useWallet } from "../providers/WalletProvider";
 import {
   addMultisigContract,
   getMultisigContracts,
+  getMultisigInfo,
+  removeMultisigContract,
 } from "../../utils/multisigStorage";
 import { getAddressBook } from "../../utils/addressBookStorage";
 
@@ -26,21 +28,33 @@ const MultisigScreen: React.FC<MultisigScreenProps> = ({
   onMultisigDeploymentSuccess,
 }) => {
   const [addresses, setAddresses] = useState<string[]>([""]);
+  const [contractName, setContractName] = useState<string>("");
   const [minSignatures, setMinSignatures] = useState<number>(1);
   const [minSignaturesInput, setMinSignaturesInput] = useState<string>("1");
   const [error, setError] = useState<string>("");
   const [addressErrors, setAddressErrors] = useState<string[]>([""]);
   const { deployMultiSig, wallet } = useWallet();
   const [isLoading, setIsLoading] = useState(false);
-  const [savedMultisigs, setSavedMultisigs] = useState<string[]>([]);
+  const [savedMultisigs, setSavedMultisigs] = useState<
+    { address: string; name?: string }[]
+  >([]);
   const [customMultisig, setCustomMultisig] = useState<string>("");
   const [customMultisigError, setCustomMultisigError] = useState<string>("");
   const [addressBook, setAddressBook] = useState<
     { address: string; name: string }[]
   >([]);
 
+  const loadSavedMultisigs = () => {
+    setSavedMultisigs(
+      getMultisigContracts().map((address) => ({
+        address,
+        name: getMultisigInfo(address)?.name,
+      }))
+    );
+  };
+
   useEffect(() => {
-    setSavedMultisigs(getMultisigContracts());
+    loadSavedMultisigs();
     // Load address book
     const book = getAddressBook();
     setAddressBook(
@@ -129,8 +143,12 @@ const MultisigScreen: React.FC<MultisigScreenProps> = ({
       
       setError("");
       const multiSigAddress = await deployMultiSig(filtered, minSignatures);
-      addMultisigContract(multiSigAddress);
-      setSavedMultisigs(getMultisigContracts());
+      addMultisigContract(multiSigAddress, {
+        name: contractName.trim() || undefined,
+        signers: filtered,
+        minSignatures,
+      });
+      loadSavedMultisigs();
       onMultisigDeploymentSuccess({
         contractAddress: multiSigAddress,
         signers: filtered,
@@ -158,9 +176,9 @@ const MultisigScreen: React.FC<MultisigScreenProps> = ({
       return;
     }
     setCustomMultisigError("");
-    if (!savedMultisigs.includes(addr)) {
+    if (!savedMultisigs.some((m) => m.address === addr)) {
       addMultisigContract(addr);
-      setSavedMultisigs(getMultisigContracts());
+      loadSavedMultisigs();
     }
     setCustomMultisig("");
     onOpenMultisigInteract(addr);
@@ -168,9 +186,8 @@ const MultisigScreen: React.FC<MultisigScreenProps> = ({
 
   // Remove a multisig address from the saved list
   const handleRemoveSavedMultisig = (addr: string) => {
-    const updated = savedMultisigs.filter((a) => a !== addr);
-    localStorage.setItem("multisigContracts", JSON.stringify(updated));
-    setSavedMultisigs(updated);
+    removeMultisigContract(addr);
+    loadSavedMultisigs();
   };
 
   return (
@@ -219,6 +236,17 @@ const MultisigScreen: React.FC<MultisigScreenProps> = ({
         <div className="multisig-content">
           <h2>Deploy MultiSig Contract</h2>
           <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label>Contract Name (optional):</label>
+              <input
+                type="text"
+                className="input"
+                value={contractName}
+                placeholder="e.g. Team Treasury"
+                onChange={(e) => setContractName(e.target.value)}
+                disabled={isLoading}
+              />
+            </div>
             <div className="form-group">
               <label>Addresses:</label>
               {addresses.map((addr, idx) => (
@@ -336,8 +364,8 @@ const MultisigScreen: React.FC<MultisigScreenProps> = ({
               }}
             />
             <datalist id="saved-multisigs-list">
-              {savedMultisigs.map((addr) => (
-                <option value={addr} key={addr} />
+              {savedMultisigs.map(({ address, name }) => (
+                <option value={address} key={address} label={name} />
               ))}
             </datalist>
             <button
@@ -358,19 +386,19 @@ const MultisigScreen: React.FC<MultisigScreenProps> = ({
           <div className="saved-multisigs margin-bottom-24">
             <h4>Saved MultiSig Contracts</h4>
             <div className="multisig-contracts-list">
-              {savedMultisigs.map((addr, idx) => (
+              {savedMultisigs.map(({ address, name }, idx) => (
                 <div
-                  key={addr}
+                  key={address}
                   className="multisig-contract-card"
-                  onClick={() => onOpenMultisigInteract(addr)}
+                  onClick={() => onOpenMultisigInteract(address)}
                   title="Click to open multisig contract"
                 >
                   <div className="multisig-contract-info">
                     <span className="multisig-contract-number">
-                      Contract #{idx + 1}
+                      {name || `Contract #${idx + 1}`}
                     </span>
                     <span className="multisig-contract-address">
-                      {addr}
+                      {address}
                     </span>
                   </div>
                   <div className="multisig-contract-actions">
@@ -380,7 +408,7 @@ const MultisigScreen: React.FC<MultisigScreenProps> = ({
                       title="Remove from saved"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleRemoveSavedMultisig(addr);
+                        handleRemoveSavedMultisig(address);
                       }}
                     >
                       🗑️

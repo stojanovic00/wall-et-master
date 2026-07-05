@@ -2,7 +2,7 @@ import React from "react";
 import { ethers } from "ethers";
 
 export interface TransactionDetails {
-  type: "eth-transfer" | "erc20-transfer" | "multisig-propose" | "multisig-sign" | "multisig-execute" | "multisig-deposit" | "recovery-deploy" | "recovery-action" | "token-approval";
+  type: "eth-transfer" | "erc20-transfer" | "multisig-propose" | "multisig-sign" | "multisig-execute" | "multisig-deposit" | "recovery-deploy" | "recovery-action" | "token-approval" | "delegation-setup" | "delegation-revoke";
   to: string;
   from: string;
   value?: string;
@@ -73,6 +73,10 @@ const TransactionConfirmationPrompt: React.FC<TransactionConfirmationPromptProps
         return "Recovery Contract Action";
       case "token-approval":
         return "Token Approval";
+      case "delegation-setup":
+        return "Enable Smart Account";
+      case "delegation-revoke":
+        return "Disable Smart Account";
       default:
         return "Transaction";
     }
@@ -110,6 +114,10 @@ const TransactionConfirmationPrompt: React.FC<TransactionConfirmationPromptProps
         return "🔄";
       case "token-approval":
         return "🔐";
+      case "delegation-setup":
+        return "🔗";
+      case "delegation-revoke":
+        return "🔓";
       default:
         return "📄";
     }
@@ -186,7 +194,7 @@ const TransactionConfirmationPrompt: React.FC<TransactionConfirmationPromptProps
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span style={{ color: '#94a3b8', fontSize: '14px' }}>Token:</span>
                 <span style={{ color: '#3b82f6', fontSize: '14px', fontFamily: 'monospace' }}>
-                  {formatAddress(transaction.tokenAddress)}
+                  {transaction.tokenSymbol ? `${transaction.tokenSymbol} (${formatAddress(transaction.tokenAddress)})` : formatAddress(transaction.tokenAddress)}
                 </span>
               </div>
             )}
