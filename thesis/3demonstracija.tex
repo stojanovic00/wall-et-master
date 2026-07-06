@@ -65,7 +65,7 @@ Nakon \v sto Nov\v canik 2 doda svoj potpis na ve\'c predlo\v zenu transakciju, 
   \label{fig:demo-review3}
 \end{figure}
 
-\section{Depozit sredstava bez \en{EIP-7702} delegacije}
+\section{Depozit sredstava bez \en{EIP-7702}{} delegacije}
 
 Iako je transakcija potpisana od strane oba potrebna potpisnika, njeno izvr\v savanje jo\v s uvek nije mogu\'ce jer ugovor ne raspola\v ze dovoljnim sredstvima. Budu\'ci da "pametni" nalog kod Nov\v canika 2 nije aktiviran, depozit \en{RSDC} tokena zahteva dve odvojene transakcije. Na kartici za depozit, Nov\v canik 2 unosi identifikator transakcije i iznos od 30 tokena (Slika~\ref{fig:demo-deposit2tx}). Prva transakcija odobrava \texttt{MultiSig} ugovoru da raspola\v ze navedenim iznosom \en{RSDC} tokena u ime Nov\v canika 2 (Slika~\ref{fig:demo-approve1}).
 
@@ -87,7 +87,7 @@ Druga, zasebna transakcija zatim stvarno prenosi odobreni iznos u \texttt{MultiS
   \caption{Zavr\v setak klasi\v cnog, dvotransakcionog depozita.}
 \end{figure}
 
-\section{Aktivacija \en{EIP-7702} delegacije}
+\section{Aktivacija \en{EIP-7702}{} delegacije}
 
 Preostalih 20 \en{RSDC} tokena obezbe\dj uje Nov\v canik 1, ovog puta uz aktiviranu delegaciju. Uklju\v civanjem "pametnog" naloga, Nov\v canik 1 potpisuje transakciju tipa 4 kojom se izvr\v savanje sopstvenog koda delegira na ugovor \texttt{Approver} (Slika~\ref{fig:demo-enableeip}). Nakon potvrde transakcije na mre\v zi, po\v cetni ekran Nov\v canika 1 pokazuje aktivan "pametni" nalog, uz napomenu da depozit \en{ERC-20} tokena sada zahteva samo jednu transakciju (Slika~\ref{fig:demo-eipactive}).
 
@@ -131,3 +131,107 @@ Nakon izvr\v senja, ugovor prenosi ukupnih 50 \en{RSDC} tokena na adresu Nov\v c
   \caption{Pregled uspe\v sno izvr\v sene transakcije.}
   \label{fig:demo-done}
 \end{figure}
+
+
+\section{Potvrda transakcija na \en{Sepolia}{} mre\v zi}
+
+Interfejs prikazan na prethodnim slikama odra\v zava stanje ugovora na blok\v cejnu, ali sam po sebi ne dokazuje da su transakcije zaista izvr\v sene na javnoj mre\v zi. Ova sekcija zato prikazuje stvarne podatke o pet klju\v cnih transakcija scenarija, o\v citane direktno sa \en{Sepolia} mre\v ze - identi\v cne onima koje bi prikazao i \en{Etherscan} istra\v ziva\v c. Radi jednostavnosti, u listinzima ispod nov\v canici su ozna\v ceni kao \texttt{Wallet 1} i \texttt{Wallet 2}, u skladu sa oznakama Nov\v canik 1 i Nov\v canik 2 iz prethodnog teksta. Svaka transakcija je dodatno nezavisno proveriva putem linka u odgovaraju\'coj fusnoti.
+
+\newpage
+
+\textbf{Odobrenje tro\v senja tokena.} Prva transakcija klasi\v cnog, dvotransakcionog depozita - Nov\v canik 2 odobrava \texttt{MultiSig} ugovoru da raspola\v ze sa 30 \en{RSDC} tokena\footnote{\url{https://sepolia.etherscan.io/tx/0x5255eb29e63d382dcb9191d979599df7ac8072c671e8b8ec2cb263b4ace78798}}.
+
+\begin{lstlisting}[caption={Transakcija 1: odobrenje (\texttt{approve}) - klasi\v can depozit}, label={lst:onchain-tx1}]
+Method            approve(address,uint256)
+Transaction Hash  0x5255eb29e63d382dcb9191d979599df7ac8072c671e8b8ec2cb263b4ace78798
+Status            Success
+Block             11211023
+Timestamp         Jul-05-2026 09:26:48 PM UTC
+From              Wallet 2 (0xe8b6cadD...C7260F5af)
+To                RSDC contract (0xB3B81294...05A933FAD)
+Value             0 ETH
+Transaction Fee   0.00003040901262048 ETH
+Gas Price         1.124593662 Gwei
+Logs (1)          Approval(owner: Wallet 2, spender: MultiSig, value: 30.0 RSDC)
+\end{lstlisting}
+
+\textbf{Depozit tokena.} Druga, zasebna transakcija stvarno prenosi odobreni iznos u \texttt{MultiSig} ugovor\footnote{\url{https://sepolia.etherscan.io/tx/0x9c5698c19e9d0a6e480746ac8e181a116f219d3b8ad8287c4023790f6311fd23}}. Dve odvojene transakcije, sa dva odvojena \en{hash}-a i dva odvojena potpisa, potvr\dj uju da depozit bez aktivne delegacije zaista zahteva dva koraka.
+
+\newpage
+
+\begin{lstlisting}[caption={Transakcija 2: depozit (\texttt{depositToken}) - klasi\v can depozit}, label={lst:onchain-tx2}]
+Method            depositToken(bytes32,uint256)
+Transaction Hash  0x9c5698c19e9d0a6e480746ac8e181a116f219d3b8ad8287c4023790f6311fd23
+Status            Success
+Block             11211024
+Timestamp         Jul-05-2026 09:27:00 PM UTC
+From              Wallet 2 (0xe8b6cadD...C7260F5af)
+To                MultiSig contract (0x87f72C48...946d77C2a)
+Value             0 ETH
+Transaction Fee   0.000093550465472625 ETH
+Gas Price         1.079573775 Gwei
+Logs (1)          Transfer(from: Wallet 2, to: MultiSig, value: 30.0 RSDC)
+\end{lstlisting}
+
+\textbf{\en{EIP-7702}{} delegacija.} Transakcija kojom Nov\v canik 1 aktivira "pametni" nalog je tipa 4, sa istom adresom u poljima \texttt{From} i \texttt{To}, bez poziva bilo kakve funkcije u ovoj transakciji - ovla\v s\' cenje se obra\dj uje nezavisno od sadr\v zaja transakcije (odeljak 3.3)\footnote{\url{https://sepolia.etherscan.io/tx/0x9a6d4a1cf1471f23e77a4690f4c377ea7a2e060e3106b61fdf6f4a5d9e92ea4d}}. Sadr\v zaj ovla\v s\' cenja potvr\dj uje da je ciljna adresa upravo ugovor \texttt{Approver}, sa \texttt{nonce} vredno\v s\' cu \texttt{66} - jedan vi\v se od \texttt{nonce} vrednosti same transakcije, u skladu sa pravilom opisanim u odeljku 3.3.
+
+
+\newpage
+
+\begin{lstlisting}[caption={Transakcija 3: \en{EIP-7702}{} delegacija}, label={lst:onchain-tx3}]
+Transaction Hash  0x9a6d4a1cf1471f23e77a4690f4c377ea7a2e060e3106b61fdf6f4a5d9e92ea4d
+Status            Success
+Block             11211032
+Timestamp         Jul-05-2026 09:28:48 PM UTC
+Type              4
+From              Wallet 1 (0x861b70dC...b080aD842)
+To                Wallet 1, self (0x861b70dC...b080aD842)
+Value             0 ETH
+Transaction Fee   0.000039681032360176 ETH
+Gas Price         1.077001204 Gwei
+
+Authorizations:
+  Authority          Wallet 1 (0x861b70dC...b080aD842)
+  Delegated Address  Approver contract (0x828F4dc0...6C2429764)
+  Nonce              66
+  Validity           True
+  yParity            0
+  r                  0xeacb9c6e3e42f401309e236c3b32fa9f6f7b69d503d34d61d16b2be212aa9ee3
+  s                  0x594dd5c475c0e93d5d31fdba6f98c7b5ef2e71507416b7fbd327b72dd7c10e09
+\end{lstlisting}
+
+\textbf{Objedinjeni depozit.} Preostalih 20 \en{RSDC}{} tokena Nov\v canik 1 deponuje uz aktivnu delegaciju, pozivom \texttt{approveAndDeposit} na sopstvenu adresu\footnote{\url{https://sepolia.etherscan.io/tx/0x78519cee218349525dcdee6047f2c3e25b76123a1deda023923dc13333b755b3}}. Za razliku od prve dve transakcije, ovde se oba doga\dj aja - odobrenje i prenos - nalaze u zapisniku iste, jedine transakcije.
+
+\newpage
+
+\begin{lstlisting}[caption={Transakcija 4: objedinjeni depozit (\texttt{approveAndDeposit})}, label={lst:onchain-tx4}]
+Method            approveAndDeposit(address,address,bytes32,uint256)
+Transaction Hash  0x78519cee218349525dcdee6047f2c3e25b76123a1deda023923dc13333b755b3
+Status            Success
+Block             11211060
+Timestamp         Jul-05-2026 09:34:24 PM UTC
+From              Wallet 1 (0x861b70dC...b080aD842)
+To                Wallet 1, self (0x861b70dC...b080aD842)
+Value             0 ETH
+Transaction Fee   0.000073909932213898 ETH
+Gas Price         1.056626002 Gwei
+Logs (2)          Approval(owner: Wallet 1, spender: MultiSig, value: 20.0 RSDC)
+                  Transfer(from: Wallet 1, to: MultiSig, value: 20.0 RSDC)
+\end{lstlisting}
+
+\textbf{Izvr\v senje.} Zavr\v sna transakcija prenosi ukupnih 50 \en{RSDC}{} tokena iz ugovora na adresu Nov\v canika 2 i menja status predloga transakcije u izvr\v sen\footnote{\url{https://sepolia.etherscan.io/tx/0xec8533605ef0778b37ab9169108b5de628fbfccbdb289668ff370307b9575551}}, \v cime se scenario zavr\v sava.
+
+\begin{lstlisting}[caption={Transakcija 5: izvr\v senje (\texttt{execute})}, label={lst:onchain-tx5}]
+Method            execute(bytes32)
+Transaction Hash  0xec8533605ef0778b37ab9169108b5de628fbfccbdb289668ff370307b9575551
+Status            Success
+Block             11211066
+Timestamp         Jul-05-2026 09:35:36 PM UTC
+From              Wallet 1 (0x861b70dC...b080aD842)
+To                MultiSig contract (0x87f72C48...946d77C2a)
+Value             0 ETH
+Transaction Fee   0.000083534451447606 ETH
+Gas Price         1.087957326 Gwei
+Logs (2)          Transfer(from: MultiSig, to: Wallet 2, value: 50.0 RSDC)
+                  Executed(txHash: 0x889e8932...)
+\end{lstlisting}

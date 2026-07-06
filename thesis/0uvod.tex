@@ -2,7 +2,7 @@
 
 \section{Motivacija}
 
-Upravljanje digitalnom imovinom na \en{blockchain} mre\v zama sve \v ce\v s\' ce prevazilazi individualni kontekst. Decentralizovane autonomne organizacije (\en{DAO}), kompanije i timovi \v cesto zajedni\v cki dr\v ze kriptovalute i tokene kao deo poslovnih procesa ili zajedni\v ckih fondova \cite{buterin2014}. U takvim scenarijima, odluke o tro\v senju sredstava ne treba da donosi jedna osoba, ve\' c ih treba odobriti ve\' ci broj ovla\v s\' cenih u\v cesnika.
+Upravljanje digitalnom imovinom na blok\v cejn mre\v zama sve \v ce\v s\' ce prevazilazi individualni kontekst. Decentralizovane autonomne organizacije (\en{DAO}), kompanije i timovi \v cesto zajedni\v cki dr\v ze kriptovalute i tokene kao deo poslovnih procesa ili zajedni\v ckih fondova \cite{buterin2014}. U takvim scenarijima, odluke o tro\v senju sredstava ne treba da donosi jedna osoba, ve\' c ih treba odobriti ve\' ci broj ovla\v s\' cenih u\v cesnika.
 
 Standardni \en{Ethereum} nalog u vlasni\v stvu korisnika ne podr\v zava ovakav model upravljanja. Svaka transakcija se autorizuje isklju\v civo jednim privatnim klju\v cem, bez mogu\' cnosti definisanja praga saglasnosti ili zahtevanja odobrenja vi\v se strana \cite{antonopoulos2018}. Ovo stvara centralnu ta\v cku odlu\v civanja i centralnu ta\v cku rizika: kompromitovanje tog jednog klju\v ca daje neograni\v cen pristup celokupnoj imovini, bez mogu\' cnosti zaustavljanja ili opoziva.
 
@@ -17,7 +17,7 @@ Ovaj model ima tri klju\v cna ograni\v cenja relevantna za ovaj rad:
 \begin{enumerate}
   \item \textbf{Jedinstvena ta\v cka otkaza} - kompromitovanje jednog klju\v ca kompromituje ceo nalog bez mogu\' cnosti zaustavljanja transakcija ili opoziva pristupa.
   \item \textbf{Odsustvo vi\v sepotpisne autorizacije} - nije mogu\' ce zahtevati saglasnost ve\' ceg broja strana pre izvr\v savanja transakcija visoke vrednosti, \v sto je uobi\v cajeni zahtev u korporativnim i timskim okru\v zenjima.
-  \item \textbf{Lo\v se korisni\v cko iskustvo pri transferu \en{ERC20} tokena} - standard \en{ERC20} \cite{erc20} zahteva da korisnik najpre po\v salje transakciju $approve()$, a tek zatim pametni ugovor mo\v ze pozvati $transferFrom()$ u drugoj, zasebnoj transakciji. Korisnik pla\' ca naknadu za gas dva puta i potvr\dj uje dve odvojene \en{blockchain} operacije.
+  \item \textbf{Lo\v se korisni\v cko iskustvo pri transferu \en{ERC20} tokena} - standard \en{ERC20} \cite{erc20} zahteva da korisnik najpre po\v salje transakciju $approve()$, a tek zatim pametni ugovor mo\v ze pozvati $transferFrom()$ u drugoj, zasebnoj transakciji. Korisnik pla\' ca naknadu za gas dva puta i potvr\dj uje dve odvojene blok\v cejn operacije.
 \end{enumerate}
 
 Navedena ograni\v cenja posebno dolaze do izra\v zaja kod vi\v sepotpisnih nov\v canika, gde vi\v se korisnika deli vlasni\v stvo nad zajedni\v ckim sredstvima. Deponovanje \en{ERC20} tokena u takav nov\v canik klasi\v cnim pristupom zahteva dve transakcije od strane korisnika, \v sto uvodi dodatnu slo\v zenost i pove\' cava mogu\' cnost gre\v ske.

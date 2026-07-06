@@ -39,7 +39,11 @@
 \pagestyle{fancy}
 \renewcommand{\headrulewidth}{0.4pt}
 \fancyhead{}
-\fancyhead[L]{\textenglish{EIP-7702} vi\v sepotpisni nov\v canik}
+%% \textenglish{} occasionally leaves the ambient language state stuck on
+%% Latin for a page or two after it's used nearby (e.g. near \en{}-heavy
+%% paragraphs or footnotes) - force the Cyrillic-mapped font explicitly on
+%% the Serbian portion so the header can't be affected by that leak.
+\fancyhead[L]{\textenglish{EIP-7702}{} \cyrillicfont vi\v sepotpisni nov\v canik}
 \fancyhead[R]{Aleksandar Stojanovi\' c}
 \fancyfoot{}
 \fancyfoot[C]{\thepage}
@@ -72,6 +76,9 @@
 }
 \usepackage{wrapfig}
 \usepackage{booktabs}
+%% Long unbroken hex strings (tx hashes, signatures) in table cells have no
+%% natural break points for \texttt{} - seqsplit allows breaking anywhere.
+\usepackage{seqsplit}
 %% Long unbroken hex strings (tx hashes) in \url{} have no default break
 %% points - xurl allows breaking anywhere so footnote URLs wrap in narrow
 %% columns instead of overflowing the page margin.
