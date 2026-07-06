@@ -1,0 +1,169 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[a4paper, top=2.2cm, bottom=2.2cm, left=1.8cm, right=1.8cm, columnsep=0.7cm]{geometry}
+\usepackage{xcolor}
+
+%% Cirilica - kuca se latinica, mapiranje je pretvara u cirilicu na izlazu
+\usepackage{fontspec}
+\setmainfont{Carlito}
+\newfontfamily{\cyrillicfont}{Carlito}[Mapping=ascii-to-serbian]
+\newfontfamily{\cyrillicfonttt}{Carlito}
+\usepackage{polyglossia}
+\setmainlanguage[Script=Cyrillic]{serbian}
+\setotherlanguage{english}
+
+\usepackage[backend=biber, style=numeric, sorting=none, autolang=other]{biblatex}
+\addbibresource{references.bib}
+%% Match the bibliography heading to the same centered/bold/uppercase style
+%% used for numbered sections (via \titleformat), just without a number.
+\defbibheading{bibliography}[Bibliografija]{%
+  \begin{center}\normalsize\bfseries\MakeUppercase{#1}\end{center}
+  \vspace{-0.4em}
+}
+
+%% Strane reci - italic + engleski font (bez ascii-to-serbian mapiranja)
+\newcommand{\en}[1]{\textit{\textenglish{#1}}}
+
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{amsmath}
+
+\graphicspath{ {./slike/} }
+
+% Section numbering/format to match the IEEE-style zbornik template:
+% centered, bold, all-caps top-level sections; bold left-aligned subsections
+\renewcommand{\thesection}{\arabic{section}}
+\titleformat{\section}{\centering\normalsize\bfseries}{\thesection.}{0.5em}{\MakeUppercase}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection.}{0.5em}{}
+\titlespacing{\section}{0pt}{1.2em}{0.6em}
+\titlespacing{\subsection}{0pt}{1em}{0.4em}
+
+\pagestyle{empty}
+\setlength{\parindent}{1em}
+
+\begin{document}
+\twocolumn[
+  {\noindent
+   \begin{minipage}[c]{0.09\textwidth}
+     \includegraphics[width=\textwidth]{FTN-Logo.png}
+   \end{minipage}%
+   \begin{minipage}[c]{0.88\textwidth}
+     \centering
+     {\Large\bfseries Zbornik radova Fakulteta tehni\v ckih nauka, Novi Sad}
+   \end{minipage}
+
+   \vspace{0.3cm}
+   \noindent\rule{\textwidth}{0.8pt}
+
+   \noindent\hfill\begin{minipage}[t]{0.35\textwidth}
+     \raggedright\bfseries\footnotesize
+     \en{UDK}: \makebox[0.5\textwidth]{}\\[0.15cm]
+     \en{DOI}: \makebox[0.5\textwidth]{}
+   \end{minipage}
+
+   \vspace{0.4cm}
+
+   \begin{center}
+     {\large\bfseries DIZAJN I IMPLEMENTACIJA \en{EIP-7702}{}-KOMPATIBILNOG \en{ETHEREUM}{} VI\v SEPOTPISNOG NOV\v CANIKA}
+
+     \vspace{0.4cm}
+
+     {\large\bfseries \en{DESIGN AND IMPLEMENTATION OF AN EIP-7702-COMPATIBLE ETHEREUM MULTISIG WALLET}}
+
+     \vspace{0.5cm}
+
+     {\normalsize Aleksandar Stojanovi\' c, \textit{Fakultet tehni\v ckih nauka, Novi Sad}}
+   \end{center}
+
+   \vspace{0.3cm}
+   \noindent\textbf{Oblast -- RA\v CUNARSTVO I AUTOMATIKA}
+
+   \vspace{0.4cm}
+
+   \noindent
+   \begin{minipage}[t]{0.48\textwidth}
+     \noindent\textbf{\textit{Kratak sadr\v zaj}} -- U ovom radu predstavljen je vi\v sepotpisni \en{Ethereum} nov\v canik koji re\v sava dva ograni\v cenja standardnog naloga u vlasni\v stvu korisnika (\en{EOA}): odsustvo vi\v sepotpisne autorizacije i potrebu za dve odvojene transakcije pri deponovanju \en{ERC-20} tokena. Predlo\v zeno re\v senje kombinuje vi\v sepotpisni pametni ugovor sa \en{EIP-7702} mehanizmom delegacije koda, \v cime korisnik u jednoj transakciji atomski odobrava i deponuje sredstva. Rad uklju\v cuje i demonstraciju sistema stvarnim transakcijama na \en{Sepolia} test mre\v zi, kojima je potvr\dj ena u\v steda gasa od pribli\v zno 38\% u odnosu na klasi\v can pristup.
+
+     \medskip
+     \noindent\textbf{\textit{Klju\v cne re\v ci}}: blok\v cejn, vi\v sepotpisni ugovori, \en{EIP-7702}, apstrakcija naloga
+   \end{minipage}%
+   \hfill
+   \begin{minipage}[t]{0.48\textwidth}
+     \noindent\textbf{\en{Abstract}} -- \en{This paper presents a multisig Ethereum wallet that addresses two limitations of the standard externally owned account (EOA): the lack of multisignature authorization and the need for two separate transactions when depositing ERC-20 tokens. The proposed solution combines a multisig smart contract with the EIP-7702 code delegation mechanism, allowing a user to atomically approve and deposit funds in a single transaction. The work includes a demonstration of the system with real transactions on the Sepolia test network, confirming a gas saving of approximately 38\% compared to the classic approach.}
+
+     \medskip
+     \noindent\textbf{\en{Keywords}}: \en{blockchain, multisig contracts, EIP-7702, account abstraction}
+   \end{minipage}
+
+   \vspace{0.5cm}
+  }
+]
+
+\section{Uvod}
+
+Blok\v cejn tehnologija, uvedena \en{Bitcoin} mre\v zom \cite{nakamotou}, omogu\'cila je nastanak digitalne imovine bez centralizovanog posrednika. Standardni \en{Ethereum} nalog u vlasni\v stvu korisnika (\en{Externally Owned Account}, \en{EOA}) autorizuje svaku transakciju isklju\v civo jednim privatnim klju\v cem, bez mogu\'cnosti definisanja praga saglasnosti vi\v se strana \cite{antonopoulos2018}. Ovo predstavlja jedinstvenu ta\v cku otkaza: kompromitovanje jednog klju\v ca daje neograni\v cen pristup celokupnoj imovini naloga. Vi\v sepotpisni (\en{multisig}) protokoli re\v savaju ovaj problem zahtevanjem saglasnosti $M$ od $N$ potpisnika pre izvr\v senja transakcije, na na\v cin analogan potpisivanju korporativnih ra\v cuna u tradicionalnim finansijama.
+
+Dodatni problem javlja se pri radu sa \en{ERC-20} tokenima \cite{erc20u}: standard zahteva da korisnik po\v salje transakciju $approve()$, a tek zatim pametni ugovor mo\v ze pozvati $transferFrom()$ u drugoj, zasebnoj transakciji. Korisnik pla\'ca naknadu za gas dva puta i potvr\dj uje dve odvojene blok\v cejn operacije, \v sto je posebno izra\v zeno kod vi\v sepotpisnih nov\v canika.
+
+Ovaj rad predstavlja vi\v sepotpisni \en{Ethereum} nov\v canik koji kombinuje $M$-od-$N$ pametan ugovor sa mehanizmom \en{EIP-7702} \cite{eip7702u}, uvedenim \en{Ethereum} nadogradnjom \en{Pectra} \cite{pectrau}, koji omogu\'cava da \en{EOA} privremeno izvr\v si kod pametnog ugovora u okviru jedne transakcije. Sistem je realizovan kao ekstenzija za \en{Chromium}-bazirane pretra\v ziva\v ce i testiran na \en{Sepolia} testnoj mre\v zi.
+
+\section{Vi\v sepotpisni protokoli i \en{EIP-7702}{}}
+
+\en{Ethereum} razlikuje dva tipa naloga: \en{EOA}, kontrolisan privatnim klju\v cem, i nalog pametnog ugovora, \v ciji je kod trajno zapisan na blok\v cejnu i izvr\v sava se na \en{Ethereum} virtuelnoj ma\v sini \cite{woodu}. Vi\v sepotpisni ugovor implementira obrazac $M$-od-$N$ tako \v sto \v cuva listu ovla\v s\'cenih potpisnika i prag potrebnih potpisa, a svaka transakcija prolazi kroz tri faze: predlaganje ($propose$), potpisivanje ($sign$) i izvr\v savanje ($execute$), analogno protokolima poput \en{Safe} \cite{safeu}.
+
+\en{EIP-7702} \cite{eip7702u} uvodi transakciju tipa 4 koja nosi listu ovla\v s\'cenja ($authorization\_list$). Svako ovla\v s\'cenje sadr\v zi identifikator mre\v ze, ciljnu adresu pametnog ugovora i $nonce$ vrednost, i potpisano je privatnim klju\v cem naloga koji delegira izvr\v savanje. Kada mre\v za prihvati ovla\v s\'cenje, u kod slot \en{EOA} naloga upisuje se delegacijski ozna\v civa\v c -- vrednost $0xef0100$ nadovezana adresom ciljnog ugovora. Od tog trenutka, svaki poziv ka tom \en{EOA} nalogu izvr\v sava kod ciljnog ugovora u kontekstu naloga, sve dok se delegacija eksplicitno ne opozove slanjem ovla\v s\'cenja sa nultom adresom. Za razliku od potpune apstrakcije naloga kakvu predla\v ze \en{EIP-4337} \cite{eip4337u}, \en{EIP-7702} ne zahteva trajnu promenu tipa naloga.
+
+\section{Implementacija}
+
+Sistem se sastoji od dva pametna ugovora i klijentske \en{React}/\en{TypeScript} ekstenzije koja komunicira sa \en{Ethereum} mre\v zom putem \en{ethers.js} biblioteke \cite{ethersu}. Ugovor \en{MultiSig} \v cuva mapiranje ovla\v s\'cenih potpisnika i prag $minSignatures$. Predlog transakcije identifikovan je vredno\v s\' cu $txHash = keccak256(posiljalac, nonce{+}{+})$, namerno nezavisnom od sadr\v zaja same transakcije, kako bi se izbegle kolizije izme\dj u istovetnih uzastopnih predloga. Funkcija $execute$ prenosi sredstva tek kada broj potpisa dostigne prag i ugovor raspola\v ze dovoljnim iznosom.
+
+Ugovor \en{Approver} implementira funkciju $approveAndDeposit$, koja redom poziva $approve()$ nad \en{ERC-20} tokenom i $depositToken()$ nad \en{MultiSig} ugovorom. Kada je nalog korisnika delegiran na ovaj ugovor putem \en{EIP-7702}, poziv $approveAndDeposit$ na sopstvenu adresu izvr\v sava obe operacije u okviru jedne transakcije, jer se $address(this)$ unutar delegiranog koda razre\v sava na adresu samog \en{EOA} naloga, a ne na adresu ugovora \en{Approver}.
+
+\section{Demonstracija i rezultati}
+
+Funkcionalnost sistema potvr\dj ena je scenariom sa dva korisnika i \en{MultiSig} ugovorom sa pragom 2-od-3, izvr\v senim na \en{Sepolia} test mre\v zi. Prvi korisnik predla\v ze i potpisuje prenos 50 test-tokena, drugi korisnik dodaje drugi potpis, nakon \v cega oba korisnika deponuju potrebna sredstva. Tabela~1 prikazuje uporedne rezultate za depozit istog iznosa (30 tokena) sa i bez aktivne \en{EIP-7702} delegacije, o\v citane direktno sa mre\v ze.
+
+\begin{center}
+\small
+\begin{tabular}{lccc}
+\hline
+\textbf{Pristup} & \textbf{Transakcija} & \textbf{Potpisi} & \textbf{Gas} \\
+\hline
+Klasi\v can & 2 & 2 & 113.695 \\
+\en{EIP-7702} & 1 & 1 & 69.949 \\
+\hline
+\end{tabular}
+
+\vspace{0.2cm}
+{\footnotesize Tabela 1: Pore\dj enje klasi\v cnog i \en{EIP-7702} pristupa depozitu}
+\end{center}
+
+Objedinjeni pristup zahteva jedno potpisivanje umesto dva i smanjuje potro\v snju gasa za pribli\v zno 38\%, uz identi\v can krajnji efekat -- ugovor \en{MultiSig} prima isti iznos tokena, spreman za dalje izvr\v savanje ve\'c potpisanog predloga. Svaka transakcija navedena u ovom radu nezavisno je proveriva na \en{Etherscan} istra\v ziva\v cu \en{Sepolia} mre\v ze.
+
+\section{Zaklju\v cak}
+
+Rad je pokazao da kombinacija vi\v sepotpisnog pametnog ugovora i \en{EIP-7702} delegacije koda zna\v cajno unapre\dj uje korisni\v cko iskustvo pri radu sa \en{ERC-20} tokenima, bez potrebe za potpunom migracijom naloga na nov\v canike implementirane  uz pomo\' c pametnog ugovora (\en{smart contract wallets}). Trenutna implementacija testirana je isklju\v civo na test mre\v zi i nije pro\v sla nezavisnu bezbednosnu reviziju, \v sto je preduslov za razmatranje upotrebe na glavnoj mre\v zi. Isti obrazac -- objedinjavanje vi\v se uzastopnih poziva u jednu transakciju putem privremenog pona\v sanja pametnog ugovora -- nije ograni\v cen na depozit tokena u vi\v sepotpisni ugovor, ve\'c se mo\v ze primeniti na bilo koji tok koji danas zahteva vi\v se odvojenih transakcija.
+
+\footnotesize
+\printbibliography[title={Bibliografija}]
+\normalsize
+
+\medskip
+\noindent\textbf{Kratka biografija:}
+
+\medskip
+\noindent
+\begin{minipage}[c]{0.32\columnwidth}
+  \includegraphics[width=\textwidth]{profile_photo.png}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.63\columnwidth}
+  \footnotesize \textbf{Aleksandar Stojanovi\' c} ro\dj en je 2000. godine u Novom Sadu. Osnovne akademske studije na Fakultetu tehni\v ckih nauka u Novom Sadu, smer Elektrotehnika i ra\v cunarstvo, zavr\v sio je 2023. godine. Trenutno je student master akademskih studija na studijskom programu Ra\v cunarstvo i automatika i radi kao in\v zenjer bezbednosti u kompaniji \en{Parity Technologies}.
+
+  \medskip
+  kontakt: \textenglish{aleksandar.stojanovic@uns.ac.rs}
+\end{minipage}
+
+\end{document}
