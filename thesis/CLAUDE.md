@@ -9,7 +9,8 @@ This file provides guidance to Claude Code when working on this master's thesis.
 - **Chapter 1 - Uvod** (`0uvod.tex`): COMPLETE, APPROVED
 - **Chapter 2 - Osnove i srodna resenja** (`1osnovniKoncepti.tex`): COMPLETE, includes a "Kripto novcanik" section (custodial/non-custodial, hot/cold) inserted after 2.1
 - **Chapter 3 - Implementacija** (`2implementacija.tex`): 3.1-3.4 written (see structure below), awaiting user approval
-- **Chapter 4 - Zakljucak** (`zakljucak.tex`): NEXT TO WRITE
+- **Chapter 4 - Demonstracija** (`3demonstracija.tex`): NEXT TO WRITE - kompletan scenario, screenshots, stvarni podaci transakcija sa Sepolia mreze
+- **Chapter 5 - Zakljucak** (`zakljucak.tex`): After chapter 4
 
 Workflow: write one chapter/section → user approves → proceed to next.
 
