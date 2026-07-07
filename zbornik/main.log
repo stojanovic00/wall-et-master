@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2026.4.13)  6 JUL 2026 15:02
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2026.4.13)  7 JUL 2026 02:56
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1245,8 +1245,9 @@ Bitcoin []\TU/Carlito(1)/m/n/10 мрежом [[]1[]], омо-
  []
 
 
-Overfull \hbox (4.02115pt too wide) in paragraph at lines 106--107
-\TU/Carlito(1)/m/n/10 зује сваку трансакцију искључиво једним приватним кљу-
+Overfull \hbox (5.59953pt too wide) in paragraph at lines 106--107
+\TU/Carlito(1)/m/n/10 приступ целокупној имовини налога. Вишепотписни ([]\TU/Ca
+rlito(0)/m/it/10 mul-
  []
 
 
@@ -1774,12 +1775,12 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 21660 strings out of 476696
- 443598 string characters out of 5806955
- 1873018 words of memory out of 6000000
- 41628 multiletter control sequences out of 15000+600000
- 515720 words of font info for 86 fonts, out of 8000000 for 9000
+ 21670 strings out of 476696
+ 443753 string characters out of 5806955
+ 1874018 words of memory out of 6000000
+ 41633 multiletter control sequences out of 15000+600000
+ 516863 words of font info for 91 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 72i,6n,107p,857b,6693s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 72i,8n,107p,967b,6693s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 Output written on main.pdf (2 pages).

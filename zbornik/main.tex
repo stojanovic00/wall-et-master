@@ -66,11 +66,11 @@
    \vspace{0.4cm}
 
    \begin{center}
-     {\large\bfseries DIZAJN I IMPLEMENTACIJA \en{EIP-7702}{}-KOMPATIBILNOG \en{ETHEREUM}{} VI\v SEPOTPISNOG NOV\v CANIKA}
+     {\large\bfseries DIZAJN I IMPLEMENTACIJA \en{EIP-7702}{}-KOMPATIBILNOG \en{ETHEREUM}{} VI\v SEPOTPISNOG DIGITALNOG NOV\v CANIKA}
 
      \vspace{0.4cm}
 
-     {\large\bfseries \en{DESIGN AND IMPLEMENTATION OF AN EIP-7702-COMPATIBLE ETHEREUM MULTISIG WALLET}}
+     {\large\bfseries \en{DESIGN AND IMPLEMENTATION OF AN EIP-7702-COMPATIBLE ETHEREUM MULTI-SIGNATURE WALLET}}
 
      \vspace{0.5cm}
 
@@ -103,7 +103,7 @@
 
 \section{Uvod}
 
-Blok\v cejn tehnologija, uvedena \en{Bitcoin} mre\v zom \cite{nakamotou}, omogu\'cila je nastanak digitalne imovine bez centralizovanog posrednika. Standardni \en{Ethereum} nalog u vlasni\v stvu korisnika (\en{Externally Owned Account}, \en{EOA}) autorizuje svaku transakciju isklju\v civo jednim privatnim klju\v cem, bez mogu\'cnosti definisanja praga saglasnosti vi\v se strana \cite{antonopoulos2018}. Ovo predstavlja jedinstvenu ta\v cku otkaza: kompromitovanje jednog klju\v ca daje neograni\v cen pristup celokupnoj imovini naloga. Vi\v sepotpisni (\en{multisig}) protokoli re\v savaju ovaj problem zahtevanjem saglasnosti $M$ od $N$ potpisnika pre izvr\v senja transakcije, na na\v cin analogan potpisivanju korporativnih ra\v cuna u tradicionalnim finansijama.
+Blok\v cejn tehnologija, uvedena \en{Bitcoin} mre\v zom \cite{nakamotou}, omogu\'cila je nastanak digitalne imovine bez centralizovanog posrednika.\footnote{\textbf{Napomena:} Ovaj rad proistekao je iz master rada \v ciji mentor je bio dr Du\v san Gaji\' c, vanred. prof.} Standardni \en{Ethereum} nalog u vlasni\v stvu korisnika (\en{Externally Owned Account}, \en{EOA}) autorizuje svaku transakciju isklju\v civo jednim privatnim klju\v cem, bez mogu\'cnosti definisanja praga saglasnosti vi\v se strana \cite{antonopoulos2018}. Ovo predstavlja jedinstvenu ta\v cku otkaza: kompromitovanje jednog klju\v ca daje neograni\v cen pristup celokupnoj imovini naloga. Vi\v sepotpisni (\en{multisig}) protokoli re\v savaju ovaj problem zahtevanjem saglasnosti $M$ od $N$ potpisnika pre izvr\v senja transakcije, na na\v cin analogan potpisivanju korporativnih ra\v cuna u tradicionalnim finansijama.
 
 Dodatni problem javlja se pri radu sa \en{ERC-20} tokenima \cite{erc20u}: standard zahteva da korisnik po\v salje transakciju $approve()$, a tek zatim pametni ugovor mo\v ze pozvati $transferFrom()$ u drugoj, zasebnoj transakciji. Korisnik pla\'ca naknadu za gas dva puta i potvr\dj uje dve odvojene blok\v cejn operacije, \v sto je posebno izra\v zeno kod vi\v sepotpisnih nov\v canika.
 
@@ -163,7 +163,7 @@ Rad je pokazao da kombinacija vi\v sepotpisnog pametnog ugovora i \en{EIP-7702} 
   \footnotesize \textbf{Aleksandar Stojanovi\' c} ro\dj en je 2000. godine u Novom Sadu. Osnovne akademske studije na Fakultetu tehni\v ckih nauka u Novom Sadu, smer Elektrotehnika i ra\v cunarstvo, zavr\v sio je 2023. godine. Trenutno je student master akademskih studija na studijskom programu Ra\v cunarstvo i automatika i radi kao in\v zenjer bezbednosti u kompaniji \en{Parity Technologies}.
 
   \medskip
-  kontakt: \textenglish{aleksandar.stojanovic@uns.ac.rs}
+  kontakt: \textenglish{al.stojanovic0@gmail.com}
 \end{minipage}
 
 \end{document}
