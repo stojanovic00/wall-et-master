@@ -311,6 +311,137 @@
       \verb https://eips.ethereum.org/EIPS/eip-4337
       \endverb
     \endentry
+    \entry{eip3074u}{misc}{}{}
+      \name{author}{2}{}{%
+        {{hash=43e9de71b3550d692deef3b776bc5fde}{%
+           family={Wilson},
+           familyi={W\bibinitperiod},
+           given={Sam},
+           giveni={S\bibinitperiod}}}%
+        {{hash=b3f3ff7530b8aabe8347b19a69d7fb6f}{%
+           family={Zoltu},
+           familyi={Z\bibinitperiod},
+           given={Micah},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{7e2a1dc10ab663519c43b0a639b759cd}
+      \strng{fullhash}{7e2a1dc10ab663519c43b0a639b759cd}
+      \strng{fullhashraw}{7e2a1dc10ab663519c43b0a639b759cd}
+      \strng{bibnamehash}{7e2a1dc10ab663519c43b0a639b759cd}
+      \strng{authorbibnamehash}{7e2a1dc10ab663519c43b0a639b759cd}
+      \strng{authornamehash}{7e2a1dc10ab663519c43b0a639b759cd}
+      \strng{authorfullhash}{7e2a1dc10ab663519c43b0a639b759cd}
+      \strng{authorfullhashraw}{7e2a1dc10ab663519c43b0a639b759cd}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{langid}{english}
+      \field{title}{EIP-3074: {AUTH} and {AUTHCALL} opcodes}
+      \field{year}{2020}
+      \verb{urlraw}
+      \verb https://eips.ethereum.org/EIPS/eip-3074
+      \endverb
+      \verb{url}
+      \verb https://eips.ethereum.org/EIPS/eip-3074
+      \endverb
+    \endentry
+    \entry{diangelo2020}{article}{}{}
+      \name{author}{2}{}{%
+        {{hash=f425e962d2e586b8c0fb9b5420b3012c}{%
+           family={Angelo},
+           familyi={A\bibinitperiod},
+           given={Monika},
+           giveni={M\bibinitperiod},
+           prefix={di},
+           prefixi={d\bibinitperiod}}}%
+        {{hash=cfc01e72a53130f0b40d1ef5887c64f0}{%
+           family={Salzer},
+           familyi={S\bibinitperiod},
+           given={Gernot},
+           giveni={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{e20caad851cf65615f98ee2b06e12a08}
+      \strng{fullhash}{e20caad851cf65615f98ee2b06e12a08}
+      \strng{fullhashraw}{e20caad851cf65615f98ee2b06e12a08}
+      \strng{bibnamehash}{e20caad851cf65615f98ee2b06e12a08}
+      \strng{authorbibnamehash}{e20caad851cf65615f98ee2b06e12a08}
+      \strng{authornamehash}{e20caad851cf65615f98ee2b06e12a08}
+      \strng{authorfullhash}{e20caad851cf65615f98ee2b06e12a08}
+      \strng{authorfullhashraw}{e20caad851cf65615f98ee2b06e12a08}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{arXiv preprint}
+      \field{langid}{english}
+      \field{title}{Wallet Contracts on Ethereum -- Identification, Types, Usage, and Profiles}
+      \field{year}{2020}
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/2001.06909
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/2001.06909
+      \endverb
+    \endentry
+    \entry{permit2u}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=a9cfce9e9e42c35cf8dae5eac78cb0bd}{%
+           family={{Uniswap Labs}},
+           familyi={U\bibinitperiod}}}%
+      }
+      \strng{namehash}{a9cfce9e9e42c35cf8dae5eac78cb0bd}
+      \strng{fullhash}{a9cfce9e9e42c35cf8dae5eac78cb0bd}
+      \strng{fullhashraw}{a9cfce9e9e42c35cf8dae5eac78cb0bd}
+      \strng{bibnamehash}{a9cfce9e9e42c35cf8dae5eac78cb0bd}
+      \strng{authorbibnamehash}{a9cfce9e9e42c35cf8dae5eac78cb0bd}
+      \strng{authornamehash}{a9cfce9e9e42c35cf8dae5eac78cb0bd}
+      \strng{authorfullhash}{a9cfce9e9e42c35cf8dae5eac78cb0bd}
+      \strng{authorfullhashraw}{a9cfce9e9e42c35cf8dae5eac78cb0bd}
+      \field{extraname}{1}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{langid}{english}
+      \field{title}{{Permit2}: Next Generation Token Approvals}
+      \field{year}{2022}
+      \verb{urlraw}
+      \verb https://github.com/Uniswap/permit2
+      \endverb
+      \verb{url}
+      \verb https://github.com/Uniswap/permit2
+      \endverb
+    \endentry
+    \entry{uniswap2021u}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=a9cfce9e9e42c35cf8dae5eac78cb0bd}{%
+           family={{Uniswap Labs}},
+           familyi={U\bibinitperiod}}}%
+      }
+      \strng{namehash}{a9cfce9e9e42c35cf8dae5eac78cb0bd}
+      \strng{fullhash}{a9cfce9e9e42c35cf8dae5eac78cb0bd}
+      \strng{fullhashraw}{a9cfce9e9e42c35cf8dae5eac78cb0bd}
+      \strng{bibnamehash}{a9cfce9e9e42c35cf8dae5eac78cb0bd}
+      \strng{authorbibnamehash}{a9cfce9e9e42c35cf8dae5eac78cb0bd}
+      \strng{authornamehash}{a9cfce9e9e42c35cf8dae5eac78cb0bd}
+      \strng{authorfullhash}{a9cfce9e9e42c35cf8dae5eac78cb0bd}
+      \strng{authorfullhashraw}{a9cfce9e9e42c35cf8dae5eac78cb0bd}
+      \field{extraname}{2}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{langid}{english}
+      \field{title}{Uniswap v3 Core}
+      \field{year}{2021}
+      \verb{urlraw}
+      \verb https://uniswap.org/whitepaper-v3.pdf
+      \endverb
+      \verb{url}
+      \verb https://uniswap.org/whitepaper-v3.pdf
+      \endverb
+    \endentry
     \entry{ethersu}{misc}{}{}
       \name{author}{1}{}{%
         {{hash=75b8ad948409ec90eb3d4eefddc17014}{%
