@@ -2,15 +2,15 @@
 
 \section{Motivacija}
 
-Upravljanje digitalnom imovinom na blok\v cejn mre\v zama sve \v ce\v s\' ce prevazilazi individualni kontekst. Decentralizovane autonomne organizacije (\en{DAO}), kompanije i timovi \v cesto zajedni\v cki dr\v ze kriptovalute i tokene kao deo poslovnih procesa ili zajedni\v ckih fondova \cite{buterin2014}. U takvim scenarijima, odluke o tro\v senju sredstava ne treba da donosi jedna osoba, ve\' c ih treba odobriti ve\' ci broj ovla\v s\' cenih u\v cesnika.
+Upravljanje digitalnom imovinom na blok\v cejn mre\v zama sve \v ce\v s\' ce prevazilazi individualni kontekst. Decentralizovane autonomne organizacije (engl. \en{DAO}), kompanije i timovi \v cesto zajedni\v cki dr\v ze kriptovalute i tokene kao deo poslovnih procesa ili zajedni\v ckih fondova \cite{buterin2014}. U takvim scenarijima, odluke o tro\v senju sredstava ne treba da donosi jedna osoba, ve\' c ih treba odobriti ve\' ci broj ovla\v s\' cenih u\v cesnika.
 
 Standardni \en{Ethereum} nalog u vlasni\v stvu korisnika ne podr\v zava ovakav model upravljanja. Svaka transakcija se autorizuje isklju\v civo jednim privatnim klju\v cem, bez mogu\' cnosti definisanja praga saglasnosti ili zahtevanja odobrenja vi\v se strana \cite{antonopoulos2018}. Ovo stvara centralnu ta\v cku odlu\v civanja i centralnu ta\v cku rizika: kompromitovanje tog jednog klju\v ca daje neograni\v cen pristup celokupnoj imovini, bez mogu\' cnosti zaustavljanja ili opoziva.
 
-Vi\v sepotpisni (\en{multisig}) protokoli re\v savaju ovaj problem zahtevanjem saglasnosti $M$ od $N$ potpisnika pre izvr\v savanja transakcije. Ovakav pristup je u tradicionalnim finansijama dugo prisutan - korporativni ra\v cuni zahtevaju potpise vi\v se ovla\v s\' cenih lica, a odluke o tro\v senju ve\' cih iznosa prolaze kroz formalne procese odobravanja. Digitalna imovina zaslu\v zuje isti nivo institucionalne za\v stite.
+Vi\v sepotpisni (engl. \en{multisig}) protokoli re\v savaju ovaj problem zahtevanjem saglasnosti $M$ od $N$ potpisnika pre izvr\v savanja transakcije. Ovakav pristup je u tradicionalnim finansijama dugo prisutan - korporativni ra\v cuni zahtevaju potpise vi\v se ovla\v s\' cenih lica, a odluke o tro\v senju ve\' cih iznosa prolaze kroz formalne procese odobravanja. Digitalna imovina zaslu\v zuje isti nivo institucionalne za\v stite.
 
 \section{Domen problema}
 
-\en{Ethereum} protokol defini\v se dve vrste naloga: naloge u vlasni\v stvu eksternih korisnika (\en{Externally Owned Account}, \en{EOA}) i naloge pametnih ugovora \cite{wood2024}. \en{EOA} je deterministi\v cki izveden iz jednog 256-bitnog privatnog klju\v ca kori\v s\' cenjem elipti\v cke kriptografije (\en{ECDSA}). Svaka transakcija mora biti potpisana tim jednim klju\v cem - nema praga saglasnosti, nema delegiranja ovla\v s\' cenja, nema mogu\' cnosti opoziva.
+\en{Ethereum} protokol defini\v se dve vrste naloga: naloge u vlasni\v stvu eksternih korisnika (engl. \en{Externally Owned Account}, \en{EOA}) i naloge pametnih ugovora \cite{wood2024}. \en{EOA} je deterministi\v cki izveden iz jednog 256-bitnog privatnog klju\v ca kori\v s\' cenjem elipti\v cke kriptografije (engl. \en{ECDSA}). Svaka transakcija mora biti potpisana tim jednim klju\v cem - nema praga saglasnosti, nema delegiranja ovla\v s\' cenja, nema mogu\' cnosti opoziva.
 
 Ovaj model ima tri klju\v cna ograni\v cenja relevantna za ovaj rad:
 

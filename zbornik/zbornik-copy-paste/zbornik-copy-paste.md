@@ -56,7 +56,7 @@ DESIGN AND IMPLEMENTATION OF AN EIP-7702-COMPATIBLE ETHEREUM MULTI-SIGNATURE WAL
 
 ## Napomena (o mentorstvu)
 
-НАПОМЕНА: Овај рад проистекао је из мастер рада чији ментор је био др Душан Гајић, ванред. проф.
+НАПОМЕНА: Овај рад проистекао је из мастер рада чији ментор је био др Душан Гајић, ред. проф.
 
 *(ovo ide kao izdvojen blok sa horizontalnom linijom iznad, ne kao fusnota)*
 

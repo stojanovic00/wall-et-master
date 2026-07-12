@@ -74,7 +74,7 @@ These rules were explicitly established by the user - do not violate them:
 6. **No "gasna naknada"** - use `gas` or `tro\v skovi izvr\v savanja transakcije`.
 7. **No "bezstanjevan"** - not a real Serbian word. Say `ugovor koji ne sme imati logiku koja zahteva \v cuvanje stanja (\en{stateless contract})`.
 8. **"trofazni"** - written as one word without a hyphen.
-9. **First use of a technical term**: introduce with English in parentheses - example: `delegacijski ozna\v civa\v c (\en{delegation designator})`.
+9. **First use of a technical term/loanword** (ONLY the very first occurrence in the whole thesis, across all chapters - do NOT repeat the gloss if the term is reintroduced/re-explained in a later chapter): introduce with a Serbian phrase followed by `(engl. \en{Term})` - the literal word `engl.` (short for `engleski`) is typed in plain Latin (NOT wrapped in `\en{}`, so it maps to Cyrillic `енгл.` like normal text), and only the actual foreign term inside the parens gets `\en{}`. Example: `Vi\v sepotpisni (engl. \en{multisig}) protokoli`, `delegacijski ozna\v civa\v c (engl. \en{delegation designator})`. Flagged explicitly by the professor's review. Before adding this gloss, grep the WHOLE thesis for the term - if it already appears earlier in an earlier chapter, do not add the gloss again, just use `\en{Term}` bare.
 10. **"pametni" (smart account context)**: put in Serbian quotes - `"pametni"`.
 11. **\cite{key1,key2}**: NO space between keys. A space causes wrong Cyrillic output (`[накамото2008, 2]` instead of `[1, 2]`).
 12. References must be specific and non-vague. Never cite just a docs homepage if a whitepaper or EIP page exists.
