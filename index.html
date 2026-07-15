@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +12,12 @@
             box-sizing: border-box;
         }
 
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
             background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #1e3a8a 100%);
@@ -18,12 +25,19 @@
             position: relative;
         }
 
+        /*
+         * Sized off vmin (not vw/vh separately) so the mascot keeps the same
+         * proportions and the same bottom-left crop regardless of window
+         * aspect ratio - important when filming in a narrow vertical-split
+         * window instead of a full-width one.
+         */
         .logo {
             position: fixed;
-            bottom: 20px;
-            left: -170px;
-            width: 50vw;
-            height: 50vh;
+            bottom: 0;
+            left: 0;
+            width: 42vmin;
+            height: 42vmin;
+            transform: translateX(-9%);
         }
 
         .logo img {
@@ -33,9 +47,11 @@
         }
     </style>
 </head>
+
 <body>
     <div class="logo">
         <img src=".assets/wallet-blue.png" alt="Wall-ET Logo">
     </div>
 </body>
+
 </html>

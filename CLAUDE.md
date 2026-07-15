@@ -8,6 +8,16 @@ WALL-ET is a secure Ethereum wallet browser extension for Chromium-based browser
 
 **⚠️ Important: This is a testnet-only wallet for educational/demo purposes. Never use for mainnet or real funds.**
 
+## Repository Map
+
+This repo holds three things: the wallet extension, the Solidity contracts, and the master's thesis (+ defense slides).
+
+- **Extension source**: `extension/src/` (see full structure below)
+- **Solidity contracts**: `contracts/src/contracts/*.sol` (`MultiSig.sol`, `Approver.sol`, `SocialRecovery.sol`, `RSDC.sol`), interfaces in `contracts/src/interfaces/`, tests in `contracts/test/*.t.sol`, Foundry project (`contracts/lib/` submodules: forge-std, openzeppelin-contracts)
+- **Thesis root**: `thesis/main.tex` (XeLaTeX + biblatex/biber, Serbian Cyrillic via `Mapping=ascii-to-serbian`). Chapters included via `\input`: `0uvod.tex`, `1osnovniKoncepti.tex`, `2implementacija.tex`, `3demonstracija.tex`, `zakljucak.tex`. Bibliography: `thesis/references.bib`. Figures: `thesis/slike/` (diagrams, logos), `thesis/demo_ss/` (numbered demo screenshots `1_main_screen.png`...`22_tx_review_executed.png`). Special pages (title/KDI/zadatak/statement PDFs): `thesis/special_pages/`. See `thesis/CLAUDE.md` for thesis-specific build/style rules.
+- **Defense presentation**: `docs/` - reveal.js slide deck built from the thesis + contracts, deployed via GitHub Pages.
+- **Speaker script** (private, not deployed): `SPEAKER-SCRIPT.md` - full spoken narration for the defense, deliberately kept outside `docs/` so it never gets published to the public Pages site.
+
 ## Development Commands
 
 ### Build and Development
