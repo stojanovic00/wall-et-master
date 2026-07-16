@@ -1,9 +1,10 @@
 <!doctype html>
 <html lang="sr-Cyrl">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EIP-7702 вишепотписни новчаник — одбрана мастер рада</title>
+  <title>EIP-7702 вишепотписни новчаник - одбрана мастер рада</title>
 
   <link rel="stylesheet" href="lib/reveal/dist/reset.css">
   <link rel="stylesheet" href="lib/reveal/dist/reveal.css">
@@ -12,67 +13,125 @@
 
   <style>
     /* Projector-safe legibility overrides */
-    .reveal { font-size: 30px; }
-    .reveal h1 { font-size: 1.9em; }
-    .reveal h2 { font-size: 1.5em; }
-    .reveal h3 { font-size: 1.15em; }
-    .reveal section img { border: none; box-shadow: none; }
-    .reveal pre { width: 100%; box-shadow: none; }
-    .reveal pre code {
-      font-size: 0.58em;
-      line-height: 1.35;
-      max-height: 560px;
+    .reveal {
+      font-size: 30px;
     }
-    .reveal .small { font-size: 0.65em; }
-    .reveal .tiny { font-size: 0.5em; }
-    .reveal ul, .reveal ol { display: block; }
-    .reveal section.center { text-align: center; }
+
+    .reveal h1 {
+      font-size: 1.9em;
+    }
+
+    .reveal h2 {
+      font-size: 1.5em;
+    }
+
+    .reveal h3 {
+      font-size: 1.15em;
+    }
+
+    .reveal section img {
+      border: none;
+      box-shadow: none;
+    }
+
+    .reveal pre {
+      width: 100%;
+      box-shadow: none;
+    }
+
+    .reveal pre code {
+      font-size: 0.62em;
+      line-height: 1.5;
+      max-height: 520px;
+    }
+
+    .reveal .small {
+      font-size: 0.65em;
+    }
+
+    .reveal ul,
+    .reveal ol {
+      display: block;
+    }
+
+    .reveal section.center {
+      text-align: center;
+    }
+
+    .reveal section>ul,
+    .reveal section>ol {
+      font-size: 1.1em;
+      margin-top: 0.5em;
+    }
+
+    .reveal li {
+      margin: 0.6em 0;
+      line-height: 1.5;
+    }
 
     /* Foreign/technical terms inside Cyrillic prose - matches the thesis's
        own \en{} convention (italic, kept in Latin script). */
-    .en { font-style: italic; white-space: nowrap; }
-
-    .title-slide h1 { margin-bottom: 0.2em; }
-    .title-slide .author { font-size: 0.7em; font-weight: normal; margin-top: 1.2em; }
-    .title-slide .subtitle { font-size: 0.6em; font-weight: normal; color: #555; margin-top: 0.4em; }
-    .title-slide .logos { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2em; }
-    .title-slide .logos img { height: 130px; }
-
-    .two-col { display: flex; gap: 1.2em; align-items: flex-start; }
-    .two-col > div { flex: 1; }
-    .two-col img { max-height: 480px; width: auto; }
-
-    .callout {
-      border-left: 6px solid #2b6cb0;
-      background: #eef4fb;
-      padding: 0.5em 0.8em;
-      margin-top: 0.6em;
-      text-align: left;
-      font-size: 0.75em;
+    .en {
+      font-style: italic;
+      white-space: nowrap;
     }
-    .research-question {
-      border-left: 6px solid #b7791f;
-      background: #fdf6ec;
-      padding: 0.6em 0.9em;
-      margin-top: 0.8em;
-      text-align: left;
-      font-size: 0.72em;
+
+    .title-slide h1 {
+      margin-bottom: 0.2em;
     }
-    .limits-grid, .results-grid { display: flex; gap: 1em; text-align: left; }
-    .limits-grid > div, .results-grid > div { flex: 1; }
 
-    table.gas-table { margin: 0 auto; border-collapse: collapse; font-size: 0.75em; }
-    table.gas-table th, table.gas-table td { border: 1px solid #ccc; padding: 0.35em 0.7em; text-align: right; }
-    table.gas-table th:first-child, table.gas-table td:first-child { text-align: left; }
-    table.gas-table th { background: #f2f2f2; }
+    .title-slide .author {
+      font-size: 0.7em;
+      font-weight: normal;
+      margin-top: 1.2em;
+    }
 
-    .video-wrap { position: relative; width: 100%; max-width: 900px; margin: 0 auto; }
-    .video-wrap iframe { width: 100%; height: 480px; border: 0; background: #000; }
-    .video-caption { font-size: 0.55em; margin-top: 0.4em; color: #444; }
+    .title-slide .subtitle {
+      font-size: 0.6em;
+      font-weight: normal;
+      color: #555;
+      margin-top: 0.4em;
+    }
 
-    .footnote-src { font-size: 0.42em; color: #888; margin-top: 0.5em; }
+    .title-slide .logos {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.2em;
+    }
+
+    .title-slide .logos img {
+      height: 130px;
+    }
+
+    .video-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .video-wrap iframe {
+      width: 100%;
+      height: 480px;
+      border: 0;
+      background: #000;
+    }
+
+    .video-caption {
+      font-size: 0.55em;
+      margin-top: 0.4em;
+      color: #444;
+    }
+
+    .diagram-caption {
+      font-size: 0.5em;
+      color: #555;
+      margin-top: 0.3em;
+    }
   </style>
 </head>
+
 <body>
   <div class="reveal">
     <div class="slides">
@@ -83,24 +142,138 @@
           <img src="media/univerzitet-logo.png" alt="Универзитет у Новом Саду">
           <img src="media/FTN-Logo.png" alt="Факултет техничких наука">
         </div>
-        <h1>Дизајн и имплементација <span class="en">EIP-7702</span>-компатибилног <span class="en">Ethereum</span> вишепотписног дигиталног новчаника</h1>
+        <h1>Дизајн и имплементација <span class="en">EIP-7702</span>-компатибилног <span class="en">Ethereum</span>
+          вишепотписног дигиталног новчаника</h1>
         <p class="author">Александар Стојановић</p>
         <p class="subtitle">Нови Сад, 2026.</p>
-        <aside class="notes">
-          Добар дан, поштована комисијо. Представићу мастер рад на тему дизајна и имплементације
-          EIP-7702-компатибилног Ethereum вишепотписног новчаника. Кратко: рад решава проблем
-          безбедног, тимског управљања крипто средствима без напуштања стандардног Ethereum налога.
-          Презентација траје око 15 минута.
-        </aside>
       </section>
 
-      <!-- 2. ХВАЛА / ПИТАЊА -->
+      <!-- 2. ШТА ЈЕ НОВЧАНИК -->
+      <section>
+        <h2>Шта је дигитални новчаник</h2>
+        <ul>
+          <li>Апликација која представља "омотач" око приватног кључа и потписује трансакције у име корисника</li>
+          <li>Стандардни облик налога: <span class="en">EOA</span>, једна адреса, један приватни кључ</li>
+          <li>Служи за слање и пријем <span class="en">ETH</span> и <span class="en">ERC-20</span> токена, интеракцију
+            са паметним уговорима</li>
+        </ul>
+      </section>
+
+      <!-- 3. НЕДОСТАТАК СТАНДАРДНОГ НОВЧАНИКА -->
+      <section>
+        <h2>Недостаци</h2>
+        <ul>
+          <li>Један приватни кључ = јединствена тачка отказа</li>
+          <li>Пословни свет уобичајено захтева сагласност више страна пре трансакција веће вредности</li>
+          <li>Стандардни <span class="en">EOA</span> новчаник то нативно не подржава</li>
+        </ul>
+      </section>
+
+      <!-- 4. ВИШЕПОТПИСНИ УГОВОР -->
+      <section>
+        <h2>Решење: вишепотписни уговор (<span class="en">M</span>-од-<span class="en">N</span>)</h2>
+        <p>\[ 1 \leq M \leq N \]</p>
+        <ul>
+          <li>Паметни уговор чува листу овлашћених потписника и праг <span class="en">M</span></li>
+          <li>Ток интеракције: <code>propose</code> → <code>sign</code> → <code>execute</code></li>
+          <li>Трансакција се извршава тек када се прикупи довољно потписа</li>
+        </ul>
+      </section>
+
+      <!-- 5. ERC-20 UX ПРОБЛЕМ -->
+      <section>
+        <h2>Проблем: депозит <span class="en">ERC-20</span> токена</h2>
+        <p class="small">Нативни <span class="en">ETH</span> депозит иде директно, једном трансакцијом.
+          <span class="en">ERC-20</span> стандард захтева одобрење пре преноса средстава.
+        </p>
+        <div class="center">
+          <img src="media/classic_flow.png" style="max-height: 480px">
+          <p class="diagram-caption">approve() па тек онда transferFrom(), две трансакције, два потписа, два пута гас
+          </p>
+        </div>
+      </section>
+
+      <!-- 6. ПОСТОЈЕЋА РЕШЕЊА: PERMIT2 -->
+      <section>
+        <h2>Постојећа решења: <span class="en">Permit2</span></h2>
+        <ul>
+          <li><span class="en">Permit2</span> (Uniswap) је треће лице - канонски уговор коме се даје једно, обично
+            максимално одобрење за сва будућа повлачења</li>
+          <li>Корисник трајно верује туђем уговору, опозив захтева посебну трансакцију одобрења износа нула</li>
+          <li><span class="en">EIP-7702</span> ниједном трећем уговору не даје стално одобрење, делегација се опозива
+            истом врстом трансакције којом је и активирана</li>
+        </ul>
+      </section>
+
+      <!-- 7. EIP-7702 УВОД -->
+      <section>
+        <h2><span class="en">EIP-7702</span></h2>
+        <ul>
+          <li>Уведен <span class="en">Pectra</span> надоградњом <span class="en">Ethereum</span> мреже, активна од 7.
+            маја 2025.</li>
+          <li>Не позива се туђи уговор, него се његов код привремено делегира <span class="en">EOA</span> налогу,
+            чинећи га "паметним налогом"</li>
+          <li>Код се извршава са адресе самог корисника, не са адресе туђег уговора, <span class="en">EOA</span>
+            задржава своју адресу и приватни кључ</li>
+        </ul>
+      </section>
+
+      <!-- 8. САДРЖАЈ ТРАНСАКЦИЈЕ ТИПА 4 -->
+      <section>
+        <h2>Шта носи трансакција типа 4</h2>
+        <pre><code class="language-javascript" data-trim>{
+  type: 4,
+  chainId: 11155111,                    // Sepolia
+  nonce: 91,                            // sopstveni nonce transakcije
+  authorizationList: [
+    {
+      address: "0x828F4dc0...C2429764", // Approver ugovor (kod se delegira)
+      nonce: 92,                        // tx.nonce + 1 (self-sponsored)
+      yParity: 1,
+      r: "0xec9d4f8a...944aa253",       // potpis EOA-a
+      s: "0x236389ad...1d6a11fe97",
+    }
+  ]
+}</code></pre>
+        <p class="diagram-caption"><a href="https://sepolia.etherscan.io/tx/0x7dfe5a05a609187c4f5f41ca95a0b261bdd58c3f1dd0f69d9e44da6681e190eb" target="_blank" rel="noopener">https://sepolia.etherscan.io/tx/0x7dfe5a05a609187c4f5f41ca95a0b261bdd58c3f1dd0f69d9e44da6681e190eb</a></p>
+      </section>
+
+      <!-- 9. EIP-7702 ДЕПОЗИТ -->
+      <section>
+        <h2><span class="en">EIP-7702</span>: једна трансакција уместо две</h2>
+        <p class="small"><code>approveAndDeposit</code> обавља одобрење и депозит атомски, у једној трансакцији.</p>
+        <div class="center">
+          <img src="media/eip7702_flow_phase2.png" style="max-height: 480px">
+          <p class="diagram-caption">Приказана фаза депозита, активација делегације и опозив су посебни, једнократни
+            кораци</p>
+        </div>
+      </section>
+
+      <!-- 10. ДЕМО -->
+      <section>
+        <h2>Демо - комплетан ток</h2>
+        <div class="video-wrap">
+          <iframe data-src="https://www.youtube.com/embed/5iiDxoc7X4c" allow="autoplay; fullscreen"
+            allowfullscreen></iframe>
+        </div>
+        <p class="video-caption">Снимак демонстрира комплетан радни ток, објављивање уговора, потписивање и
+          извршавање трансакције, класичан и <span class="en">EIP-7702</span> депозит.</p>
+      </section>
+
+      <!-- 11. ЗАКЉУЧАК -->
+      <section>
+        <h2>Закључак</h2>
+        <ul>
+          <li>Комбинација M-од-N вишепотписног уговора и <span class="en">EIP-7702</span> делегације решава оба
+            ограничења <span class="en">EOA</span> налога, без миграције идентитета</li>
+          <li>Демонстрирано стварним трансакцијама на <span class="en">Sepolia</span> мрежи</li>
+        </ul>
+      </section>
+
+      <!-- 12. ХВАЛА / ПИТАЊА -->
       <section class="center">
         <h1>Хвала на пажњи!</h1>
         <p class="small">Питања?</p>
-        <aside class="notes">
-          Хвала на пажњи, спреман сам за питања.
-        </aside>
       </section>
 
     </div>
@@ -109,28 +282,24 @@
   <script type="module">
     import Reveal from './lib/reveal/dist/reveal.mjs';
     import Highlight from './lib/reveal/dist/plugin/highlight.mjs';
-    import Notes from './lib/reveal/dist/plugin/notes.mjs';
     import RevealMath from './lib/reveal/dist/plugin/math.mjs';
-    import hljsSolidity from './lib/highlightjs-solidity/solidity.es.min.js';
 
     Reveal.initialize({
       hash: true,
       controls: true,
       progress: true,
-      center: false,
+      center: true,
       width: 1280,
       height: 720,
       margin: 0.06,
       minScale: 0.2,
       maxScale: 2.0,
-      plugins: [ Highlight, Notes, RevealMath.KaTeX ],
+      plugins: [Highlight, RevealMath.KaTeX],
       katex: {
         local: 'lib/katex',
-      },
-      highlight: {
-        beforeHighlight: (hljs) => hljs.registerLanguage('solidity', hljsSolidity),
       },
     });
   </script>
 </body>
+
 </html>
