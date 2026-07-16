@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="sr-Latn">
+<html lang="sr-Cyrl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EIP-7702 višepotpisni novčanik — odbrana master rada</title>
+  <title>EIP-7702 вишепотписни новчаник — одбрана мастер рада</title>
 
   <link rel="stylesheet" href="lib/reveal/dist/reset.css">
   <link rel="stylesheet" href="lib/reveal/dist/reveal.css">
@@ -28,12 +28,15 @@
     .reveal ul, .reveal ol { display: block; }
     .reveal section.center { text-align: center; }
 
+    /* Foreign/technical terms inside Cyrillic prose - matches the thesis's
+       own \en{} convention (italic, kept in Latin script). */
+    .en { font-style: italic; white-space: nowrap; }
+
     .title-slide h1 { margin-bottom: 0.2em; }
-    .title-slide .subtitle { font-size: 0.6em; font-weight: normal; color: #555; }
+    .title-slide .author { font-size: 0.7em; font-weight: normal; margin-top: 1.2em; }
+    .title-slide .subtitle { font-size: 0.6em; font-weight: normal; color: #555; margin-top: 0.4em; }
     .title-slide .logos { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2em; }
-    .title-slide .logos img { height: 70px; }
-    .title-slide .meta { margin-top: 1.6em; font-size: 0.62em; text-align: left; display: inline-block; }
-    .title-slide .meta div { margin: 0.15em 0; }
+    .title-slide .logos img { height: 130px; }
 
     .two-col { display: flex; gap: 1.2em; align-items: flex-start; }
     .two-col > div { flex: 1; }
@@ -66,492 +69,38 @@
     .video-wrap { position: relative; width: 100%; max-width: 900px; margin: 0 auto; }
     .video-wrap iframe { width: 100%; height: 480px; border: 0; background: #000; }
     .video-caption { font-size: 0.55em; margin-top: 0.4em; color: #444; }
-    .video-fallback { font-size: 0.5em; margin-top: 0.6em; color: #777; }
 
     .footnote-src { font-size: 0.42em; color: #888; margin-top: 0.5em; }
-
-    .badge {
-      display: inline-block;
-      background: #2b6cb0;
-      color: white;
-      border-radius: 4px;
-      padding: 0.1em 0.5em;
-      font-size: 0.55em;
-      vertical-align: middle;
-      margin-left: 0.4em;
-    }
-
-    .todo-marker {
-      display: inline-block;
-      background: #e53e3e;
-      color: white;
-      font-weight: bold;
-      padding: 0.05em 0.5em;
-      border-radius: 3px;
-      font-size: 0.5em;
-    }
   </style>
 </head>
 <body>
   <div class="reveal">
     <div class="slides">
 
-      <!-- 1. NASLOVNA STRANA -->
+      <!-- 1. НАСЛОВНА СТРАНА -->
       <section class="title-slide center">
         <div class="logos">
-          <img src="media/univerzitet-logo.png" alt="Univerzitet u Novom Sadu">
-          <img src="media/FTN-Logo.png" alt="Fakultet tehničkih nauka">
+          <img src="media/univerzitet-logo.png" alt="Универзитет у Новом Саду">
+          <img src="media/FTN-Logo.png" alt="Факултет техничких наука">
         </div>
-        <h1>Dizajn i implementacija <span style="white-space:nowrap">EIP-7702</span>-kompatibilnog <span style="white-space:nowrap">Ethereum</span> višepotpisnog digitalnog novčanika</h1>
-        <p class="subtitle">Odbrana master rada</p>
-        <div class="meta">
-          <div><strong>Kandidat:</strong> Aleksandar Stojanović</div>
-          <div><strong>Mentor:</strong> prof. dr Dušan Gajić</div>
-          <div><strong>Fakultet tehničkih nauka, Univerzitet u Novom Sadu</strong></div>
-          <div>Novi Sad, 2026.</div>
-        </div>
+        <h1>Дизајн и имплементација <span class="en">EIP-7702</span>-компатибилног <span class="en">Ethereum</span> вишепотписног дигиталног новчаника</h1>
+        <p class="author">Александар Стојановић</p>
+        <p class="subtitle">Нови Сад, 2026.</p>
         <aside class="notes">
-          Dobar dan / poštovani komisijo. Predstaviću master rad na temu dizajna i implementacije
-          EIP-7702-kompatibilnog Ethereum višepotpisnog novčanika. Kratko: rad rešava problem
-          bezbednog, timskog upravljanja kripto sredstvima bez napuštanja standardnog Ethereum naloga.
-          Prezentacija traje oko 15 minuta.
+          Добар дан, поштована комисијо. Представићу мастер рад на тему дизајна и имплементације
+          EIP-7702-компатибилног Ethereum вишепотписног новчаника. Кратко: рад решава проблем
+          безбедног, тимског управљања крипто средствима без напуштања стандардног Ethereum налога.
+          Презентација траје око 15 минута.
         </aside>
       </section>
 
-      <!-- 2. SADRŽAJ -->
-      <section>
-        <h2>Sadržaj</h2>
-        <ol>
-          <li>Problem i motivacija</li>
-          <li>Osnove: nalozi, ugovori, višepotpisni protokoli</li>
-          <li><span style="white-space:nowrap">EIP-7702</span>: mehanizam delegacije koda</li>
-          <li>Implementacija: <code>MultiSig</code> i <code>Approver</code></li>
-          <li>Bezbednosna analiza</li>
-          <li>Demonstracija</li>
-          <li>Rezultati na <span style="white-space:nowrap">Sepolia</span> mreži</li>
-          <li>Ograničenja i zaključak</li>
-        </ol>
+      <!-- 2. ХВАЛА / ПИТАЊА -->
+      <section class="center">
+        <h1>Хвала на пажњи!</h1>
+        <p class="small">Питања?</p>
         <aside class="notes">
-          Ovo je struktura izlaganja — prati strukturu samog rada. Krećem od problema koji rad
-          rešava, prolazim kroz teorijske osnove, zatim sam mehanizam EIP-7702, moju implementaciju,
-          bezbednosnu analizu jednog suptilnog nonce problema koji sam otkrio, pa demonstraciju,
-          stvarne rezultate merenja gasa, i na kraju ograničenja i zaključak.
+          Хвала на пажњи, спреман сам за питања.
         </aside>
-      </section>
-
-      <!-- 3. PROBLEM / DOMEN PROBLEMA -->
-      <section>
-        <h2>Problem: ograničenja standardnog EOA naloga</h2>
-        <p class="small">Ethereum razlikuje dva tipa naloga: <strong>EOA</strong> (nalog u vlasništvu eksternog korisnika,
-          kontrolisan jednim privatnim ključem) i <strong>nalog pametnog ugovora</strong>.</p>
-        <ul>
-          <li><strong>Jedinstvena tačka otkaza</strong> — kompromitovanje jednog ključa kompromituje ceo nalog, bez
-            mogućnosti zaustavljanja ili opoziva.</li>
-          <li><strong>Odsustvo višepotpisne autorizacije</strong> — nije moguće zahtevati saglasnost više strana pre
-            transakcija visoke vrednosti.</li>
-          <li><strong>Loše korisničko iskustvo pri ERC-20 depozitu</strong> — standard zahteva <code>approve()</code>
-            pa tek zatim <code>transferFrom()</code> — dve transakcije, dva puta gas, dve potvrde.</li>
-        </ul>
-        <div class="research-question">
-          <strong>Istraživačko pitanje:</strong> kako obezbediti M-od-N višepotpisnu autorizaciju i atomski depozit
-          ERC-20 tokena u jednoj transakciji, a da korisnik ne napusti svoj EOA identitet i ključeve?
-        </div>
-        <aside class="notes">
-          Ovde je srž motivacije. EOA nalog nema prag saglasnosti niti mogućnost opoziva — jedan
-          kompromitovan ključ znači potpun gubitak kontrole. Drugo, ERC-20 standard iz 2015. godine
-          zahteva da korisnik prvo pošalje approve, pa tek onda druga strana može povući sredstva —
-          kod višepotpisnog novčanika to znači da korisnik dva puta plaća gas i dva puta potpisuje samo
-          da bi obavio jedan depozit. Istraživačko pitanje koje sam postavio je na ekranu — to je zapravo
-          celo predloženo rešenje u jednoj rečenici.
-        </aside>
-      </section>
-
-      <!-- 4. OSNOVE -->
-      <section>
-        <section>
-          <h2>Osnove: nalozi i pametni ugovori</h2>
-          <div class="two-col">
-            <div>
-              <h3 class="small">EOA</h3>
-              <ul class="small">
-                <li>Kontrolisan 256-bitnim privatnim ključem (<span class="small">ECDSA</span>)</li>
-                <li>Nema kod — samo prenosi vrednost</li>
-                <li>Svaka transakcija potpisana jednim ključem</li>
-              </ul>
-            </div>
-            <div>
-              <h3 class="small">Pametni ugovor</h3>
-              <ul class="small">
-                <li>Kod trajno zapisan na blokčejnu</li>
-                <li>Izvršava se determinističko na EVM-u</li>
-                <li>Objavljuje se posebnom transakcijom</li>
-              </ul>
-            </div>
-          </div>
-          <div class="callout">
-            Kripto novčanik ne čuva sredstva — ona uvek ostaju u stanju mreže. Novčanik upravlja privatnim
-            ključem i potpisuje transakcije u ime vlasnika.
-          </div>
-          <aside class="notes">
-            Kratak podsetnik za komisiju: EOA je "obični" nalog — adresa izvedena iz privatnog ključa,
-            bez ikakvog koda. Pametan ugovor ima kod koji se izvršava na Ethereum virtuelnoj mašini,
-            deterministički, na svakom čvoru mreže. WALL-ET, novčanik razvijen u ovom radu, je
-            neposrednički "vrući" novčanik implementiran kao veb ekstenzija — privatni ključ se generiše,
-            šifruje i čuva isključivo lokalno.
-          </aside>
-        </section>
-        <section>
-          <h3>Višepotpisni protokoli (M-od-N)</h3>
-          <p class="small">Transakcija se izvršava tek kada <strong>M</strong> od ukupno <strong>N</strong> ovlašćenih
-            potpisnika da saglasnost:</p>
-          <p>\[ 1 \leq M \leq N \]</p>
-          <p class="small">Tok interakcije: <code>propose</code> → <code>sign</code> → <code>execute</code>.
-            Ugovor pamti potpisnike, prag i predložene transakcije — ne postoji pojedinac sa unilateralnim
-            pristupom sredstvima.</p>
-          <aside class="notes">
-            M-od-N je standardni obrazac praga saglasnosti, poznat iz tradicionalnih finansija —
-            korporativni računi zahtevaju više potpisa. Na Ethereumu se implementira pametnim ugovorom
-            koji čuva listu potpisnika i prag M. Tok je uvek isti: neko predloži transakciju, ostali je
-            potpisuju, a kada se skupi dovoljno potpisa bilo ko može pokrenuti izvršavanje.
-          </aside>
-        </section>
-      </section>
-
-      <!-- 5. EIP-7702 MEHANIZAM -->
-      <section>
-        <section>
-          <h2>EIP-7702: delegacija koda za EOA</h2>
-          <ul class="small">
-            <li>Uveden <strong>Pectra</strong> nadogradnjom Ethereum mreže — aktivirana <strong>7. maja 2025.</strong></li>
-            <li>Novi tip transakcije — <strong>tip 4</strong> — sa poljem <code>authorization_list</code></li>
-            <li>Svako ovlašćenje: identifikator mreže, adresa ciljnog ugovora, <code>nonce</code> — potpisano
-              privatnim ključem EOA-a</li>
-            <li>EOA <strong>zadržava svoju adresu i ključeve</strong> — samo privremeno izvršava tuđi kod</li>
-          </ul>
-          <div class="callout">
-            Delegacijski označivač (<em>delegation designator</em>) upisan u kod slot EOA-a:
-            <pre style="margin-top:0.4em"><code class="language-solidity" data-trim>0xef0100 + adresa_ciljnog_ugovora (20 bajtova)</code></pre>
-            Bajt <code>0xef</code> je rezervisan kao nevažeći EVM bajtkod (EIP-3541) — ne meša se sa pravim kodom ugovora.
-          </div>
-          <aside class="notes">
-            EIP-7702 je centralni mehanizam ovog rada. Ključna razlika u odnosu na potpuni prelazak na
-            pametni ugovor (kao kod Gnosis Safe): EOA ne menja adresu niti gubi svoje ključeve. Transakcija
-            tipa 4 nosi authorization_list — svaki unos je potpisano ovlašćenje da EOA privremeno izvrši
-            kod određenog ugovora. Protokol to upisuje kao specijalnu 23-bajtnu vrednost u kod slot naloga.
-          </aside>
-        </section>
-        <section>
-          <h3 class="small">Bezbednosna svojstva delegacije</h3>
-          <ul class="small">
-            <li><strong>Zaštita od replay napada</strong> — <code>nonce</code> u ovlašćenju mora odgovarati
-              trenutnom nonce-u EOA-a</li>
-            <li><strong>Vezanost za mrežu</strong> — identifikator mreže sprečava preuzimanje ovlašćenja sa
-              testne na glavnu mrežu</li>
-            <li><strong>Kontekst izvršavanja</strong> — <code>address(this)</code> u delegiranom kodu vraća adresu
-              EOA-a, analogno <code>delegatecall</code>-u</li>
-            <li><strong>Bezstanjski ugovor</strong> — delegirani ugovor ne sme se oslanjati na sopstveni
-              <code>storage</code>, jer je EOA-ov <code>storage</code> prazan</li>
-            <li>Opoziv: nova transakcija tipa 4 sa <code>ZeroAddress</code> kao ciljem — kod slot se prazni</li>
-          </ul>
-          <aside class="notes">
-            Ovo je backup slajd, koristim ga samo ako komisija pita za detalje bezbednosti mehanizma
-            samog EIP-a (ne moje implementacije, to je posebna analiza kasnije). Dva stuba bezbednosti su
-            nonce provera protiv replay napada i chainId koji vezuje ovlašćenje za konkretnu mrežu.
-          </aside>
-        </section>
-      </section>
-
-      <!-- 6. EIP-7702 KAO UX UNAPREĐENJE -->
-      <section>
-        <h2>EIP-7702 kao unapređenje korisničkog iskustva</h2>
-        <div class="two-col">
-          <div class="center">
-            <p class="tiny"><strong>Klasičan tok</strong> — dve transakcije</p>
-            <img src="media/classic_flow.png" alt="Klasičan tok depozita ERC-20 tokena">
-          </div>
-          <div class="center">
-            <p class="tiny"><strong>EIP-7702 tok</strong> — trofazni: aktivacija, atomski depozit, opoziv</p>
-            <img src="media/eip7702_flow.png" alt="EIP-7702 tok depozita ERC-20 tokena">
-          </div>
-        </div>
-        <aside class="notes">
-          Ovo je vizuelno srce rada. Levo: korisnik mora poslati approve, sačekati potvrdu, pa tek onda
-          deposit — dve transakcije, dva potpisa, dva puta gas. Desno: korisnik jednom aktivira "pametni
-          nalog" (deleguje kod na Approver ugovor), a zatim svaki naredni depozit ide kroz jednu funkciju
-          approveAndDeposit koja atomski radi i odobrenje i prenos sredstava u jednoj transakciji. Treća
-          faza je opcioni opoziv delegacije kada korisnik želi da se vrati na običan EOA.
-        </aside>
-      </section>
-
-      <!-- 7. IMPLEMENTACIJA - ARHITEKTURA + MULTISIG -->
-      <section>
-        <h2>Implementacija — arhitektura i ugovor <code>MultiSig</code></h2>
-        <p class="small">React 18 + TypeScript + <span style="white-space:nowrap">ethers.js</span> v6 · Solidity +
-          Foundry · veb ekstenzija (Manifest V3) · bez sopstvenog servera — sva poslovna logika je u
-          ugovorima na mreži.</p>
-        <pre><code class="language-solidity" data-trim data-line-numbers="1-5|9-11|13-15">mapping(address => bool) private signers;
-uint256 public minSignatures;
-uint256 private nonce;
-mapping(bytes32 => Transaction) private transactions;
-mapping(address => mapping(bytes32 => bool)) private transactionSigners;
-
-function sign(bytes32 txHash) external onlySigner {
-    Transaction storage transaction = transactions[txHash];
-    transactionSigners[msg.sender][txHash] = true;
-    transaction.signedCount++;
-    emit Signed(txHash, msg.sender);
-}
-
-function execute(bytes32 txHash) external onlySigner {
-    require(transaction.signedCount >= minSignatures, "Not enough signatures");
-    ...
-}</code></pre>
-        <p class="tiny footnote-src">Izvor: <code>contracts/src/contracts/MultiSig.sol</code>, odeljak 3.2 rada</p>
-        <aside class="notes">
-          MultiSig ugovor se objavljuje dinamički, po jedan primerak po grupi korisnika. Bitna
-          implementaciona odluka: signers je mapiranje, ne niz — ugovor može odgovoriti "da li je adresa
-          potpisnik" ali ne i nabrojati sve potpisnike, pa to klijent mora sam da zapamti. Prolazim kroz
-          kod korak po korak: stanje ugovora, potpisivanje uz brojanje potpisa, i izvršavanje koje proverava
-          prag pre transfera sredstava.
-        </aside>
-      </section>
-
-      <!-- 8. IMPLEMENTACIJA - APPROVER + DELEGACIJA -->
-      <section>
-        <h2>Implementacija — ugovor <code>Approver</code></h2>
-        <pre><code class="language-solidity" data-trim data-line-numbers="1-6|8-13">function approveToken(address token, address spender, uint256 amount) public returns (bool) {
-    bool success = IERC20(token).approve(spender, amount);
-    require(success, "ERC-20 approval failed");
-    return true;
-}
-
-function approveAndDeposit(
-    address token, address multiSigAddress, bytes32 txHash, uint256 depositAmount
-) external {
-    this.approveToken(token, multiSigAddress, depositAmount);
-    this.depositTokenToMultiSig(multiSigAddress, txHash, depositAmount);
-}</code></pre>
-        <div class="callout small">
-          Poziv preko <code>this.</code> je ključan: kada se kod izvršava u kontekstu delegiranog EOA-a,
-          <code>address(this)</code> vraća adresu EOA-a, pa se odobrenje izdaje u ime samog korisnika.
-        </div>
-        <p class="tiny footnote-src">Izvor: <code>contracts/src/contracts/Approver.sol</code>, odeljak 3.3 rada</p>
-        <aside class="notes">
-          Approver je bezstanjski ugovor — sve podatke prima kao parametre. approveAndDeposit poziva
-          prethodne dve funkcije preko this, što je namerno: to garantuje da se address(this) razrešava
-          na adresu EOA-a u trenutku delegacije, a ne na adresu samog Approver ugovora.
-        </aside>
-      </section>
-
-      <!-- 9. BEZBEDNOSNA ANALIZA -->
-      <section>
-        <h2>Bezbednosna analiza — nonce kod samoposlate autorizacije</h2>
-        <pre><code class="language-typescript" data-trim data-line-numbers="1-2|3-6">export async function setupDelegation(signer: ethers.Wallet, targetAddress: string) {
-  const currentNonce = await signer.getNonce();
-  const auth = await signer.authorize({
-    address: targetAddress,
-    nonce: currentNonce + 1,
-  });
-  ...
-}</code></pre>
-        <p class="small">Transakcija sama troši jedan <code>nonce</code> pre nego što se ovlašćenje obradi:</p>
-        <p>\[ \texttt{nonce}_{\text{autorizacija}} = \texttt{nonce}_{\text{transakcija}} + 1 \]</p>
-        <div class="callout small">
-          Stvarna <span style="white-space:nowrap">Sepolia</span> transakcija: <code>tx.nonce = 2</code>,
-          <code>authorization.nonce = 3</code>, <code>chainId = 0xaa36a7</code>. Nakon potvrde,
-          <code>eth_getCode</code> vraća <code>0xef0100</code> + adresu <code>Approver</code> ugovora — delegacija
-          potvrđena direktno na mreži.
-        </div>
-        <aside class="notes">
-          Ovo je najosetljiviji deo implementacije i deo koji sam otkrio i ispravio tokom rada. Kada je
-          pošiljalac transakcije istovremeno i potpisnik ovlašćenja unutar nje — samoposlata transakcija —
-          protokol već uveća nonce pošiljaoca za jedan pre nego što obradi authorization_list. Zato
-          ovlašćenje mora nositi trenutni_nonce plus jedan, a ne trenutni nonce pročitan neposredno pre
-          slanja. Potvrdio sam ovo stvarnom transakcijom na Sepolia mreži: nonce transakcije je 2,
-          nonce ovlašćenja je 3, i eth_getCode nakon potvrde tačno pokazuje delegacijski označivač.
-        </aside>
-      </section>
-
-      <!-- 10. DEMO -->
-      <section>
-        <section>
-          <h2>Demo — kompletan tok</h2>
-          <div class="video-wrap">
-            <iframe data-src="https://www.youtube.com/embed/5iiDxoc7X4c" allow="autoplay; fullscreen" allowfullscreen></iframe>
-          </div>
-          <p class="video-caption">Snimak demonstrira kompletan radni tok — objavljivanje <code>MultiSig</code>
-            ugovora, predlaganje i potpisivanje transakcije, klasičan i EIP-7702 depozit, i izvršavanje — sve
-            funkcionalnosti sistema u jednom scenariju.</p>
-          <p class="video-fallback">
-            Ako se video ne učita: <a href="https://www.youtube.com/watch?v=5iiDxoc7X4c" target="_blank" rel="noopener">https://www.youtube.com/watch?v=5iiDxoc7X4c</a>
-            · lokalni fallback: <code>media/demo.mp4</code>
-            <span class="todo-marker">TODO — dodati fajl</span>
-          </p>
-          <aside class="notes">
-            Ovde puštam snimak demonstracije. Podsetnik: video pokriva CEO opseg funkcionalnosti sistema —
-            objavljivanje ugovora, propose/sign/execute tok, klasičan dvotransakcioni depozit, aktivaciju
-            EIP-7702 delegacije i objedinjeni jednotransakcioni depozit, sve na Sepolia test mreži sa
-            stvarnim transakcijama. Ako nema interneta, koristim lokalni mp4 fallback ili opisujem tok usmeno
-            uz snimke ekrana iz rada (poglavlje 4). Strelica dole vodi do rezervnog snimka sa block
-            explorer-a, u slučaju da živa prezentacija/demo ne proradi.
-          </aside>
-        </section>
-        <section>
-          <h3 class="small">Rezerva — potvrda na block explorer-u</h3>
-          <!-- TODO: replace __BLOCK_EXPLORER_VIDEO_URL__ with the YouTube embed URL, format https://www.youtube.com/embed/VIDEO_ID -->
-          <div class="video-wrap">
-            <iframe data-src="__BLOCK_EXPLORER_VIDEO_URL__" allow="autoplay; fullscreen" allowfullscreen></iframe>
-          </div>
-          <p class="video-caption">Rezervni snimak - transakcije scenarija otvorene direktno na
-            <span style="white-space:nowrap">Sepolia</span> Etherscan-u, kao nezavisna potvrda da su
-            zaista izvršene na mreži (odeljak 4.6 rada).</p>
-          <p class="video-fallback">
-            Ako se video ne učita: <span class="todo-marker">TODO</span> link ka snimku
-            <span class="todo-marker">TODO</span> · lokalni fallback: <code>media/block-explorer.mp4</code>
-            <span class="todo-marker">TODO — dodati fajl</span>
-          </p>
-          <aside class="notes">
-            Rezervni slajd - koristim ga samo ako živa prezentacija (uživo vožnja kroz ekstenziju ili
-            glavni demo video) iz nekog razloga ne proradi na licu mesta. Ovaj snimak pokazuje isti
-            scenario potvrđen nezavisno na Etherscan-u - dokaz da su transakcije zaista izvršene na
-            Sepolia mreži, bez oslanjanja na moj UI.
-          </aside>
-        </section>
-      </section>
-
-      <!-- 11. REZULTATI -->
-      <section>
-        <h2>Rezultati — merenje gasa na Sepolia mreži</h2>
-        <table class="gas-table">
-          <thead>
-            <tr><th>Scenario</th><th>Transakcija(e)</th><th>Potpisi</th><th>Ukupno gasa</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Klasičan depozit</td><td>2 (approve + deposit)</td><td>2</td><td>113.695</td></tr>
-            <tr><td>EIP-7702 depozit</td><td>1 (approveAndDeposit)</td><td>1</td><td>69.949</td></tr>
-          </tbody>
-        </table>
-        <p>\[ \frac{113{,}695 - 69{,}949}{113{,}695} \approx 38\% \]</p>
-        <p class="small">Ušteda od približno <strong>38% gasa</strong>, uz jedno umesto dva potpisivanja —
-          izmereno na stvarnim transakcijama demonstracionog scenarija (poglavlje 4 rada).</p>
-        <aside class="notes">
-          Ovo su stvarni brojevi sa Sepolia mreže, ne procena. Klasičan depozit — odvojeni approve i
-          depositToken pozivi — koštao je ukupno 113.695 gasa kroz dve transakcije. Isti depozit uz aktivnu
-          EIP-7702 delegaciju, kroz jedan poziv approveAndDeposit, koštao je 69.949 gasa. To je ušteda od
-          skoro 38 posto, uz upola manje potpisivanja i čekanja na potvrdu bloka.
-        </aside>
-      </section>
-
-      <!-- 12. OGRANIČENJA -->
-      <section>
-        <h2>Ograničenja</h2>
-        <div class="limits-grid small">
-          <div>
-            <ul>
-              <li>Testirano isključivo na <span style="white-space:nowrap">Sepolia</span> testnoj mreži</li>
-              <li>Nema nezavisnu bezbednosnu reviziju ugovora</li>
-              <li>Upravljanje ključem bez BIP-39 mnemoničkih fraza ili hardverskih novčanika</li>
-            </ul>
-          </div>
-          <div>
-            <ul>
-              <li>Fokus namerno ograničen na <code>MultiSig</code> + EIP-7702</li>
-              <li><em>Social Recovery</em> i nativni ETH tokovi van obima rada</li>
-              <li>Nema prikaz istorije transakcija (npr. Etherscan API)</li>
-            </ul>
-          </div>
-        </div>
-        <aside class="notes">
-          Bitno je da budem iskren o granicama rada. Ovo je demonstracioni sistem — pre bilo kakve
-          upotrebe na glavnoj mreži bila bi neophodna nezavisna bezbednosna revizija ugovora MultiSig i
-          Approver, kao i usklađivanje upravljanja ključem sa industrijskom praksom. Social Recovery
-          ekstenzija postoji u kodu ali je svesno van obima ovog rada jer ne uključuje EIP-7702.
-        </aside>
-      </section>
-
-      <!-- 13. ZAKLJUČAK -->
-      <section>
-        <h2>Zaključak</h2>
-        <ul class="small">
-          <li>Kombinacija M-od-N višepotpisnog ugovora i EIP-7702 delegacije rešava dva ograničenja EOA
-            naloga bez migracije identiteta</li>
-          <li>Korisnik atomski odobrava i deponuje ERC-20 tokene u jednoj transakciji, uz ~38% manje gasa</li>
-          <li>Demonstrirano stvarnim transakcijama na Sepolia mreži</li>
-        </ul>
-        <h3 class="small" style="margin-top:0.8em">Budući rad</h3>
-        <ul class="small">
-          <li>Nezavisna bezbednosna revizija, BIP-39 / hardverski novčanici</li>
-          <li>Istorija transakcija (Etherscan API), podrška za više mreža</li>
-          <li>Generalizacija EIP-7702 obrasca na druge višekorak tokove van ERC-20 depozita</li>
-        </ul>
-        <aside class="notes">
-          Za kraj — rad pokazuje da EIP-7702 može značajno unaprediti korisničko iskustvo bez potrebe za
-          potpunom migracijom naloga na pametni ugovor. Isti obrazac — objedinjavanje više uzastopnih
-          poziva u jednu transakciju putem privremenog ponašanja poput pametnog ugovora — nije ograničen
-          samo na ERC-20 depozit, već bi mogao postati opšti mehanizam za poboljšanje UX-a u širem skupu
-          Ethereum aplikacija.
-        </aside>
-      </section>
-
-      <!-- 14. HVALA / PITANJA -->
-      <section>
-        <section class="center">
-          <h1>Hvala na pažnji</h1>
-          <p class="small">Pitanja?</p>
-          <p class="tiny" style="margin-top:2em">
-            Projekat prvobitno razvijen u okviru <em>Ethereum NS</em> hackathon-a, gde su Luka Ćirić i
-            Aleksandar Stojanović osvojili prvo mesto.
-          </p>
-          <aside class="notes">
-            Hvala na pažnji, spreman sam za pitanja. Ako komisija pita za detalje koje nisam pokrio —
-            imam rezervne slajdove: dodatni klijentski kod, potpunu listu referenci i dodatne snimke
-            ekrana iz demonstracije.
-          </aside>
-        </section>
-        <section>
-          <h3 class="small">Rezerva — klijentski pozivi ugovora</h3>
-          <pre><code class="language-typescript" data-trim>// Uz aktivnu delegaciju — jedna transakcija
-const delegated = new ethers.Contract(signer.address, ApproverJson.abi, signer);
-await delegated.approveAndDeposit(tokenAddress, multiSigContract, txHash, amount, { type: 2 });
-
-// Bez delegacije — dve odvojene transakcije
-await tokenContract.approve(multiSigContract, amount);
-await multisig.depositToken(txHash, amount);</code></pre>
-          <p class="tiny footnote-src">Izvor: <code>extension/src/utils/multisig.ts</code>, odeljak 3.4 rada</p>
-          <aside class="notes">
-            Rezervni slajd — klijentska strana razlikuje dva puta do istog cilja u zavisnosti od toga da
-            li je delegacija aktivna. Zanimljivo: delegatedContract je instanciran sa adresom samog
-            signer-a, ne sa adresom Approver ugovora, jer zbog delegacije EOA sam izvršava taj kod.
-          </aside>
-        </section>
-        <section>
-          <h3 class="small">Rezerva — snimci ekrana demonstracije</h3>
-          <div class="two-col">
-            <img src="media/19_deposit_2_all_in_one_tx.png" alt="Objedinjen depozit u jednoj transakciji">
-            <img src="media/22_tx_review_executed.png" alt="Pregled uspešno izvršene transakcije">
-          </div>
-          <aside class="notes">
-            Dodatni snimci ekrana iz poglavlja 4 — levo objedinjeni depozit preko aktivne EIP-7702
-            delegacije, desno pregled uspešno izvršene transakcije nakon dostignutog kvoruma potpisa.
-          </aside>
-        </section>
-        <section>
-          <h3 class="small">Rezerva — ključne reference</h3>
-          <ul class="tiny" style="text-align:left">
-            <li>V. Buterin, "Ethereum Whitepaper", 2014.</li>
-            <li>G. Wood, "Ethereum Yellow Paper", 2024.</li>
-            <li>EIP-7702: "Set EOA account code", eips.ethereum.org, 2024.</li>
-            <li>EIP-7600: "Hardfork Meta — Pectra", eips.ethereum.org, 2025.</li>
-            <li>BIP-11: "M-of-N Standard Transactions", 2011.</li>
-            <li>Safe Ecosystem Foundation, "Safe: Smart account overview", 2023.</li>
-            <li>EIP-4337: "Account abstraction using alt mempool", 2021.</li>
-            <li>Uniswap, "Permit2 and Universal Router", 2022.</li>
-          </ul>
-          <aside class="notes">
-            Puna lista referenci nalazi se u poglavlju Literatura master rada — ovo su ključne reference
-            relevantne za pitanja o EIP-7702, Pectra nadogradnji i uporedivim rešenjima.
-          </aside>
-        </section>
       </section>
 
     </div>
@@ -581,34 +130,6 @@ await multisig.depositToken(txHash, amount);</code></pre>
       highlight: {
         beforeHighlight: (hljs) => hljs.registerLanguage('solidity', hljsSolidity),
       },
-    });
-
-    // Left click anywhere = next slide/fragment, right click = previous.
-    // Excludes reveal's own controls/progress bar, links, form controls, and
-    // the demo iframe (so video playback isn't interrupted by a stray click),
-    // and ignores clicks that end a drag (text selection).
-    const isInteractive = (target) =>
-      !!target.closest('a, button, .controls, .progress, iframe, video, input, textarea, select');
-
-    let mouseDownX = 0;
-    let mouseDownY = 0;
-    document.addEventListener('mousedown', (event) => {
-      mouseDownX = event.clientX;
-      mouseDownY = event.clientY;
-    });
-
-    document.addEventListener('click', (event) => {
-      if (event.button !== 0 || isInteractive(event.target)) return;
-      const movedX = Math.abs(event.clientX - mouseDownX);
-      const movedY = Math.abs(event.clientY - mouseDownY);
-      if (movedX > 5 || movedY > 5) return; // was a drag/selection, not a click
-      Reveal.next();
-    });
-
-    document.addEventListener('contextmenu', (event) => {
-      if (isInteractive(event.target)) return;
-      event.preventDefault();
-      Reveal.prev();
     });
   </script>
 </body>
