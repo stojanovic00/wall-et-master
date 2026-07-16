@@ -349,7 +349,7 @@ const MultisigScreen: React.FC<MultisigScreenProps> = ({
           <div className="flex-align-center-gap-8">
             <input
               list="saved-multisigs-list"
-              className="input width-340"
+              className="input flex-1 min-width-0"
               placeholder="Enter or select multisig address"
               value={customMultisig}
               onChange={(e) => {

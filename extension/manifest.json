@@ -8,7 +8,6 @@
     "activeTab"
   ],
   "action": {
-    "default_popup": "dist/popup.html",
     "default_title": "WALL-ET",
     "default_icon": {
       "16": "icons/wall-et-blue.png",

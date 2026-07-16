@@ -2,6 +2,16 @@ import { ethers } from "ethers";
 import ApproverJson from "../../contracts/Approver.json";
 import Erc20Json from "../../contracts/ERC20.json";
 
+// Deposit/execute occasionally sat unmined on Sepolia long enough to get
+// dropped (surfacing as a revert to the caller), then succeeded on a plain
+// retry - classic underpriced-tip symptom, not an actual contract failure.
+// Sepolia ETH is worthless, so there's no cost tradeoff to tipping well above
+// what's ever actually needed to guarantee prompt inclusion.
+export const GENEROUS_FEE_OVERRIDES = {
+  maxPriorityFeePerGas: ethers.parseUnits("5", "gwei"),
+  maxFeePerGas: ethers.parseUnits("50", "gwei"),
+};
+
 export async function revokeDelegation(signer: ethers.Wallet) {
   console.log("\n=== REVOKING DELEGATION ===");
 
@@ -78,7 +88,7 @@ export async function depositTokenWithDelegation(
     multiSigContract,
     txHash,
     amount,
-    { type: 2 }
+    { type: 2, ...GENEROUS_FEE_OVERRIDES }
   );
   console.log("Deposit tx:", tx.hash);
   return await tx.wait();
@@ -92,7 +102,11 @@ export async function approveTokenClassic(
 ) {
   console.log("\n=== CLASSIC APPROVE (1/2) ===");
   const tokenContract = new ethers.Contract(tokenAddress, Erc20Json.abi, signer);
-  const approveTx = await tokenContract["approve(address,uint256)"](multiSigContract, amount);
+  const approveTx = await tokenContract["approve(address,uint256)"](
+    multiSigContract,
+    amount,
+    GENEROUS_FEE_OVERRIDES
+  );
   await approveTx.wait();
   console.log("Approve confirmed:", approveTx.hash);
   return approveTx.hash;
@@ -112,7 +126,11 @@ export async function depositTokenClassic(
     ],
     signer
   );
-  const depositTx = await multisig["depositToken(bytes32,uint256)"](txHash, amount);
+  const depositTx = await multisig["depositToken(bytes32,uint256)"](
+    txHash,
+    amount,
+    GENEROUS_FEE_OVERRIDES
+  );
   await depositTx.wait();
   console.log("Deposit confirmed");
   return depositTx.hash;

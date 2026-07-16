@@ -8,6 +8,7 @@ import {
   MdLogout,
   MdOutlineSettings,
   MdOutlineHistory,
+  MdClose,
 } from "react-icons/md";
 import { useWallet } from "../providers/WalletProvider";
 
@@ -104,6 +105,13 @@ const Navbar: React.FC<{
               >
                 <MdLogout size={20} />
                 <span>Sign Out</span>
+              </button>
+              <button
+                className="burger-menu-item"
+                onClick={() => window.close()}
+              >
+                <MdClose size={20} />
+                <span>Close Window</span>
               </button>
             </div>
           </div>

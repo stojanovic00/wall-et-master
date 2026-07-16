@@ -9,7 +9,12 @@ import React, {
 import { ethers } from "ethers";
 import MultiSigJson from "../../../contracts/MultiSig.json";
 import { useWallet } from "./WalletProvider";
-import { depositTokenWithDelegation, depositTokenClassic, approveTokenClassic } from "../../utils/multisig";
+import {
+  depositTokenWithDelegation,
+  depositTokenClassic,
+  approveTokenClassic,
+  GENEROUS_FEE_OVERRIDES,
+} from "../../utils/multisig";
 import { config } from "../../config";
 
 // Ethers surfaces the on-chain revert reason (from a plain require(...,"msg"))
@@ -382,7 +387,7 @@ export const MultisigContractProvider: React.FC<
       }
 
       console.log("All pre-execution checks passed. Sending execute transaction...");
-      const tx = await contract["execute(bytes32)"](txHash);
+      const tx = await contract["execute(bytes32)"](txHash, GENEROUS_FEE_OVERRIDES);
       console.log("Execute transaction sent, hash:", tx.hash, "waiting for receipt...");
       const receipt = await tx.wait();
       console.log("Execute receipt:", receipt);

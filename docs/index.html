@@ -374,26 +374,49 @@ function approveAndDeposit(
 
       <!-- 10. DEMO -->
       <section>
-        <h2>Demo — kompletan tok</h2>
-        <!-- TODO: replace __VIDEO_EMBED_URL__ with the YouTube embed URL, format https://www.youtube.com/embed/VIDEO_ID -->
-        <div class="video-wrap">
-          <iframe data-src="__VIDEO_EMBED_URL__" allow="autoplay; fullscreen" allowfullscreen></iframe>
-        </div>
-        <p class="video-caption">Snimak demonstrira kompletan radni tok — objavljivanje <code>MultiSig</code>
-          ugovora, predlaganje i potpisivanje transakcije, klasičan i EIP-7702 depozit, i izvršavanje — sve
-          funkcionalnosti sistema u jednom scenariju.</p>
-        <p class="video-fallback">
-          Ako se video ne učita: <span class="todo-marker">TODO</span> link ka snimku —
-          <span class="todo-marker">TODO</span> · lokalni fallback: <code>media/demo.mp4</code>
-          <span class="todo-marker">TODO — dodati fajl</span>
-        </p>
-        <aside class="notes">
-          Ovde puštam snimak demonstracije. Podsetnik: video pokriva CEO opseg funkcionalnosti sistema —
-          objavljivanje ugovora, propose/sign/execute tok, klasičan dvotransakcioni depozit, aktivaciju
-          EIP-7702 delegacije i objedinjeni jednotransakcioni depozit, sve na Sepolia test mreži sa
-          stvarnim transakcijama. Ako nema interneta, koristim lokalni mp4 fallback ili opisujem tok usmeno
-          uz snimke ekrana iz rada (poglavlje 4).
-        </aside>
+        <section>
+          <h2>Demo — kompletan tok</h2>
+          <div class="video-wrap">
+            <iframe data-src="https://www.youtube.com/embed/5iiDxoc7X4c" allow="autoplay; fullscreen" allowfullscreen></iframe>
+          </div>
+          <p class="video-caption">Snimak demonstrira kompletan radni tok — objavljivanje <code>MultiSig</code>
+            ugovora, predlaganje i potpisivanje transakcije, klasičan i EIP-7702 depozit, i izvršavanje — sve
+            funkcionalnosti sistema u jednom scenariju.</p>
+          <p class="video-fallback">
+            Ako se video ne učita: <a href="https://www.youtube.com/watch?v=5iiDxoc7X4c" target="_blank" rel="noopener">https://www.youtube.com/watch?v=5iiDxoc7X4c</a>
+            · lokalni fallback: <code>media/demo.mp4</code>
+            <span class="todo-marker">TODO — dodati fajl</span>
+          </p>
+          <aside class="notes">
+            Ovde puštam snimak demonstracije. Podsetnik: video pokriva CEO opseg funkcionalnosti sistema —
+            objavljivanje ugovora, propose/sign/execute tok, klasičan dvotransakcioni depozit, aktivaciju
+            EIP-7702 delegacije i objedinjeni jednotransakcioni depozit, sve na Sepolia test mreži sa
+            stvarnim transakcijama. Ako nema interneta, koristim lokalni mp4 fallback ili opisujem tok usmeno
+            uz snimke ekrana iz rada (poglavlje 4). Strelica dole vodi do rezervnog snimka sa block
+            explorer-a, u slučaju da živa prezentacija/demo ne proradi.
+          </aside>
+        </section>
+        <section>
+          <h3 class="small">Rezerva — potvrda na block explorer-u</h3>
+          <!-- TODO: replace __BLOCK_EXPLORER_VIDEO_URL__ with the YouTube embed URL, format https://www.youtube.com/embed/VIDEO_ID -->
+          <div class="video-wrap">
+            <iframe data-src="__BLOCK_EXPLORER_VIDEO_URL__" allow="autoplay; fullscreen" allowfullscreen></iframe>
+          </div>
+          <p class="video-caption">Rezervni snimak - transakcije scenarija otvorene direktno na
+            <span style="white-space:nowrap">Sepolia</span> Etherscan-u, kao nezavisna potvrda da su
+            zaista izvršene na mreži (odeljak 4.6 rada).</p>
+          <p class="video-fallback">
+            Ako se video ne učita: <span class="todo-marker">TODO</span> link ka snimku
+            <span class="todo-marker">TODO</span> · lokalni fallback: <code>media/block-explorer.mp4</code>
+            <span class="todo-marker">TODO — dodati fajl</span>
+          </p>
+          <aside class="notes">
+            Rezervni slajd - koristim ga samo ako živa prezentacija (uživo vožnja kroz ekstenziju ili
+            glavni demo video) iz nekog razloga ne proradi na licu mesta. Ovaj snimak pokazuje isti
+            scenario potvrđen nezavisno na Etherscan-u - dokaz da su transakcije zaista izvršene na
+            Sepolia mreži, bez oslanjanja na moj UI.
+          </aside>
+        </section>
       </section>
 
       <!-- 11. REZULTATI -->
